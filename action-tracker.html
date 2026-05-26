@@ -648,6 +648,96 @@
     color: rgba(255,255,255,0.7);
     padding: 4px 6px;
   }
+  /* First-run install prompt ------------------------------------------------- */
+  .install-prompt {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 110;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 32px rgba(0,0,0,.12);
+    padding: 16px 20px;
+    transform: translateY(100%);
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+    pointer-events: none;
+  }
+  .install-prompt:not([hidden]) {
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .install-prompt[hidden] { display: block !important; } /* let CSS handle the slide */
+  .install-prompt-inner {
+    max-width: 740px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .install-prompt-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .install-prompt-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .install-prompt-text strong {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .install-prompt-text span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .install-prompt-btn {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 9px 20px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .install-prompt-btn:hover { opacity: .88; }
+  .install-prompt-safari {
+    background: var(--hover);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 9px 16px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .install-prompt-dismiss {
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 6px 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .install-prompt-dismiss:hover { color: var(--text); }
+  @media (max-width: 520px) {
+    .install-prompt-inner { flex-wrap: wrap; }
+    .install-prompt-text { width: 100%; }
+  }
+  /* ───────────────────────────────────────────────────────────────────────── */
+
   .update-banner .ub-dismiss:hover { color: #fff; background: transparent; }
   .update-banner .ub-download-btn {
     background: rgba(255,255,255,0.16);
@@ -4554,6 +4644,20 @@
   <button id="ghUpdateDismiss" class="ub-dismiss" type="button" aria-label="Dismiss">×</button>
 </div>
 
+<!-- First-run install prompt banner -->
+<div class="install-prompt" id="installPrompt" hidden role="banner">
+  <div class="install-prompt-inner">
+    <img src="icon.svg" class="install-prompt-icon" alt="OmniPad" onerror="this.style.display='none'">
+    <div class="install-prompt-text">
+      <strong>Install OmniPad</strong>
+      <span>Works offline · Opens like a native app · Your data stays private</span>
+    </div>
+    <button class="install-prompt-btn" id="installPromptBtn" type="button">Install app</button>
+    <button class="install-prompt-safari" id="installPromptSafariBtn" type="button" hidden>How to install</button>
+    <button class="install-prompt-dismiss" id="installPromptDismiss" type="button" aria-label="Not now">Not now</button>
+  </div>
+</div>
+
 <div class="search-palette" id="capturePalette" hidden role="dialog" aria-label="Quick capture">
   <div class="sp-backdrop" id="captureBackdrop"></div>
   <div class="sp-modal">
@@ -4637,90 +4741,74 @@
       <button class="btn" id="closeSupport" type="button" style="padding:4px 10px; font-size:12px;">Close</button>
     </div>
 
-    <details class="sup-section" open>
-      <summary>“localhost failed to connect” / Check for updates failed</summary>
-      <div class="sup-body">
-        <p>The PWA is bound to <code>http://localhost:8080</code>. If the local server isn't running, the app still launches from the cache, but updates and any network call will fail.</p>
-        <p><strong>Restart the server:</strong></p>
-        <pre><code>cd "C:\Users\toby.strindberg\Documents\Action_Tracker_V1_0"
-python -m http.server 8080</code></pre>
-        <p>Leave that PowerShell window open. Then in the PWA: cog → Data → <em>Check for updates</em> should report <em>Up to date</em> or <em>Update ready</em>.</p>
-        <p>If <code>python</code> isn't on your PATH, use <code>npx serve -p 8080</code> (Node.js), or VS Code's Live Server extension, or any static-file server.</p>
+    <details class=”sup-section” open>
+      <summary>Install OmniPad as an app</summary>
+      <div class=”sup-body”>
+        <p><strong>Chrome or Edge (recommended):</strong> look for the install icon <strong>⊕</strong> in the address bar — it appears as a small computer-with-arrow icon on the right side. Click it, then <em>Install</em>. OmniPad opens in its own window with no browser chrome, and gets a taskbar / Start menu shortcut.</p>
+        <p>If you don't see the icon, click the button below:</p>
+        <p><button class=”btn” id=”supportInstallBtn” type=”button”>Install OmniPad</button> <span id=”supportInstallStatus” style=”font-size:12px; color:var(--muted); margin-left:8px;”></span></p>
+        <p><strong>Safari (iPhone / Mac):</strong> tap the Share icon → <em>Add to Home Screen</em> (iPhone) or <em>Add to Dock</em> (Mac). Safari doesn't support the automatic install prompt.</p>
+        <p><strong>Already installed?</strong> Your app icon opens OmniPad in standalone mode. You can safely close this browser tab.</p>
       </div>
     </details>
 
-    <details class="sup-section">
-      <summary>Stop relying on a dev server (recommended)</summary>
-      <div class="sup-body">
-        <p>For long-term use, host the folder on a free static host so the app is always reachable without a terminal session running.</p>
+    <details class=”sup-section”>
+      <summary>Moving data from a previous install</summary>
+      <div class=”sup-body”>
+        <p>Browser storage is <strong>per origin</strong>. If you were using OmniPad from a local file (<code>file://</code>) or a different URL, your data won't appear automatically — you need to export and re-import it.</p>
         <ol>
-          <li><strong>Easiest:</strong> <a href="https://app.netlify.com/drop" target="_blank" rel="noopener noreferrer">Netlify Drop</a> — drag the project folder onto the page; you get a permanent URL.</li>
-          <li>Uninstall the localhost-bound PWA (right-click app icon → Uninstall, or Edge → Settings → Apps).</li>
-          <li>Visit the new URL in Edge, click the address-bar Install button.</li>
-          <li>Migrate your data — see “Moving data between installs” below.</li>
+          <li>Open the <strong>old</strong> version → cog → Data → <em>Export JSON</em> → save the file.</li>
+          <li>Open this version → cog → Data → <em>Import JSON</em> → pick the file → confirm.</li>
         </ol>
-        <p>Other equivalent options: GitHub Pages, Cloudflare Pages, Vercel.</p>
+        <p>After importing, use this installed app as your single home. The old tab / local file can be discarded.</p>
       </div>
     </details>
 
-    <details class="sup-section">
-      <summary>Install as a PWA</summary>
-      <div class="sup-body">
-        <p>From Chrome or Edge, visit the hosted URL (<code>http://localhost:8080</code> or your Netlify URL) and click the Install button in the address bar (a small computer-with-arrow icon). The app launches in its own window with no browser chrome.</p>
-        <p>From the file directly (<code>file://</code>), install isn't possible — the browser requires an HTTP origin. The double-clickable <code>.html</code> still works as a fallback.</p>
+    <details class=”sup-section”>
+      <summary>Getting updates</summary>
+      <div class=”sup-body”>
+        <p>OmniPad updates automatically — no action needed. When a new version is pushed to GitHub:</p>
+        <ul>
+          <li><strong>Installed app users</strong> — a green <em>”New version available”</em> banner appears at the top. Click <em>Reload to update</em>.</li>
+          <li><strong>Browser-tab users</strong> — same green banner, or force a check: cog → Data → <em>Check for updates</em>.</li>
+        </ul>
+        <p>If the app feels stuck on an old version: <strong>Ctrl+Shift+R</strong> inside the app window to hard-reload past the cache.</p>
+        <p>Version: <strong id=”supportVersionDisplay”></strong></p>
       </div>
     </details>
 
-    <details class="sup-section">
-      <summary>Moving data between installs</summary>
-      <div class="sup-body">
-        <p>Browser storage is <strong>per origin</strong>. The HTML file from disk (<code>file://</code>), <code>http://localhost</code>, and a hosted URL each have separate storage.</p>
-        <ol>
-          <li>In the version that has your latest data: cog → Data → <em>Export JSON</em>.</li>
-          <li>In the destination version: cog → Data → <em>Import JSON</em>, pick the file, confirm.</li>
-        </ol>
-        <p>After migrating, pick one (typically the installed PWA) and stick to it. Treat the others as read-only fallbacks.</p>
-      </div>
-    </details>
-
-    <details class="sup-section">
-      <summary>Updating the app after edits</summary>
-      <div class="sup-body">
-        <p>The service worker is <strong>network-first</strong> for HTML, so a normal reload of the PWA picks up your latest changes when the server is online. If a new version is detected, the green “New version available” banner appears at the top — one click to apply.</p>
-        <p>If the banner doesn't show, force it: cog → Data → <em>Check for updates</em>.</p>
-        <p>If the PWA is stuck on something old: <strong>Ctrl+Shift+R</strong> inside the app window to hard-reload past the cache.</p>
-      </div>
-    </details>
-
-    <details class="sup-section">
+    <details class=”sup-section”>
       <summary>Keyboard shortcuts</summary>
-      <div class="sup-body">
-        <ul class="kbd-list">
-          <li><span class="kbd-key">Enter</span> in the add bar — create action</li>
-          <li><span class="kbd-key">Enter</span> on a row — edit the action text</li>
-          <li><span class="kbd-key">Delete</span> on a row — delete prompt</li>
-          <li><span class="kbd-key">Click</span> status pill — next status · <span class="kbd-key">Shift+Click</span> — previous</li>
-          <li><span class="kbd-key">Ctrl+K</span> — global search · <span class="kbd-key">Ctrl+Shift+K</span> — quick capture (URL / action / note)</li>
-          <li><span class="kbd-key">Ctrl+1</span> / <span class="kbd-key">Ctrl+2</span> / <span class="kbd-key">Ctrl+3</span> — switch Actions / Notes / Links</li>
-          <li><span class="kbd-key">Ctrl+B</span> / <span class="kbd-key">Ctrl+I</span> / <span class="kbd-key">Ctrl+U</span> — bold / italic / underline in notes</li>
-          <li><span class="kbd-key">Tab</span> / <span class="kbd-key">Shift+Tab</span> in a note list — indent / outdent</li>
+      <div class=”sup-body”>
+        <ul class=”kbd-list”>
+          <li><span class=”kbd-key”>Enter</span> in the add bar — create action</li>
+          <li><span class=”kbd-key”>Enter</span> on a row — edit the action text</li>
+          <li><span class=”kbd-key”>Delete</span> on a row — delete prompt</li>
+          <li><span class=”kbd-key”>Click</span> status pill — next status · <span class=”kbd-key”>Shift+Click</span> — previous</li>
+          <li><span class=”kbd-key”>Double-click</span> a row — open full action detail card</li>
+          <li><span class=”kbd-key”>Right-click</span> a row — context menu (priority, status, due date, delete)</li>
+          <li><span class=”kbd-key”>Ctrl+K</span> — global search · <span class=”kbd-key”>Ctrl+Shift+K</span> — quick capture (URL / action / note)</li>
+          <li><span class=”kbd-key”>Ctrl+1</span> / <span class=”kbd-key”>Ctrl+2</span> / <span class=”kbd-key”>Ctrl+3</span> — switch Actions / Notes / Links</li>
+          <li><span class=”kbd-key”>Ctrl+B</span> / <span class=”kbd-key”>Ctrl+I</span> / <span class=”kbd-key”>Ctrl+U</span> — bold / italic / underline in notes</li>
+          <li><span class=”kbd-key”>Tab</span> / <span class=”kbd-key”>Shift+Tab</span> in a note list — indent / outdent</li>
         </ul>
       </div>
     </details>
 
-    <details class="sup-section">
+    <details class=”sup-section”>
       <summary>Backups &amp; data safety</summary>
-      <div class="sup-body">
+      <div class=”sup-body”>
         <p>The app takes a full snapshot once per day, kept for 14 days. Open <em>History</em> (clock icon) to browse them — restore any day, or download as JSON.</p>
-        <p>Snapshots are stored locally in the same browser. If you wipe browsing data, snapshots go with it. For real safety, export a JSON file occasionally.</p>
+        <p>Snapshots live in your browser's localStorage. For an off-device backup, export a JSON file occasionally via cog → Data → <em>Export JSON</em>.</p>
       </div>
     </details>
 
-    <details class="sup-section">
+    <details class=”sup-section”>
       <summary>About &amp; privacy</summary>
-      <div class="sup-body">
-        <p>Action Tracker is a local-first PWA. Everything — actions, notes, projects, comments, backups — lives in your browser's localStorage on this device. Nothing is sent to a server.</p>
-        <p>The only network calls are to the origin that serves the app (for updates). No telemetry, no analytics.</p>
+      <div class=”sup-body”>
+        <p>OmniPad is a local-first PWA hosted on GitHub Pages. Everything — actions, notes, projects, comments, backups — lives in your browser's localStorage on this device. Nothing is sent to a server.</p>
+        <p>The only network calls are to GitHub (to serve the app and check for new versions). No telemetry, no analytics, no accounts.</p>
+        <p><a href=”https://github.com/tobystracc/Omnipad” target=”_blank” rel=”noopener”>View source on GitHub →</a></p>
       </div>
     </details>
   </div>
@@ -13203,6 +13291,123 @@ python -m http.server 8080</code></pre>
   // Check 3 s after load so it never blocks startup
   setTimeout(checkGitHubVersion, 3000);
   // ─────────────────────────────────────────────────────────────────────────────
+
+  // ===== PWA Install Prompt ====================================================
+  const INSTALL_DISMISSED_KEY = 'omnipad_installDismissed';
+  let deferredInstallPrompt = null;
+
+  function isRunningStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.matchMedia('(display-mode: fullscreen)').matches ||
+           navigator.standalone === true;
+  }
+
+  function maybeShowInstallPrompt() {
+    if (isRunningStandalone()) return;   // already installed
+    const dismissed = localStorage.getItem(INSTALL_DISMISSED_KEY);
+    if (dismissed === 'permanent') return;
+    if (dismissed) {
+      const ts = parseInt(dismissed, 10);
+      if (!isNaN(ts) && Date.now() - ts < 3 * 24 * 60 * 60 * 1000) return; // snooze 3 days
+    }
+    const prompt = document.getElementById('installPrompt');
+    const installBtn = document.getElementById('installPromptBtn');
+    const safariBtn  = document.getElementById('installPromptSafariBtn');
+    if (!prompt) return;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (deferredInstallPrompt) {
+      installBtn.removeAttribute('hidden');
+      safariBtn.setAttribute('hidden', '');
+    } else if (isSafari) {
+      installBtn.setAttribute('hidden', '');
+      safariBtn.removeAttribute('hidden');
+    } else {
+      // Browser doesn't support install prompt and isn't Safari — skip
+      return;
+    }
+    prompt.removeAttribute('hidden');
+  }
+
+  function hideInstallPrompt(permanent) {
+    const prompt = document.getElementById('installPrompt');
+    if (prompt) prompt.setAttribute('hidden', '');
+    localStorage.setItem(INSTALL_DISMISSED_KEY, permanent ? 'permanent' : Date.now().toString());
+  }
+
+  // Capture the browser's install event before it fires
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    // Show the prompt if the panel hasn't been dismissed
+    maybeShowInstallPrompt();
+  });
+
+  // Hide permanently once installed
+  window.addEventListener('appinstalled', () => {
+    hideInstallPrompt(true);
+  });
+
+  // Wire buttons
+  const installPromptBtn = document.getElementById('installPromptBtn');
+  if (installPromptBtn) {
+    installPromptBtn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      if (outcome === 'accepted') hideInstallPrompt(true);
+    });
+  }
+
+  const installPromptSafariBtn = document.getElementById('installPromptSafariBtn');
+  if (installPromptSafariBtn) {
+    installPromptSafariBtn.addEventListener('click', () => {
+      // Open support panel at the install section
+      const panel = document.getElementById('supportPanel');
+      if (panel) { panel.hidden = false; syncToolbarStates(); }
+      hideInstallPrompt(false);
+    });
+  }
+
+  const installPromptDismiss = document.getElementById('installPromptDismiss');
+  if (installPromptDismiss) {
+    installPromptDismiss.addEventListener('click', () => hideInstallPrompt(false));
+  }
+
+  // Wire the "Install OmniPad" button inside the support panel
+  const supportInstallBtn = document.getElementById('supportInstallBtn');
+  if (supportInstallBtn) {
+    supportInstallBtn.addEventListener('click', async () => {
+      const status = document.getElementById('supportInstallStatus');
+      if (isRunningStandalone()) {
+        if (status) status.textContent = '✓ Already running as installed app.';
+        return;
+      }
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        if (outcome === 'accepted') {
+          hideInstallPrompt(true);
+          if (status) status.textContent = '✓ Installed!';
+        } else {
+          if (status) status.textContent = 'Install cancelled.';
+        }
+      } else {
+        if (status) status.textContent = isRunningStandalone()
+          ? '✓ Already installed.'
+          : 'Use the ⊕ icon in the address bar, or try Chrome / Edge.';
+      }
+    });
+  }
+
+  // Wire version display in support panel
+  const supportVersionDisplay = document.getElementById('supportVersionDisplay');
+  if (supportVersionDisplay) supportVersionDisplay.textContent = APP_VERSION;
+
+  // Show the install prompt on load (after a brief delay so the page settles)
+  setTimeout(maybeShowInstallPrompt, 1500);
+  // ============================================================================
 
   // ===== Action Detail Modal =====
   let modalActionId = null;
