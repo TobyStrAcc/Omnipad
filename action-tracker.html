@@ -8008,6 +8008,9 @@ python -m http.server 8080</code></pre>
           ones: Array.isArray(parsed.ones) ? parsed.ones : [],
           cribRounds: Array.isArray(parsed.cribRounds) ? parsed.cribRounds : [],
           cribActiveRoundId: parsed.cribActiveRoundId || null,
+          collapsedProjectIds: Array.isArray(parsed.collapsedProjectIds) ? parsed.collapsedProjectIds : [],
+          streak: parsed.streak || { current: 0, longest: 0, lastCompletionDate: null },
+          lastFirstCompletionDate: parsed.lastFirstCompletionDate || null,
           settings: parsed.settings || { sortAsc: true },
           counters: parsed.counters || {
             nextActionNumber: Math.max(0, ...parsed.actions.map(a=>a.number||0)) + 1,
