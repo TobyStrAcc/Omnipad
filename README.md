@@ -4,7 +4,7 @@ A focused action-tracker and workspace PWA. Single HTML file, no dependencies, w
 
 ## Use it (no setup needed)
 
-Visit **`https://YOUR_USER.github.io/omnipad/`** in Chrome or Edge.
+Visit **`https://tobystracc.github.io/Omnipad/`** in Chrome or Edge.
 
 Click the install icon in the address bar → installs as a standalone app with its own taskbar icon. Your data stays entirely in your own browser — nothing is shared or sent anywhere.
 
@@ -16,10 +16,10 @@ Click the install icon in the address bar → installs as a standalone app with 
 
 1. Click **Fork** (top-right of this page) — this creates your own copy of the repo
 2. In your fork: **Settings → Pages → Source: Deploy from branch → `main` → `/ (root)` → Save**
-3. Wait ~60 seconds, then visit `https://YOUR_GITHUB_USERNAME.github.io/omnipad/`
+3. Wait ~60 seconds, then visit `https://YOUR_GITHUB_USERNAME.github.io/Omnipad/`
 4. Open `action-tracker.html`, find the line:
    ```
-   const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/YOUR_USER/omnipad/main';
+   const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/YOUR_USER/Omnipad/main';
    ```
    Replace `YOUR_USER` with your GitHub username, commit, and push.
 
