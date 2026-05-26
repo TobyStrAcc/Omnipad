@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '/<script>|<script type=\"text\\\\/javascript\">/{p=1; next} /<\\\\/script>/{p=0} p' C:/Users/toby.strindberg/Documents/Action_Tracker_V1_0/action-tracker.html)",
+      "Read(//tmp/**)",
+      "Bash(node -c /tmp/at-script.js)",
+      "Bash(awk 'BEGIN{o=0;c=0} {for\\(i=1;i<=length\\($0\\);i++\\){ch=substr\\($0,i,1\\); if\\(ch==\"{\"\\)o++; else if\\(ch==\"}\"\\)c++}} END{print \"open=\",o,\"close=\",c,\"diff=\",o-c}' /tmp/at-script.js)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\toby.strindberg\\\\Documents\\\\Action_Tracker_V1_0\" -Force)",
+      "Bash(Select-Object Name, Length, LastWriteTime)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(@\\(\\(Get-Content \"C:\\\\Users\\\\toby.strindberg\\\\Documents\\\\Action_Tracker_V1_0\\\\action-tracker.html\" | Measure-Object -Line\\).Lines\\))",
+      "PowerShell(\\(Get-Item \"C:\\\\Users\\\\toby.strindberg\\\\Documents\\\\Action_Tracker_V1_0\\\\action-tracker.html\"\\).Length)",
+      "Bash(mv \"C:\\\\Users\\\\toby.strindberg\\\\.claude\\\\plans\\\\redploy-this-plan-from-elegant-dove.md\" \"C:\\\\Users\\\\toby.strindberg\\\\.claude\\\\plans\\\\GitHub-deployment-plan.md\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const html=fs.readFileSync\\('C:/Users/toby.strindberg/Documents/Action_Tracker_V1_0/action-tracker.html','utf8'\\);const scripts=[...html.matchAll\\(/<script\\(?![^>]*src=\\)[^>]*>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)].map\\(m=>m[1]\\);console.log\\('inline script blocks:',scripts.length\\);scripts.forEach\\(\\(s,i\\)=>{try{new Function\\(s\\);console.log\\('block',i,'OK \\('+s.length+' chars\\)'\\)}catch\\(e\\){console.log\\('block',i,'PARSE ERROR:',e.message\\)}}\\)\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\toby.strindberg\\\\Documents\\\\Action_Tracker_V1_0\" -Recurse -File)",
+      "Bash(Select-Object FullName, Length)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\toby.strindberg\\\\Documents\\\\Action_Tracker_V1_0\" -Recurse -File | Select-Object @{Name=\"Name\";Expression={$_.Name}}, @{Name=\"Size \\(bytes\\)\";Expression={$_.Length}} | Format-Table -AutoSize)",
+      "PowerShell(@\\(Select-String -Path \"C:\\\\Users\\\\toby.strindberg\\\\Documents\\\\Action_Tracker_V1_0\\\\action-tracker.html\" -Pattern \"VERSION|GITHUB|fetch\\\\\\(\" -Context 1 -ErrorAction SilentlyContinue\\) | Select-Object -First 40)",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\toby.strindberg\\\\Documents\\\\Action_Tracker_V1_0\\\\action-tracker.html\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(head -5)"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "OmniPad",
+  "short_name": "OmniPad",
+  "description": "Local-first productivity pad. All data stays on your device.",
+  "start_url": "./action-tracker.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fafaf9",
+  "theme_color": "#18181b",
+  "lang": "en-GB",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

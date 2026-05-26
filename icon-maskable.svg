@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="mbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7a4a"/>
+      <stop offset="100%" stop-color="#f59342"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#mbg)"/>
+  <!-- centred clipboard, smaller to fit safe area -->
+  <rect x="170" y="172" width="200" height="220" rx="20" fill="#fcefe1"/>
+  <rect x="226" y="148" width="88" height="44" rx="10" fill="#a02a23"/>
+  <circle cx="270" cy="170" r="6" fill="#fcefe1"/>
+  <circle cx="216" cy="232" r="16" fill="#ff6a3d"/>
+  <polyline points="208,232 214,238 224,224" fill="none" stroke="#fcefe1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="246" y="226" width="98" height="12" rx="6" fill="#3b1f1c"/>
+  <circle cx="216" cy="290" r="16" fill="#ff6a3d"/>
+  <polyline points="208,290 214,296 224,282" fill="none" stroke="#fcefe1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="246" y="284" width="98" height="12" rx="6" fill="#3b1f1c"/>
+  <circle cx="216" cy="348" r="16" fill="none" stroke="#ff6a3d" stroke-width="4"/>
+  <rect x="246" y="342" width="78" height="12" rx="6" fill="#3b1f1c"/>
+</svg>
