@@ -959,17 +959,53 @@
     padding: 0 2px; border-radius: 4px;
   }
   .cu-close:hover { color: var(--text); background: var(--hover); }
-  .cu-card {
-    padding: 22px 24px 16px;
-    min-height: 140px;
+  .cu-undo {
+    display: inline-flex; align-items: center;
+    background: var(--hover); border: 1px solid var(--border);
+    border-radius: 999px; cursor: pointer;
+    font: inherit; font-size: 11px; font-weight: 600;
+    color: var(--muted); padding: 3px 10px 3px 8px;
   }
-  .cu-action-desc {
+  .cu-undo:hover { color: var(--text); border-color: var(--muted-2); }
+  .cu-undo[hidden] { display: none; }
+  .cu-scope {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    padding: 12px 20px 0;
+  }
+  .cu-scope-btn {
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 999px; cursor: pointer;
+    font: inherit; font-size: 11px; font-weight: 600;
+    color: var(--muted); padding: 4px 12px;
+    transition: background .1s, color .1s, border-color .1s;
+  }
+  .cu-scope-btn:hover { background: var(--hover); color: var(--text); }
+  .cu-scope-btn.active {
+    background: #7c3aed; border-color: #7c3aed; color: #fff;
+  }
+  .cu-scope-btn[hidden] { display: none; }
+  .cu-card {
+    padding: 16px 24px 16px;
+    min-height: 150px;
+  }
+  .cu-title-edit {
+    width: 100%; box-sizing: border-box;
     font-size: 18px; font-weight: 600; color: var(--text);
     line-height: 1.4; margin-bottom: 14px;
+    border: 1px solid transparent; border-radius: 10px;
+    background: transparent; resize: none;
+    padding: 8px 10px; font-family: inherit;
+    transition: background .12s, border-color .12s;
+  }
+  .cu-title-edit:hover { background: var(--hover); }
+  .cu-title-edit:focus {
+    outline: none; background: var(--surface);
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124,58,237,.12);
   }
   .cu-meta {
     display: flex; flex-wrap: wrap; gap: 7px;
-    align-items: center; margin-bottom: 8px;
+    align-items: center; margin-bottom: 12px;
   }
   .cu-pill {
     display: inline-flex; align-items: center; gap: 5px;
@@ -981,6 +1017,39 @@
   .cu-pill-project { background: color-mix(in srgb, var(--proj-color, #888) 15%, transparent); border-color: color-mix(in srgb, var(--proj-color, #888) 30%, transparent); color: var(--proj-color, #888); }
   .cu-pill-days { color: var(--muted); }
   .cu-subtasks { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  /* Editable rows: due + project */
+  .cu-edit-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 10px; flex-wrap: wrap;
+  }
+  .cu-edit-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--muted-2);
+    width: 52px; flex-shrink: 0;
+  }
+  .cu-quick-btn {
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer;
+    font: inherit; font-size: 12px; color: var(--muted);
+    padding: 5px 11px; transition: background .1s, color .1s, border-color .1s;
+  }
+  .cu-quick-btn:hover { background: var(--hover); color: var(--text); }
+  .cu-quick-btn.active {
+    background: var(--accent-soft, rgba(234,88,12,.12));
+    border-color: var(--accent); color: var(--accent); font-weight: 600;
+  }
+  .cu-quick-btn.clear { color: var(--muted-2); }
+  .cu-quick-btn.clear:hover { color: var(--danger); border-color: var(--danger); }
+  .cu-due-current {
+    font-size: 12px; color: var(--muted); margin-left: 2px;
+  }
+  .cu-project-select {
+    font: inherit; font-size: 12px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text);
+    padding: 5px 8px; cursor: pointer;
+  }
+  .cu-project-select:focus { outline: none; border-color: #7c3aed; }
   .cu-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -5310,7 +5379,17 @@
           Clean Up
         </span>
         <span class="cu-progress" id="cuProgress">0 of 0</span>
+        <button class="cu-undo" id="cuUndo" type="button" title="Undo last change (Ctrl+Z)" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:3px;"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          Undo
+        </button>
         <button class="cu-close" id="cleanupClose" type="button" aria-label="Exit clean up">×</button>
+      </div>
+      <div class="cu-scope" id="cuScope">
+        <button class="cu-scope-btn active" data-scope="all" type="button">All open</button>
+        <button class="cu-scope-btn" data-scope="stale" type="button">Stale</button>
+        <button class="cu-scope-btn" data-scope="overdue" type="button">Overdue</button>
+        <button class="cu-scope-btn" data-scope="project" id="cuScopeProject" type="button" hidden>This project</button>
       </div>
       <div class="cu-card" id="cuCard">
         <!-- populated by JS -->
@@ -5341,7 +5420,7 @@
           Delete
         </button>
       </div>
-      <div class="cu-hint">← Back &nbsp;·&nbsp; Space / → Skip &nbsp;·&nbsp; Enter Complete &nbsp;·&nbsp; Esc Exit</div>
+      <div class="cu-hint">← Back &nbsp;·&nbsp; Space / → Skip &nbsp;·&nbsp; Enter Complete &nbsp;·&nbsp; Ctrl+Z Undo &nbsp;·&nbsp; Esc Exit</div>
     </div>
   </div>
 
@@ -6214,30 +6293,63 @@
   }
 
   // ===== Clean Up Mode =========================================================
-  let cleanupQueue = [];   // action ids to review
-  let cleanupIdx   = 0;    // current position in queue
+  let cleanupQueue   = [];   // action ids to review
+  let cleanupIdx     = 0;    // current position in queue
   let cleanupSkipped = new Set(); // ids skipped this session
+  let cleanupScope   = 'all'; // 'all' | 'stale' | 'overdue' | 'project'
+  let cleanupScopeProject = null; // projectId captured when 'project' scope chosen
+  let cleanupUndo    = [];   // stack of { type:'mutate'|'delete', snapshot, idx }
+  let cuTitleSnapshot = null; // pre-edit action copy while title textarea focused
 
   function buildCleanupQueue() {
-    // All non-complete visible actions, oldest first
+    const staleDays = state.settings.staleDays || 5;
+    const todayK = dateKey(new Date());
     return getVisibleActions()
       .filter(a => a.status !== 'Complete')
+      .filter(a => {
+        if (cleanupScope === 'stale') {
+          const days = Math.floor((Date.now() - new Date(a.addedAt).getTime()) / 86400000);
+          return days > staleDays;
+        }
+        if (cleanupScope === 'overdue') {
+          return a.dueAt && daysBetweenKeys(todayK, a.dueAt) < 0;
+        }
+        if (cleanupScope === 'project') {
+          return cleanupScopeProject != null && a.projectId === cleanupScopeProject;
+        }
+        return true; // 'all'
+      })
       .map(a => a.id);
   }
 
+  function rebuildCleanupQueue() {
+    cleanupQueue = buildCleanupQueue();
+    cleanupIdx = 0;
+    cleanupSkipped.clear();
+    cleanupUndo = [];
+    renderCleanupUndo();
+    if (cleanupQueue.length === 0) renderCleanupDone();
+    else renderCleanupCard();
+  }
+
   function startCleanup() {
+    cleanupScope = 'all';
+    cleanupScopeProject = null;
     cleanupQueue  = buildCleanupQueue();
     cleanupIdx    = 0;
     cleanupSkipped.clear();
+    cleanupUndo = [];
     const overlay = document.getElementById('cleanupOverlay');
     if (!overlay) return;
+    overlay.removeAttribute('hidden'); // un-hide first so the title textarea can measure its height
+    document.getElementById('cleanupChip').classList.add('active');
+    renderCleanupScope();
+    renderCleanupUndo();
     if (cleanupQueue.length === 0) {
       renderCleanupDone();
     } else {
       renderCleanupCard();
     }
-    overlay.removeAttribute('hidden');
-    document.getElementById('cleanupChip').classList.add('active');
   }
 
   function closeCleanup() {
@@ -6245,6 +6357,44 @@
     if (overlay) overlay.setAttribute('hidden', '');
     const chip = document.getElementById('cleanupChip');
     if (chip) chip.classList.remove('active');
+  }
+
+  function setCleanupScope(scope) {
+    if (scope === 'project') {
+      // capture the current card's project so the sweep narrows to it
+      const cur = state.actions.find(a => a.id === cleanupQueue[cleanupIdx]);
+      if (cur) cleanupScopeProject = cur.projectId;
+    }
+    cleanupScope = scope;
+    renderCleanupScope();
+    rebuildCleanupQueue();
+  }
+
+  function renderCleanupScope() {
+    document.querySelectorAll('.cu-scope-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.scope === cleanupScope);
+    });
+    // "This project" only meaningful while there's a current action with a project
+    const projBtn = document.getElementById('cuScopeProject');
+    if (projBtn) {
+      const cur = state.actions.find(a => a.id === cleanupQueue[cleanupIdx]);
+      const proj = cur ? state.projects.find(p => p.id === cur.projectId) : null;
+      if (cleanupScope === 'project' && cleanupScopeProject != null) {
+        const sp = state.projects.find(p => p.id === cleanupScopeProject);
+        projBtn.hidden = false;
+        projBtn.textContent = sp ? sp.name : 'This project';
+      } else if (proj) {
+        projBtn.hidden = false;
+        projBtn.textContent = 'This project';
+      } else {
+        projBtn.hidden = true;
+      }
+    }
+  }
+
+  function renderCleanupUndo() {
+    const btn = document.getElementById('cuUndo');
+    if (btn) btn.hidden = cleanupUndo.length === 0;
   }
 
   function renderCleanupProgress() {
@@ -6259,21 +6409,34 @@
     const card = document.getElementById('cuCard');
     const btns = document.getElementById('cuActions');
     const hint = document.querySelector('.cu-hint');
+    const scope = document.getElementById('cuScope');
     if (!card) return;
     const action = state.actions.find(a => a.id === cleanupQueue[cleanupIdx]);
     if (!action) { cleanupAdvance(1); return; }
     const project = state.projects.find(p => p.id === action.projectId);
     const daysOld = Math.floor((Date.now() - new Date(action.addedAt).getTime()) / 86400000);
-    const subtasks = Array.isArray(action.subtasks) ? action.subtasks : [];
-    const doneSubs = subtasks.filter(s => s.done).length;
+    const comments = Array.isArray(action.comments) ? action.comments : [];
+    const doneSubs = comments.filter(c => c.done).length;
+    const todayK = dateKey(new Date());
 
     const statusColour = { Open: '#94a3b8', 'In Progress': '#3b82f6', Blocked: '#f97316', Complete: '#22c55e' };
     const priColour    = { High: '#ef4444', Medium: '#f97316', Low: '#22c55e' };
 
+    // Due quick-set state
+    const tomorrowK  = dateKey(new Date(Date.now() + 86400000));
+    const nextWeekK  = dateKey(new Date(Date.now() + 7 * 86400000));
+    const dueK = action.dueAt || null;
+    const dueDiff = dueK ? daysBetweenKeys(todayK, dueK) : null;
+    let dueLabel = '';
+    if (dueK) {
+      if (dueDiff < 0) dueLabel = `${-dueDiff}d overdue`;
+      else if (dueDiff === 0) dueLabel = 'today';
+      else dueLabel = fmtDueLabel(dueK, dueDiff);
+    }
+
     card.innerHTML = `
-      <div class="cu-action-desc">${action.description || '<em style="color:var(--muted)">No description</em>'}</div>
+      <textarea class="cu-title-edit" id="cuTitleEdit" rows="1" placeholder="Describe this action…" spellcheck="true"></textarea>
       <div class="cu-meta">
-        ${project ? `<span class="cu-pill cu-pill-project" style="--proj-color:${project.colour}">${project.name}</span>` : ''}
         <span class="cu-pill" style="color:${priColour[action.priority]||'var(--muted)'};border-color:${priColour[action.priority]||'var(--border)'}">
           ${action.priority || 'Medium'}
         </span>
@@ -6281,10 +6444,68 @@
           ${action.status || 'Open'}
         </span>
         <span class="cu-pill cu-pill-days">${daysOld === 0 ? 'Today' : daysOld + 'd old'}</span>
-        ${action.coname ? `<span class="cu-pill">With: ${action.coname}</span>` : ''}
+        ${action.coName ? `<span class="cu-pill">With: ${escapeHtml(action.coName)}</span>` : ''}
+        ${comments.length ? `<span class="cu-pill">Subtasks ${doneSubs}/${comments.length}</span>` : ''}
       </div>
-      ${subtasks.length ? `<div class="cu-subtasks">Subtasks: ${doneSubs}/${subtasks.length} done</div>` : ''}
+      <div class="cu-edit-row">
+        <span class="cu-edit-label">Due</span>
+        <button class="cu-quick-btn ${dueK === todayK ? 'active' : ''}" data-due="today" type="button">Today</button>
+        <button class="cu-quick-btn ${dueK === tomorrowK ? 'active' : ''}" data-due="tomorrow" type="button">Tomorrow</button>
+        <button class="cu-quick-btn ${dueK === nextWeekK ? 'active' : ''}" data-due="week" type="button">Next week</button>
+        <button class="cu-quick-btn clear" data-due="clear" type="button" ${dueK ? '' : 'disabled style="opacity:.4;cursor:default"'}>Clear</button>
+        ${dueLabel ? `<span class="cu-due-current">${dueLabel}</span>` : ''}
+      </div>
+      <div class="cu-edit-row">
+        <span class="cu-edit-label">Project</span>
+        <select class="cu-project-select" id="cuProjectSelect">
+          ${state.projects.map(p => `<option value="${p.id}" ${p.id === action.projectId ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('')}
+        </select>
+      </div>
     `;
+
+    // Title textarea — auto-grow + edit (does NOT advance the queue)
+    const ta = card.querySelector('#cuTitleEdit');
+    if (ta) {
+      ta.value = action.description || '';
+      const grow = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
+      grow();
+      requestAnimationFrame(grow); // re-measure once laid out
+      ta.addEventListener('input', () => { action.description = ta.value; save(); grow(); });
+      ta.addEventListener('focus', () => { cuTitleSnapshot = JSON.parse(JSON.stringify(action)); });
+      ta.addEventListener('blur', () => {
+        if (cuTitleSnapshot && cuTitleSnapshot.description !== action.description) {
+          cleanupUndo.push({ type: 'mutate', snapshot: cuTitleSnapshot, idx: cleanupIdx });
+          renderCleanupUndo();
+        }
+        cuTitleSnapshot = null;
+      });
+    }
+
+    // Due quick-set buttons
+    card.querySelectorAll('.cu-quick-btn[data-due]').forEach(b => {
+      b.addEventListener('click', () => {
+        const map = { today: todayK, tomorrow: tomorrowK, week: nextWeekK, clear: null };
+        const newDue = map[b.dataset.due];
+        if (b.dataset.due === 'clear' && !action.dueAt) return;
+        pushCleanupUndo(action);
+        action.dueAt = newDue;
+        save();
+        renderCleanupCard();
+      });
+    });
+
+    // Project select
+    const sel = card.querySelector('#cuProjectSelect');
+    if (sel) {
+      sel.addEventListener('change', () => {
+        const newId = Number(sel.value);
+        if (newId === action.projectId) return;
+        pushCleanupUndo(action);
+        action.projectId = newId;
+        save();
+        renderCleanupCard();
+      });
+    }
 
     // show/hide High Priority button based on current priority
     const highBtn = document.getElementById('cuHighPriority');
@@ -6292,6 +6513,8 @@
 
     if (btns) btns.style.display = '';
     if (hint) hint.style.display = '';
+    if (scope) scope.style.display = '';
+    renderCleanupScope();
     renderCleanupProgress();
   }
 
@@ -6300,17 +6523,32 @@
     const btns = document.getElementById('cuActions');
     const hint = document.querySelector('.cu-hint');
     const prog = document.getElementById('cuProgress');
-    if (card) card.innerHTML = `<div class="cu-done-msg"><strong>All done ✓</strong>No more open actions to review.</div>`;
+    const scopeMsg = {
+      all: 'No more open actions to review.',
+      stale: 'No stale actions left.',
+      overdue: 'Nothing overdue. Nice.',
+      project: 'No open actions in this project.'
+    };
+    if (card) card.innerHTML = `<div class="cu-done-msg"><strong>All done ✓</strong>${scopeMsg[cleanupScope] || scopeMsg.all}</div>`;
     if (btns) btns.style.display = 'none';
     if (hint) hint.style.display = 'none';
     if (prog) prog.textContent = 'Done';
+    renderCleanupScope();
+  }
+
+  // Snapshot the action before a mutation so it can be reverted
+  function pushCleanupUndo(action) {
+    cleanupUndo.push({ type: 'mutate', snapshot: JSON.parse(JSON.stringify(action)), idx: cleanupIdx });
+    renderCleanupUndo();
   }
 
   function cleanupApply(updates) {
     const id = cleanupQueue[cleanupIdx];
     const action = state.actions.find(a => a.id === id);
-    if (action && updates) Object.assign(action, updates);
-    if (updates && updates.status === 'Complete' && action) {
+    if (!action) { cleanupAdvance(1); return; }
+    pushCleanupUndo(action);
+    if (updates) Object.assign(action, updates);
+    if (updates && updates.status === 'Complete') {
       action.completedAt = new Date().toISOString();
     }
     save();
@@ -6319,6 +6557,10 @@
 
   function cleanupDelete() {
     const id = cleanupQueue[cleanupIdx];
+    const action = state.actions.find(a => a.id === id);
+    if (!action) return;
+    cleanupUndo.push({ type: 'delete', snapshot: JSON.parse(JSON.stringify(action)), idx: cleanupIdx });
+    renderCleanupUndo();
     state.actions = state.actions.filter(a => a.id !== id);
     cleanupQueue.splice(cleanupIdx, 1);
     save();
@@ -6328,6 +6570,37 @@
       if (cleanupIdx >= cleanupQueue.length) cleanupIdx = 0;
       renderCleanupCard();
     }
+  }
+
+  function cleanupUndoLast() {
+    const entry = cleanupUndo.pop();
+    if (!entry) return;
+    renderCleanupUndo();
+    if (entry.type === 'delete') {
+      // re-add the action and re-insert into the queue at its old position
+      state.actions.push(entry.snapshot);
+      const pos = Math.min(entry.idx, cleanupQueue.length);
+      cleanupQueue.splice(pos, 0, entry.snapshot.id);
+      cleanupIdx = pos;
+    } else {
+      // restore prior field values wholesale
+      const live = state.actions.find(a => a.id === entry.snapshot.id);
+      if (live) {
+        Object.keys(live).forEach(k => { if (!(k in entry.snapshot)) delete live[k]; });
+        Object.assign(live, entry.snapshot);
+      } else {
+        state.actions.push(entry.snapshot);
+      }
+      // make sure the restored action is in the queue and focused
+      if (!cleanupQueue.includes(entry.snapshot.id)) {
+        const pos = Math.min(entry.idx, cleanupQueue.length);
+        cleanupQueue.splice(pos, 0, entry.snapshot.id);
+      }
+      cleanupIdx = cleanupQueue.indexOf(entry.snapshot.id);
+    }
+    cleanupSkipped.delete(entry.snapshot.id);
+    save();
+    renderCleanupCard();
   }
 
   function cleanupAdvance(delta) {
@@ -6353,6 +6626,13 @@
   function handleCleanupKey(e) {
     const overlay = document.getElementById('cleanupOverlay');
     if (!overlay || overlay.hidden) return;
+    // Don't hijack typing in the title editor / project select
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT' || ae.tagName === 'SELECT' || ae.isContentEditable)) {
+      if (e.key === 'Escape') { e.preventDefault(); ae.blur(); }
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); cleanupUndoLast(); return; }
     if (e.key === 'Escape')  { e.preventDefault(); closeCleanup(); }
     if (e.key === 'Enter')   { e.preventDefault(); cleanupApply({ status: 'Complete' }); }
     if (e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); cleanupAdvance(1); }
@@ -10046,6 +10326,11 @@
   if (cuSkipBtn) cuSkipBtn.addEventListener('click', () => cleanupAdvance(1));
   const cuDeleteBtn = document.getElementById('cuDelete');
   if (cuDeleteBtn) cuDeleteBtn.addEventListener('click', cleanupDelete);
+  const cuUndoBtn = document.getElementById('cuUndo');
+  if (cuUndoBtn) cuUndoBtn.addEventListener('click', cleanupUndoLast);
+  document.querySelectorAll('.cu-scope-btn').forEach(b => {
+    b.addEventListener('click', () => setCleanupScope(b.dataset.scope));
+  });
   const matrixChipEl = document.getElementById('matrixChip');
   if (matrixChipEl) matrixChipEl.addEventListener('click', () => {
     const cur = (state.settings && state.settings.actionsViewMode) || 'list';
