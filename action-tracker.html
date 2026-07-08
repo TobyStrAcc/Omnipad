@@ -10588,6 +10588,12 @@
     renderLinksView();
   }
 
+  // Clipboard text for "Copy name + URL": title on the first line, URL on the second.
+  function linkNameAndUrl(link) {
+    const name = (link.title || '').trim();
+    return name ? `${name}\n${link.url}` : link.url;
+  }
+
   // Map a link's URL to a platform-app protocol when "Open in app" is enabled and the file looks like an Office doc.
   function openHrefFor(link) {
     if (state.settings.openOfficeInApp === false) return link.url;
@@ -10984,6 +10990,20 @@
     });
     acts.appendChild(copyBtn);
 
+    const copyNameUrlBtn = document.createElement('button');
+    copyNameUrlBtn.type = 'button';
+    copyNameUrlBtn.className = 'li-action-btn';
+    copyNameUrlBtn.title = 'Copy name + URL';
+    copyNameUrlBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/><line x1="12" y1="12" x2="19" y2="12"/><line x1="12" y1="16" x2="17" y2="16"/></svg>';
+    copyNameUrlBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(linkNameAndUrl(link));
+        copyNameUrlBtn.style.color = '#16a34a';
+        setTimeout(() => { copyNameUrlBtn.style.color = ''; }, 800);
+      } catch (e) {}
+    });
+    acts.appendChild(copyNameUrlBtn);
+
     const editBtn = document.createElement('button');
     editBtn.type = 'button';
     editBtn.className = 'li-action-btn';
@@ -11024,6 +11044,7 @@
       showContextMenu([
         { icon: '↗', label: 'Open link', action: () => { visitLink(link.id); window.open(link.url, '_blank', 'noopener'); } },
         { icon: '⧉', label: 'Copy URL', action: () => navigator.clipboard.writeText(link.url).then(() => showSoftToast('URL copied')) },
+        { icon: '⧉', label: 'Copy name + URL', action: () => navigator.clipboard.writeText(linkNameAndUrl(link)).then(() => showSoftToast('Name + URL copied')) },
         null,
         { icon: '✎', label: 'Rename', action: () => {
             const titleEl = row.querySelector('.li-title a');
