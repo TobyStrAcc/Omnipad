@@ -3024,6 +3024,35 @@
   .crib-card .crib-del:hover { background: #fdecec; color: var(--danger); }
   html[data-theme="dark"] .crib-card .crib-del:hover { background: rgba(220,38,38,0.18); }
   .crib-card .crib-del svg { width: 13px; height: 13px; }
+  /* Crib star / prioritise */
+  .crib-card .crib-star-btn {
+    position: absolute;
+    top: 8px; right: 36px;
+    background: transparent;
+    border: 0;
+    color: var(--muted-2);
+    cursor: pointer;
+    width: 24px; height: 24px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0;
+    transition: opacity .12s ease, color .12s ease, background .12s ease;
+  }
+  .crib-card:hover .crib-star-btn { opacity: 1; }
+  .crib-card .crib-star-btn:hover { background: var(--hover); color: var(--high); }
+  .crib-card .crib-star-btn.is-starred { opacity: 1; color: var(--high); }
+  .crib-card .crib-star-btn svg { width: 14px; height: 14px; }
+  .crib-card.is-starred::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--high);
+    border-radius: 10px 0 0 10px;
+  }
   .crib-field { margin-bottom: 8px; }
   .crib-field:last-child { margin-bottom: 0; }
   .crib-field-row {
@@ -3283,6 +3312,25 @@
     padding: 0;
   }
   .sales-row-del:hover { background: #fdecec; color: var(--danger); }
+  .sales-row-actions { white-space: nowrap; text-align: right; }
+  .sales-star-btn {
+    background: transparent;
+    border: 0;
+    color: var(--muted-2);
+    cursor: pointer;
+    width: 24px; height: 24px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    vertical-align: middle;
+  }
+  .sales-star-btn:hover { background: var(--hover); color: var(--high); }
+  .sales-star-btn.is-starred { color: var(--high); }
+  .sales-star-btn svg { width: 14px; height: 14px; }
+  .crib-sales-table tr.is-starred td { background: rgba(234,88,12,0.06); }
+  .crib-sales-table tr.is-starred td:first-child { box-shadow: inset 3px 0 0 0 var(--high); }
 
   .crib-empty-section {
     color: var(--muted-2);
@@ -4458,6 +4506,8 @@
     body.printing-crib .crib-drag-handle,
     body.printing-crib .crib-chip-remove,
     body.printing-crib .crib-account-del,
+    body.printing-crib .crib-star-btn,
+    body.printing-crib .sales-star-btn,
     body.printing-crib .crib-accounts-block .btn { display: none !important; }
     body.printing-crib .crib-section { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12pt; }
     body.printing-crib .crib-section-head h3 { font-size: 13pt; margin: 8pt 0 4pt; color: #000; }
@@ -5338,6 +5388,7 @@
 
       <div class="crib-footer">
         <button class="btn" id="cribExportBtn" type="button">Export Crib</button>
+        <button class="btn" id="cribExportHtmlBtn" type="button">Export HTML</button>
         <button class="btn" id="cribPrintBtn" type="button">Print sheet</button>
       </div>
     </div>
@@ -11957,6 +12008,20 @@
     del.innerHTML = ICONS.x;
     del.addEventListener('click', () => deleteCribItem(kind, item.id));
     card.appendChild(del);
+    // Star / prioritise — highlighted in the HTML export & flagged in the Pitch prompt
+    if (item.starred) card.classList.add('is-starred');
+    const star = document.createElement('button');
+    star.className = 'crib-star-btn' + (item.starred ? ' is-starred' : '');
+    star.type = 'button';
+    star.title = item.starred ? 'Priority — starred for pitch & HTML export' : 'Star as priority';
+    star.innerHTML = '<svg viewBox="0 0 24 24" fill="' + (item.starred ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    star.addEventListener('click', () => {
+      const willStar = !item.starred;
+      updateCribItem(kind, item.id, 'starred', willStar);
+      showSoftToast(willStar ? 'Starred as priority' : 'Star removed', '★');
+      renderCribView();
+    });
+    card.appendChild(star);
     fieldsBuilder(card);
     return card;
   }
@@ -12019,6 +12084,7 @@
     const tbody = document.createElement('tbody');
     cribData().sales.forEach(s => {
       const tr = document.createElement('tr');
+      if (s.starred) tr.classList.add('is-starred');
       const mkCell = (field, opts) => {
         const td = document.createElement('td');
         let inp;
@@ -12048,6 +12114,19 @@
       tr.appendChild(mkCell('status', { select: true }));
       tr.appendChild(mkCell('role', { placeholder: 'Your role' }));
       const tdDel = document.createElement('td');
+      tdDel.className = 'sales-row-actions';
+      const star = document.createElement('button');
+      star.className = 'sales-star-btn' + (s.starred ? ' is-starred' : '');
+      star.type = 'button';
+      star.title = s.starred ? 'Priority — starred for pitch & HTML export' : 'Star as priority';
+      star.innerHTML = '<svg viewBox="0 0 24 24" fill="' + (s.starred ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+      star.addEventListener('click', () => {
+        const willStar = !s.starred;
+        updateCribItem('sales', s.id, 'starred', willStar);
+        showSoftToast(willStar ? 'Starred as priority' : 'Star removed', '★');
+        renderCribSales();
+      });
+      tdDel.appendChild(star);
       const del = document.createElement('button');
       del.className = 'sales-row-del';
       del.type = 'button';
@@ -12364,6 +12443,8 @@
     });
     const exportBtn = document.getElementById('cribExportBtn');
     if (exportBtn) exportBtn.addEventListener('click', exportCrib);
+    const exportHtmlBtn = document.getElementById('cribExportHtmlBtn');
+    if (exportHtmlBtn) exportHtmlBtn.addEventListener('click', exportCribHtml);
     const printBtn = document.getElementById('cribPrintBtn');
     if (printBtn) printBtn.addEventListener('click', () => {
       document.body.classList.add('printing-crib');
@@ -12407,11 +12488,18 @@
     });
   }, 0);
 
-  function cribAsMarkdown() {
+  function cribAsMarkdown(opts) {
     ensureCribRounds();
     const r = activeRound();
     const c = r;
     const lines = [];
+    const o = opts || {};
+    const prioritiseStars = !!o.prioritiseStars;
+    const ordered = (arr) => {
+      const a = arr || [];
+      return prioritiseStars ? a.slice().sort((x, y) => (y.starred ? 1 : 0) - (x.starred ? 1 : 0)) : a;
+    };
+    const mark = (it) => (it && it.starred ? '★ ' : '');
     const owner = ownerNameFromTitle() || 'Owner';
     lines.push(`# ${owner}'s Crib Sheet`);
     lines.push(`*Round: ${r.name || 'Untitled round'} · Generated ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}*`);
@@ -12441,8 +12529,8 @@
       projects: () => {
         if (!c.projects.length) return;
         lines.push('## Projects');
-        c.projects.forEach(p => {
-          lines.push(`### ${p.title || '(untitled)'}`);
+        ordered(c.projects).forEach(p => {
+          lines.push(`### ${mark(p)}${p.title || '(untitled)'}`);
           if (p.scope) lines.push(`- **Scope:** ${p.scope}`);
           if (p.value) lines.push(`- **Value:** ${p.value}`);
           if (p.complexity) lines.push(`- **Complexity:** ${p.complexity}`);
@@ -12457,8 +12545,8 @@
       bd: () => {
         if (!c.bd.length) return;
         lines.push('## Business Development');
-        c.bd.forEach(b => {
-          lines.push(`### ${b.name || b.oppId || '(untitled)'}`);
+        ordered(c.bd).forEach(b => {
+          lines.push(`### ${mark(b)}${b.name || b.oppId || '(untitled)'}`);
           if (b.oppId) lines.push(`- **Opp ID:** ${b.oppId}`);
           if (b.wbs) lines.push(`- **WBS:** ${b.wbs}`);
           if (b.value) lines.push(`- **Value:** ${b.value}`);
@@ -12473,8 +12561,8 @@
         lines.push('| Opp ID | Opportunity | Client | Value | Status | Role |');
         lines.push('|---|---|---|---|---|---|');
         const totals = { Won: 0, 'In Progress': 0, Lost: 0 };
-        c.sales.forEach(s => {
-          lines.push(`| ${s.oppId || ''} | ${s.opp || ''} | ${s.name || ''} | ${s.value || ''} | ${s.status || ''} | ${s.role || ''} |`);
+        ordered(c.sales).forEach(s => {
+          lines.push(`| ${s.oppId || ''} | ${(s.starred ? '★ ' : '')}${s.opp || ''} | ${s.name || ''} | ${s.value || ''} | ${s.status || ''} | ${s.role || ''} |`);
           const v = parseFloat(String(s.value || '').replace(/[^0-9.\-]/g, ''));
           if (!isNaN(v) && totals[s.status] !== undefined) totals[s.status] += v;
         });
@@ -12486,8 +12574,8 @@
       priority: () => {
         if (!c.priority.length) return;
         lines.push('## Priorities');
-        c.priority.forEach(p => {
-          lines.push(`### ${p.description || '(untitled)'}`);
+        ordered(c.priority).forEach(p => {
+          lines.push(`### ${mark(p)}${p.description || '(untitled)'}`);
           if (p.type) lines.push(`- **Type:** ${p.type}`);
           if (p.contribution) lines.push(`- **Contribution:** ${p.contribution}`);
           if (p.metrics) lines.push(`- **Metrics:** ${p.metrics}`);
@@ -12497,8 +12585,8 @@
       practice: () => {
         if (!c.practice.length) return;
         lines.push('## Practice & Community');
-        c.practice.forEach(p => {
-          lines.push(`### ${p.title || '(untitled)'}`);
+        ordered(c.practice).forEach(p => {
+          lines.push(`### ${mark(p)}${p.title || '(untitled)'}`);
           if (p.keyAchievements) {
             p.keyAchievements.split('\n').forEach(l => { if (l.trim()) lines.push(`${l.trim().startsWith('•') ? l.trim().replace(/^•\s*/, '- ') : '- ' + l.trim()}`); });
           }
@@ -12508,9 +12596,15 @@
       dev: () => {
         if (!c.dev.length) return;
         lines.push('## Development Points');
-        c.dev.forEach(d => {
+        ordered(c.dev).forEach(d => {
           if (d.bullets) {
-            d.bullets.split('\n').forEach(l => { if (l.trim()) lines.push(`${l.trim().startsWith('•') ? l.trim().replace(/^•\s*/, '- ') : '- ' + l.trim()}`); });
+            let first = true;
+            d.bullets.split('\n').forEach(l => {
+              if (!l.trim()) return;
+              const body = l.trim().startsWith('•') ? l.trim().replace(/^•\s*/, '- ') : '- ' + l.trim();
+              lines.push((first && d.starred) ? body.replace(/^- /, '- ★ ') : body);
+              first = false;
+            });
           }
         });
         lines.push('');
@@ -12518,8 +12612,8 @@
       kx: () => {
         if (!c.kx.length && !state.links.some(l => l.inCrib)) return;
         lines.push('## KX Contributions');
-        c.kx.forEach(k => {
-          if (k.title || k.link) lines.push(`- **${k.title || '(untitled)'}**${k.link ? ` — ${k.link}` : ''}`);
+        ordered(c.kx).forEach(k => {
+          if (k.title || k.link) lines.push(`- ${mark(k)}**${k.title || '(untitled)'}**${k.link ? ` — ${k.link}` : ''}`);
         });
         state.links.filter(l => l.inCrib).forEach(l => {
           lines.push(`- **${l.title || urlDomain(l.url)}** — ${l.url}`);
@@ -12529,8 +12623,8 @@
       ai: () => {
         if (!c.ai.length) return;
         lines.push('## AI');
-        c.ai.forEach(a => {
-          lines.push(`### ${a.title || '(untitled)'}`);
+        ordered(c.ai).forEach(a => {
+          lines.push(`### ${mark(a)}${a.title || '(untitled)'}`);
           if (a.description) lines.push(`- **Description:** ${a.description}`);
           if (a.usage) lines.push(`- **Usage / # users:** ${a.usage}`);
           if (a.outputs) lines.push(`- **Output / Links:** ${a.outputs}`);
@@ -12547,11 +12641,11 @@
         const quals = c.qualifications || [];
         if (!quals.length) return;
         lines.push('## Qualifications');
-        quals.forEach(q => {
+        ordered(quals).forEach(q => {
           const parts = [q.name || '(untitled)'];
           if (q.issuer) parts.push(q.issuer);
           if (q.year) parts.push(`(${q.year})`);
-          lines.push(`- ${parts.join(' — ')}`);
+          lines.push(`- ${mark(q)}${parts.join(' — ')}`);
         });
         lines.push('');
       }
@@ -12575,9 +12669,268 @@
     showSoftToast('Crib sheet exported as Markdown', '⬇');
   }
 
+  // Presentable, self-contained landscape HTML deck of the active Crib round.
+  function cribAsHTML() {
+    ensureCribRounds();
+    const r = activeRound();
+    const c = r;
+    const s = r.summary || {};
+    const owner = ownerNameFromTitle() || 'Owner';
+    const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const genDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const fmtMoney = (n) => n >= 1000000 ? '£' + (n / 1000000).toFixed(2) + 'M' : n >= 1000 ? '£' + Math.round(n / 1000) + 'K' : '£' + n;
+    const highlights = [];
+
+    const kv = (k, v) => `<div class="kv"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
+    const bullets = (text) => {
+      const items = String(text || '').split('\n').map(l => l.replace(/^\s*•\s*/, '').trim()).filter(Boolean);
+      return items.length ? '<ul class="ach">' + items.map(i => `<li>${esc(i)}</li>`).join('') + '</ul>' : '';
+    };
+    const card = (starred, titleHtml, inner) =>
+      `<div class="card${starred ? ' starred' : ''}">${starred ? '<span class="star-badge">★ Priority</span>' : ''}${titleHtml ? `<div class="card-title">${titleHtml}</div>` : ''}${inner}</div>`;
+    const panel = (title, inner) => `<div class="panel"><h2 class="panel-h">${esc(title)}</h2>${inner}</div>`;
+    const cardsWrap = (inner) => `<div class="cards">${inner}</div>`;
+
+    const builders = {
+      projects: () => {
+        if (!c.projects.length) return null;
+        const cards = c.projects.map(p => {
+          if (p.starred) highlights.push(['Projects', p.title || 'Untitled project']);
+          let rows = '';
+          if (p.scope) rows += kv('Scope', p.scope);
+          if (p.value) rows += kv('Value', p.value);
+          if (p.complexity) rows += kv('Complexity', p.complexity);
+          if (p.teamSize) rows += kv('Team size', p.teamSize);
+          if (p.keyAchievements) rows += `<div class="ach-h">Key achievements</div>${bullets(p.keyAchievements)}`;
+          return card(p.starred, esc(p.title || 'Untitled project'), rows);
+        }).join('');
+        return { html: panel('Projects', cardsWrap(cards)), w: 1 + c.projects.length * 0.6 };
+      },
+      practice: () => {
+        if (!c.practice.length) return null;
+        const cards = c.practice.map(p => {
+          if (p.starred) highlights.push(['Practice & Community', p.title || 'Untitled']);
+          return card(p.starred, esc(p.title || 'Untitled'), bullets(p.keyAchievements));
+        }).join('');
+        return { html: panel('Practice & Community', cardsWrap(cards)), w: 1 + c.practice.length * 0.55 };
+      },
+      sales: () => {
+        if (!c.sales.length) return null;
+        const totals = { Won: 0, 'In Progress': 0, Lost: 0 };
+        const pillClass = { 'Won': 'won', 'In Progress': 'prog', 'Lost': 'lost' };
+        const rows = c.sales.map(x => {
+          if (x.starred) highlights.push(['Sales', x.opp || x.oppId || 'Opportunity']);
+          const v = parseFloat(String(x.value || '').replace(/[^0-9.\-]/g, ''));
+          if (!isNaN(v) && totals[x.status] !== undefined) totals[x.status] += v;
+          const pc = pillClass[x.status] || 'prog';
+          return `<tr class="${x.starred ? 'starred' : ''}"><td>${esc(x.oppId)}</td><td>${x.starred ? '★ ' : ''}${esc(x.opp)}</td><td>${esc(x.name)}</td><td>${esc(x.value)}</td><td>${x.status ? `<span class="pill ${pc}">${esc(x.status)}</span>` : ''}</td><td>${esc(x.role)}</td></tr>`;
+        }).join('');
+        const tbl = `<table class="tbl"><thead><tr><th>Opp ID</th><th>Opportunity</th><th>Client</th><th>Value</th><th>Status</th><th>Role</th></tr></thead><tbody>${rows}</tbody></table>` +
+          `<div class="totals"><span class="pill won">Won ${fmtMoney(totals.Won)}</span><span class="pill prog">In Progress ${fmtMoney(totals['In Progress'])}</span><span class="pill lost">Lost ${fmtMoney(totals.Lost)}</span> <span class="muted">· ${c.sales.length} opportunities</span></div>`;
+        return { html: panel('Sales', tbl), w: 1.4 + c.sales.length * 0.3 };
+      },
+      bd: () => {
+        if (!c.bd.length) return null;
+        const cards = c.bd.map(b => {
+          if (b.starred) highlights.push(['Business Development', b.name || b.oppId || 'Untitled']);
+          let rows = '';
+          if (b.oppId) rows += kv('Opp ID', b.oppId);
+          if (b.wbs) rows += kv('WBS', b.wbs);
+          if (b.value) rows += kv('Value', b.value);
+          if (b.description) rows += kv('Description', b.description);
+          if (b.rolePlayed) rows += kv('Role played', b.rolePlayed);
+          return card(b.starred, esc(b.name || b.oppId || 'Untitled'), rows);
+        }).join('');
+        return { html: panel('Business Development', cardsWrap(cards)), w: 1 + c.bd.length * 0.6 };
+      },
+      priority: () => {
+        if (!c.priority.length) return null;
+        const cards = c.priority.map(p => {
+          if (p.starred) highlights.push(['Priorities', p.description || 'Untitled']);
+          let rows = '';
+          if (p.type) rows += kv('Type', p.type);
+          if (p.contribution) rows += kv('Contribution', p.contribution);
+          if (p.metrics) rows += kv('Metrics', p.metrics);
+          return card(p.starred, esc(p.description || 'Untitled'), rows);
+        }).join('');
+        return { html: panel('Priorities', cardsWrap(cards)), w: 1 + c.priority.length * 0.6 };
+      },
+      dev: () => {
+        if (!c.dev.length) return null;
+        const cards = c.dev.map(d => {
+          if (d.starred) {
+            const first = String(d.bullets || '').split('\n').map(l => l.replace(/^\s*•\s*/, '').trim()).filter(Boolean)[0];
+            highlights.push(['Development', first || 'Development point']);
+          }
+          return card(d.starred, '', bullets(d.bullets));
+        }).join('');
+        return { html: panel('Development Points', cardsWrap(cards)), w: 1 + c.dev.length * 0.5 };
+      },
+      kx: () => {
+        const links = state.links.filter(l => l.inCrib);
+        if (!c.kx.length && !links.length) return null;
+        const items = c.kx.map(k => {
+          if (k.starred) highlights.push(['KX Contributions', k.title || 'Untitled']);
+          const linkHtml = k.link ? ` — ${/^https?:\/\//i.test(k.link) ? `<a href="${esc(k.link)}">${esc(k.link)}</a>` : esc(k.link)}` : '';
+          return `<li class="${k.starred ? 'starred' : ''}">${k.starred ? '★ ' : ''}<strong>${esc(k.title || 'Untitled')}</strong>${linkHtml}</li>`;
+        });
+        const linkItems = links.map(l => `<li><strong>${esc(l.title || urlDomain(l.url))}</strong> — <a href="${esc(l.url)}">${esc(l.url)}</a></li>`);
+        return { html: panel('KX Contributions', `<ul class="kx">${items.concat(linkItems).join('')}</ul>`), w: 1 + (c.kx.length + links.length) * 0.3 };
+      },
+      ai: () => {
+        if (!c.ai.length) return null;
+        const cards = c.ai.map(a => {
+          if (a.starred) highlights.push(['AI', a.title || 'Untitled']);
+          let rows = '';
+          if (a.description) rows += kv('Description', a.description);
+          if (a.usage) rows += kv('Usage / users', a.usage);
+          if (a.outputs) rows += kv('Outputs / links', a.outputs);
+          return card(a.starred, esc(a.title || 'Untitled'), rows);
+        }).join('');
+        return { html: panel('AI', cardsWrap(cards)), w: 1 + c.ai.length * 0.6 };
+      },
+      topSkills: () => {
+        const skills = c.topSkills || [];
+        if (!skills.length) return null;
+        const chips = skills.map(sk => `<span class="chip">${esc(sk)}</span>`).join('');
+        return { html: panel('Top Skills', `<div class="chips">${chips}</div>`), w: 1 };
+      },
+      qualifications: () => {
+        const quals = c.qualifications || [];
+        if (!quals.length) return null;
+        const rows = quals.map(q => {
+          if (q.starred) highlights.push(['Qualifications', q.name || 'Untitled']);
+          return `<tr class="${q.starred ? 'starred' : ''}"><td>${q.starred ? '★ ' : ''}${esc(q.name || 'Untitled')}</td><td>${esc(q.issuer)}</td><td>${esc(q.year)}</td></tr>`;
+        }).join('');
+        return { html: panel('Qualifications', `<table class="tbl"><thead><tr><th>Qualification</th><th>Issuer</th><th>Year</th></tr></thead><tbody>${rows}</tbody></table>`), w: 1 + quals.length * 0.3 };
+      }
+    };
+
+    const sectionOrder = r.sectionOrder || ['projects', 'practice', 'sales', 'bd', 'priority', 'dev', 'kx', 'ai', 'topSkills', 'qualifications'];
+    const panels = [];
+    sectionOrder.forEach(key => { if (builders[key]) { const out = builders[key](); if (out) panels.push(out); } });
+
+    // Cover (built after panels so starred highlights are collected)
+    const tiles = [];
+    if (s.timeAtLevel) tiles.push(['Time at level', s.timeAtLevel]);
+    if (s.peopleLead) tiles.push(['People Lead', s.peopleLead]);
+    if (s.chargability) tiles.push(['Chargeability', s.chargability + '%']);
+    const tilesHtml = tiles.length ? `<div class="tiles">${tiles.map(t => `<div class="tile"><div class="t-k">${esc(t[0])}</div><div class="t-v">${esc(t[1])}</div></div>`).join('')}</div>` : '';
+    const metaBits = [];
+    if (s.currentPosition) metaBits.push(esc(s.currentPosition));
+    if (s.targeting) metaBits.push('Targeting: ' + esc(s.targeting));
+    const metaHtml = metaBits.length ? `<div class="cover-meta">${metaBits.join(' &nbsp;·&nbsp; ')}</div>` : '';
+    const acctRows = (s.clientAccounts || []).filter(a => a.name || a.dayRate).map(a => `<tr><td>${esc(a.name)}</td><td>${esc(a.dayRate)}</td></tr>`).join('');
+    const acctHtml = acctRows ? `<div class="panel"><h2 class="panel-h">Client Accounts</h2><table class="tbl"><thead><tr><th>Account</th><th>Day rate</th></tr></thead><tbody>${acctRows}</tbody></table></div>` : '';
+    const hlHtml = highlights.length ? `<div class="highlights"><h3>★ Priority Highlights</h3><ul>${highlights.map(h => `<li><span class="hs">${esc(h[0])}:</span> ${esc(h[1])}</li>`).join('')}</ul></div>` : '';
+    // Single continuous landscape page: cover band + summary lead, then all section
+    // panels flow after it. Print paginates naturally and each panel is
+    // break-inside: avoid, so nothing is ever clipped. Reusing the cover's spare
+    // space for content keeps a fully-populated crib to ~1–3 landscape pages.
+    const bodyHtml = `<section class="page">` +
+      `<div class="cover-band"><h1 class="cover-name">${esc(s.name || owner)}</h1>` +
+      `<div class="cover-sub">Performance Round Crib${r.name ? ' — ' + esc(r.name) : ''}</div>${metaHtml}</div>` +
+      tilesHtml + hlHtml + acctHtml +
+      panels.map(p => p.html).join('') +
+      `<div class="foot">Generated ${esc(genDate)} · OmniPad</div></section>`;
+
+    const css = `
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #18181b; background: #f3f4f6; -webkit-print-color-adjust: exact; print-color-adjust: exact; line-height: 1.45; }
+a { color: #6d00c9; text-decoration: none; }
+.muted { color: #6b7280; }
+.toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 18px; background: #1f2937; color: #fff; }
+.toolbar .tb-label { font-size: 13px; opacity: .9; }
+.toolbar button { background: #A100FF; color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.toolbar button:hover { background: #8a00da; }
+.deck { max-width: 1123px; margin: 20px auto; padding: 0 14px; }
+.page { background: #fff; border-radius: 10px; box-shadow: 0 2px 14px rgba(0,0,0,.09); padding: 28px 32px; margin-bottom: 20px; }
+.cover-band { background: linear-gradient(120deg, #A100FF 0%, #6d00c9 100%); color: #fff; border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+.cover-name { font-size: 30px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+.cover-sub { font-size: 14.5px; opacity: .92; margin-top: 6px; font-weight: 600; }
+.cover-meta { font-size: 13px; opacity: .9; margin-top: 12px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.tile { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; }
+.tile .t-k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; font-weight: 700; }
+.tile .t-v { font-size: 16px; font-weight: 700; margin-top: 4px; }
+.highlights { border: 1px solid #A100FF; background: #faf5ff; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; break-inside: avoid; }
+.highlights h3 { margin: 0 0 8px; font-size: 12.5px; color: #A100FF; text-transform: uppercase; letter-spacing: .06em; }
+.highlights ul { margin: 0; padding-left: 18px; }
+.highlights li { font-size: 13px; margin: 3px 0; }
+.highlights .hs { color: #6b7280; font-weight: 700; }
+.panel { margin-bottom: 12px; break-inside: avoid; }
+.panel:last-child { margin-bottom: 0; }
+.panel-h { font-size: 12.5px; text-transform: uppercase; letter-spacing: .08em; color: #A100FF; font-weight: 800; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid #ede9fe; }
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; position: relative; background: #fff; break-inside: avoid; }
+.card.starred { border-color: #A100FF; box-shadow: inset 3px 0 0 0 #A100FF; background: #faf5ff; }
+.star-badge { position: absolute; top: 10px; right: 10px; font-size: 9.5px; font-weight: 800; color: #A100FF; background: #f3e8ff; padding: 2px 8px; border-radius: 999px; letter-spacing: .03em; }
+.card-title { font-weight: 700; font-size: 14.5px; margin-bottom: 6px; padding-right: 72px; }
+.kv { display: flex; gap: 8px; font-size: 12.5px; margin: 2px 0; }
+.kv .k { color: #6b7280; font-weight: 700; min-width: 92px; flex-shrink: 0; }
+.kv .v { color: #18181b; }
+.ach-h { font-size: 11px; color: #6b7280; font-weight: 700; margin-top: 6px; }
+.ach { margin: 3px 0 0; padding-left: 18px; }
+.ach li { font-size: 12.5px; margin: 1px 0; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.tbl th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; font-weight: 800; padding: 7px 10px; background: #f9fafb; border-bottom: 2px solid #ede9fe; }
+table.tbl td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+table.tbl tbody tr:last-child td { border-bottom: 0; }
+table.tbl tr.starred td { background: #faf5ff; }
+table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-weight: 600; }
+.pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.pill.won { background: #d1fae5; color: #047857; }
+.pill.prog { background: #dbeafe; color: #1e40af; }
+.pill.lost { background: #fee2e2; color: #b91c1c; }
+.totals { margin-top: 10px; }
+.totals .pill { margin-right: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: #f3e8ff; color: #6d00c9; border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 700; }
+.kx { margin: 0; padding-left: 18px; }
+.kx li { font-size: 12.5px; margin: 3px 0; }
+.kx li.starred { list-style: none; margin-left: -18px; }
+.foot { margin-top: 16px; text-align: right; font-size: 10.5px; color: #9ca3af; }
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .deck { max-width: none; margin: 0; padding: 0; }
+  .page { box-shadow: none; border-radius: 0; margin: 0; padding: 10mm 12mm; }
+  .page + .page { break-before: page; }
+  @page { size: A4 landscape; margin: 0; }
+}`;
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(s.name || owner)} — Crib Sheet</title>
+<style>${css}</style>
+</head>
+<body>
+<div class="toolbar no-print"><span class="tb-label">${esc(s.name || owner)} · ${esc(r.name || 'Crib')}</span><button type="button" onclick="window.print()">Print / Save as PDF</button></div>
+<div class="deck">${bodyHtml}</div>
+</body>
+</html>`;
+  }
+
+  function exportCribHtml() {
+    const html = cribAsHTML();
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const owner = (ownerNameFromTitle() || 'crib').toLowerCase().replace(/\s+/g, '-');
+    a.href = url;
+    a.download = `${owner}-crib-${dateKey(new Date())}.html`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
+    showSoftToast('Crib exported as HTML', '⬇');
+  }
+
   function buildPitchPrompt() {
     const owner = ownerNameFromTitle() || 'the candidate';
-    const md = cribAsMarkdown();
+    const md = cribAsMarkdown({ prioritiseStars: true });
     return [
       `You are a senior pitch coach helping ${owner} present themselves at their best to a senior audience (e.g. promotion panel, partner review, leadership skip-level).`,
       ``,
@@ -12592,6 +12945,7 @@
       `- Use confident, specific language. No fluff. No filler. No "I think" / "perhaps".`,
       `- Format as flowing prose with at most 3 short paragraph breaks. Avoid bullet points in the final output.`,
       `- Where data is incomplete in the Crib Sheet, lean on what's strongest and don't invent metrics.`,
+      `- Items marked with ★ are ${owner}'s flagged priorities — lead with them and give them the most detail and air-time.`,
       ``,
       `--- BEGIN CRIB SHEET ---`,
       md,
