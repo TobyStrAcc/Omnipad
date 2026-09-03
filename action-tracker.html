@@ -2892,6 +2892,7 @@
   [data-section-key="dev"]          .crib-section-head { border-left-color:#8b5cf6; background:linear-gradient(90deg,rgba(139,92,246,.1) 0%,transparent 75%); }
   [data-section-key="kx"]           .crib-section-head { border-left-color:#06b6d4; background:linear-gradient(90deg,rgba(6,182,212,.1) 0%,transparent 75%); }
   [data-section-key="ai"]           .crib-section-head { border-left-color:#ec4899; background:linear-gradient(90deg,rgba(236,72,153,.1) 0%,transparent 75%); }
+  [data-section-key="relationships"].crib-section-head { border-left-color:#14b8a6; background:linear-gradient(90deg,rgba(20,184,166,.1) 0%,transparent 75%); }
   [data-section-key="topSkills"]    .crib-section-head { border-left-color:#10b981; background:linear-gradient(90deg,rgba(16,185,129,.1) 0%,transparent 75%); }
   [data-section-key="qualifications"].crib-section-head { border-left-color:#6366f1; background:linear-gradient(90deg,rgba(99,102,241,.1) 0%,transparent 75%); }
   .crib-pitch-section               .crib-section-head { border-left-color:#a855f7; background:linear-gradient(90deg,rgba(168,85,247,.1) 0%,transparent 75%); }
@@ -5285,6 +5286,7 @@
           <button class="crib-tray-btn" data-add="dev" type="button"><span class="ctb-icon">📈</span><span>Development</span></button>
           <button class="crib-tray-btn" data-add="kx" type="button"><span class="ctb-icon">📚</span><span>KX</span></button>
           <button class="crib-tray-btn" data-add="ai" type="button"><span class="ctb-icon">🤖</span><span>AI</span></button>
+          <button class="crib-tray-btn" data-add="relationships" type="button"><span class="ctb-icon">🔗</span><span>Relationship</span></button>
         </div>
       </div>
 
@@ -5359,6 +5361,14 @@
           <button class="btn small" id="cribAddAiBtn" type="button">+ Add</button>
         </div>
         <div class="crib-cards" id="cribAiList"></div>
+      </div>
+
+      <div class="crib-section" id="cribRelationshipsSection" data-section-key="relationships">
+        <div class="crib-section-head">
+          <span class="crib-section-handle" title="Drag to reorder section">⋮⋮</span><h3>Key Relationships</h3>
+          <button class="btn small" id="cribAddRelationshipsBtn" type="button">+ Add</button>
+        </div>
+        <div class="crib-sales-wrap" id="cribRelationshipsList"></div>
       </div>
 
       <div class="crib-section" id="cribTopSkillsSection" data-section-key="topSkills">
@@ -5634,7 +5644,7 @@
       collapsedProjectIds: [],
       notes: [],
       links: [],
-      counters: { nextActionNumber: 1, nextActionId: 1, nextProjectId: 2, nextCommentId: 1, nextNoteId: 1, nextLinkId: 1, nextOneId: 1, nextOneEntryId: 1, nextCribProjectId: 1, nextCribPracticeId: 1, nextCribSalesId: 1, nextCribKxId: 1, nextCribAiId: 1, nextCribBdId: 1, nextCribPriorityId: 1, nextCribDevId: 1, nextCribRoundId: 1 }
+      counters: { nextActionNumber: 1, nextActionId: 1, nextProjectId: 2, nextCommentId: 1, nextNoteId: 1, nextLinkId: 1, nextOneId: 1, nextOneEntryId: 1, nextCribProjectId: 1, nextCribPracticeId: 1, nextCribSalesId: 1, nextCribKxId: 1, nextCribAiId: 1, nextCribBdId: 1, nextCribPriorityId: 1, nextCribDevId: 1, nextCribRelationshipId: 1, nextCribRoundId: 1 }
     };
   }
 
@@ -5704,7 +5714,7 @@
       // If we have legacy state.crib but no rounds yet, wrap it as the first round
       if (parsed.cribRounds.length === 0 && parsed.crib && typeof parsed.crib === 'object') {
         const legacy = parsed.crib;
-        ['projects','practice','sales','kx','ai','bd','priority','dev'].forEach(k => {
+        ['projects','practice','sales','kx','ai','bd','priority','dev','relationships'].forEach(k => {
           if (!Array.isArray(legacy[k])) legacy[k] = [];
         });
         parsed.cribRounds.push({
@@ -5728,9 +5738,9 @@
         });
       }
       // Ensure each round has all sections + a summary
-      const DEFAULT_SECTION_ORDER = ['projects','practice','sales','bd','priority','dev','kx','ai','topSkills','qualifications'];
+      const DEFAULT_SECTION_ORDER = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
       parsed.cribRounds.forEach(r => {
-        ['projects','practice','sales','kx','ai','bd','priority','dev'].forEach(k => {
+        ['projects','practice','sales','kx','ai','bd','priority','dev','relationships'].forEach(k => {
           if (!Array.isArray(r[k])) r[k] = [];
         });
         if (!Array.isArray(r.topSkills)) r.topSkills = [];
@@ -5764,6 +5774,7 @@
       if (!parsed.counters.nextCribBdId) parsed.counters.nextCribBdId = (ids('bd').length ? Math.max(...ids('bd')) : 0) + 1;
       if (!parsed.counters.nextCribPriorityId) parsed.counters.nextCribPriorityId = (ids('priority').length ? Math.max(...ids('priority')) : 0) + 1;
       if (!parsed.counters.nextCribDevId) parsed.counters.nextCribDevId = (ids('dev').length ? Math.max(...ids('dev')) : 0) + 1;
+      if (!parsed.counters.nextCribRelationshipId) parsed.counters.nextCribRelationshipId = (ids('relationships').length ? Math.max(...ids('relationships')) : 0) + 1;
       if (!parsed.counters.nextCribQualificationId) parsed.counters.nextCribQualificationId = (ids('qualifications').length ? Math.max(...ids('qualifications')) : 0) + 1;
       if (!parsed.counters.nextCribClientAccountId) parsed.counters.nextCribClientAccountId = (allRounds.flatMap(r => (r.summary.clientAccounts || []).map(x => x.id || 0)).length ? Math.max(...allRounds.flatMap(r => (r.summary.clientAccounts || []).map(x => x.id || 0))) : 0) + 1;
       if (!parsed.counters.nextCribRoundId) parsed.counters.nextCribRoundId = Math.max(0, ...allRounds.map(r => r.id || 0)) + 1;
@@ -11255,6 +11266,40 @@
   // ============== Crib Sheet ==============
   const SALES_STATUSES = ['In Progress', 'Won', 'Lost'];
 
+  // Parse a money string like "£4.65M", "850k", "1,200,000", "£12m" into a number.
+  function cribParseMoney(v) {
+    if (v == null) return 0;
+    const s = String(v).trim().toLowerCase().replace(/[£$,\s]/g, '');
+    if (!s) return 0;
+    const m = s.match(/^(-?\d*\.?\d+)(k|m|bn|b)?$/);
+    if (!m) { const n = parseFloat(s.replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; }
+    let n = parseFloat(m[1]);
+    if (isNaN(n)) return 0;
+    const suf = m[2];
+    if (suf === 'k') n *= 1e3;
+    else if (suf === 'm') n *= 1e6;
+    else if (suf === 'b' || suf === 'bn') n *= 1e9;
+    return n;
+  }
+  // Format a number as concise GBP: £4.65M, £850K, £12.
+  function cribFmtMoney(n) {
+    const a = Math.abs(n);
+    if (a >= 1e9) return '£' + (n / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'bn';
+    if (a >= 1e6) return '£' + (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+    if (a >= 1e3) return '£' + Math.round(n / 1e3) + 'K';
+    return '£' + Math.round(n);
+  }
+  // Aggregate the key sales numbers from a round's sales array.
+  function cribSalesMetrics(sales) {
+    const m = { count: (sales || []).length, potential: 0, Won: 0, 'In Progress': 0, Lost: 0 };
+    (sales || []).forEach(s => {
+      const v = cribParseMoney(s.value);
+      m.potential += v;
+      if (m[s.status] !== undefined) m[s.status] += v;
+    });
+    return m;
+  }
+
   function ensureCribRounds() {
     if (!Array.isArray(state.cribRounds) || state.cribRounds.length === 0) {
       state.cribRounds = [{
@@ -11262,13 +11307,13 @@
         name: 'Current round',
         createdAt: new Date().toISOString(),
         summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '' },
-        projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: []
+        projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: [], relationships: []
       }];
       state.cribActiveRoundId = 1;
       if (!state.counters.nextCribRoundId) state.counters.nextCribRoundId = 2;
     }
     state.cribRounds.forEach(r => {
-      ['projects','practice','sales','kx','ai','bd','priority','dev'].forEach(k => {
+      ['projects','practice','sales','kx','ai','bd','priority','dev','relationships'].forEach(k => {
         if (!Array.isArray(r[k])) r[k] = [];
       });
       if (!r.summary || typeof r.summary !== 'object') r.summary = {};
@@ -11381,6 +11426,24 @@
     });
     save(); renderCribView();
     setTimeout(() => scrollAndFocus('cribDevSection', 'cribDevList'), 0);
+  }
+  function addCribRelationship() {
+    ensureCribShape();
+    const d = cribData();
+    if (!Array.isArray(d.relationships)) d.relationships = [];
+    if (!state.counters.nextCribRelationshipId) state.counters.nextCribRelationshipId = 1;
+    const now = new Date().toISOString();
+    d.relationships.push({
+      id: state.counters.nextCribRelationshipId++,
+      name: '', client: '', role: '', strength: '', notes: '',
+      addedAt: now, updatedAt: now
+    });
+    save(); renderCribView();
+    setTimeout(() => {
+      scrollIntoSection('cribRelationshipsSection');
+      const t = document.querySelectorAll('#cribRelationshipsList tbody tr input');
+      if (t && t.length) t[t.length - 5]?.focus();
+    }, 0);
   }
   function scrollAndFocus(sectionId, listId) {
     scrollIntoSection(sectionId);
@@ -11528,7 +11591,7 @@
   function reorderCribSection(draggedKey, targetKey, before) {
     ensureCribRounds();
     const r = activeRound();
-    if (!Array.isArray(r.sectionOrder)) r.sectionOrder = ['projects','practice','sales','bd','priority','dev','kx','ai','topSkills','qualifications'];
+    if (!Array.isArray(r.sectionOrder)) r.sectionOrder = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
     const fromIdx = r.sectionOrder.indexOf(draggedKey);
     const toIdx = r.sectionOrder.indexOf(targetKey);
     if (fromIdx === -1 || toIdx === -1) return;
@@ -11550,6 +11613,7 @@
     renderCribDev();
     renderCribKx();
     renderCribAi();
+    renderCribRelationships();
     renderCribTopSkills();
     renderCribQualifications();
     applyCribSectionOrder();
@@ -11558,11 +11622,11 @@
 
   function applyCribSectionOrder() {
     const r = activeRound();
-    const order = r.sectionOrder || ['projects','practice','sales','bd','priority','dev','kx','ai','topSkills','qualifications'];
+    const order = r.sectionOrder || ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
     const sectionIdMap = {
       projects: 'cribProjectsSection', practice: 'cribPracticeSection', sales: 'cribSalesSection',
       bd: 'cribBdSection', priority: 'cribPrioritySection', dev: 'cribDevSection',
-      kx: 'cribKxSection', ai: 'cribAiSection', topSkills: 'cribTopSkillsSection',
+      kx: 'cribKxSection', ai: 'cribAiSection', relationships: 'cribRelationshipsSection', topSkills: 'cribTopSkillsSection',
       qualifications: 'cribQualificationsSection'
     };
     const footer = document.querySelector('#cribView .crib-footer');
@@ -11808,6 +11872,7 @@
       reseed(cloned.bd, 'nextCribBdId');
       reseed(cloned.priority, 'nextCribPriorityId');
       reseed(cloned.dev, 'nextCribDevId');
+      reseed(cloned.relationships || [], 'nextCribRelationshipId');
       reseed(cloned.qualifications || [], 'nextCribQualificationId');
       (cloned.summary.clientAccounts || []).forEach(a => { a.id = state.counters.nextCribClientAccountId++; });
       newRound = {
@@ -11818,11 +11883,12 @@
         projects: cloned.projects, practice: cloned.practice, sales: cloned.sales,
         bd: cloned.bd, priority: cloned.priority, dev: cloned.dev,
         kx: cloned.kx, ai: cloned.ai,
+        relationships: cloned.relationships || [],
         topSkills: cloned.topSkills ? [...cloned.topSkills] : [],
         qualifications: cloned.qualifications || [],
         pitchNotes: cloned.pitchNotes || '',
         storyFrame: cloned.storyFrame || '',
-        sectionOrder: cloned.sectionOrder ? [...cloned.sectionOrder] : ['projects','practice','sales','bd','priority','dev','kx','ai','topSkills','qualifications']
+        sectionOrder: cloned.sectionOrder ? [...cloned.sectionOrder] : ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications']
       };
     } else {
       newRound = {
@@ -11830,9 +11896,9 @@
         name: `Round ${state.cribRounds.length + 1}`,
         createdAt: now,
         summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '', chargability: '', clientAccounts: [] },
-        projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: [],
+        projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: [], relationships: [],
         topSkills: [], qualifications: [], pitchNotes: '', storyFrame: '',
-        sectionOrder: ['projects','practice','sales','bd','priority','dev','kx','ai','topSkills','qualifications']
+        sectionOrder: ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications']
       };
     }
     state.cribRounds.push(newRound);
@@ -12140,23 +12206,78 @@
     // Totals row
     const totalsTr = document.createElement('tr');
     totalsTr.className = 'sales-totals';
-    const totals = { Won: 0, 'In Progress': 0, Lost: 0 };
-    cribData().sales.forEach(s => {
-      const v = parseFloat(String(s.value || '').replace(/[^0-9.\-]/g, ''));
-      if (!isNaN(v) && totals[s.status] !== undefined) totals[s.status] += v;
-    });
+    const met = cribSalesMetrics(cribData().sales);
     const tdTotals = document.createElement('td');
     tdTotals.colSpan = 7;
-    const fmtNum = (n) => n >= 1000000 ? '£' + (n/1000000).toFixed(2) + 'M' :
-                          n >= 1000 ? '£' + Math.round(n/1000) + 'K' :
-                          '£' + n;
     tdTotals.innerHTML =
-      `<span class="sales-status-pill" data-status="Won">Won: ${fmtNum(totals.Won)}</span>` +
-      `&nbsp;&nbsp;<span class="sales-status-pill" data-status="In Progress">In Progress: ${fmtNum(totals['In Progress'])}</span>` +
-      `&nbsp;&nbsp;<span class="sales-status-pill" data-status="Lost">Lost: ${fmtNum(totals.Lost)}</span>` +
-      `&nbsp;&nbsp;<span style="color:var(--muted)">Total opps: ${cribData().sales.length}</span>`;
+      `<span style="color:var(--muted)">Total opps: <strong style="color:var(--fg)">${met.count}</strong></span>` +
+      `&nbsp;&nbsp;<span style="color:var(--muted)">Potential: <strong style="color:var(--fg)">${cribFmtMoney(met.potential)}</strong></span>` +
+      `&nbsp;&nbsp;<span class="sales-status-pill" data-status="Won">Won: ${cribFmtMoney(met.Won)}</span>` +
+      `&nbsp;&nbsp;<span class="sales-status-pill" data-status="In Progress">In Progress: ${cribFmtMoney(met['In Progress'])}</span>` +
+      `&nbsp;&nbsp;<span class="sales-status-pill" data-status="Lost">Lost: ${cribFmtMoney(met.Lost)}</span>`;
     totalsTr.appendChild(tdTotals);
     tbody.appendChild(totalsTr);
+    table.appendChild(tbody);
+    root.appendChild(table);
+  }
+
+  function renderCribRelationships() {
+    const root = document.getElementById('cribRelationshipsList');
+    if (!root) return;
+    root.innerHTML = '';
+    const rows = cribData().relationships || [];
+    if (!rows.length) {
+      root.appendChild(mkEmptySection('No key relationships yet.'));
+      return;
+    }
+    const table = document.createElement('table');
+    table.className = 'crib-sales-table';
+    const thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th style="width:18%">Name</th><th style="width:18%">Client</th><th style="width:18%">Role</th><th style="width:15%">Strength</th><th style="width:25%">Notes</th><th style="width:6%"></th></tr>';
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    rows.forEach(x => {
+      const tr = document.createElement('tr');
+      if (x.starred) tr.classList.add('is-starred');
+      const mkCell = (field, ph) => {
+        const td = document.createElement('td');
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.value = x[field] || '';
+        if (ph) inp.placeholder = ph;
+        inp.addEventListener('input', () => updateCribItem('relationships', x.id, field, inp.value));
+        td.appendChild(inp);
+        return td;
+      };
+      tr.appendChild(mkCell('name', 'Name'));
+      tr.appendChild(mkCell('client', 'Client'));
+      tr.appendChild(mkCell('role', 'Role / title'));
+      tr.appendChild(mkCell('strength', 'e.g. Strong'));
+      tr.appendChild(mkCell('notes', 'Notes'));
+      const tdAct = document.createElement('td');
+      tdAct.className = 'sales-row-actions';
+      const star = document.createElement('button');
+      star.className = 'sales-star-btn' + (x.starred ? ' is-starred' : '');
+      star.type = 'button';
+      star.title = x.starred ? 'Priority — starred for pitch & HTML export' : 'Star as priority';
+      star.innerHTML = '<svg viewBox="0 0 24 24" fill="' + (x.starred ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+      star.addEventListener('click', () => {
+        const willStar = !x.starred;
+        updateCribItem('relationships', x.id, 'starred', willStar);
+        showSoftToast(willStar ? 'Starred as priority' : 'Star removed', '★');
+        renderCribRelationships();
+      });
+      tdAct.appendChild(star);
+      const del = document.createElement('button');
+      del.className = 'sales-row-del';
+      del.type = 'button';
+      del.title = 'Delete row';
+      del.innerHTML = ICONS.x;
+      del.addEventListener('click', () => deleteCribItem('relationships', x.id));
+      tdAct.appendChild(del);
+      tr.appendChild(tdAct);
+      tbody.appendChild(tr);
+    });
     table.appendChild(tbody);
     root.appendChild(table);
   }
@@ -12417,7 +12538,8 @@
       ai: addCribAi,
       bd: addCribBd,
       priority: addCribPriority,
-      dev: addCribDev
+      dev: addCribDev,
+      relationships: addCribRelationship
     };
     document.querySelectorAll('.crib-tray-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -12435,6 +12557,7 @@
       cribAddSalesBtn: addCribSales, cribAddBdBtn: addCribBd,
       cribAddPriorityBtn: addCribPriority, cribAddDevBtn: addCribDev,
       cribAddKxBtn: addCribKx, cribAddAiBtn: addCribAi,
+      cribAddRelationshipsBtn: addCribRelationship,
       cribAddQualBtn: addCribQualification
     };
     Object.entries(cribBtnMap).forEach(([id, fn]) => {
@@ -12505,6 +12628,11 @@
     lines.push(`*Round: ${r.name || 'Untitled round'} · Generated ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}*`);
     lines.push('');
 
+    if (r.storyFrame) {
+      lines.push(`**Your story angle:** ${r.storyFrame}`);
+      lines.push('');
+    }
+
     // Summary
     const s = r.summary || {};
     if (s.name || s.currentPosition || s.targeting || s.timeAtLevel || s.peopleLead || s.chargability || (s.clientAccounts && s.clientAccounts.length)) {
@@ -12524,7 +12652,7 @@
       lines.push('');
     }
 
-    const sectionOrder = r.sectionOrder || ['projects','practice','sales','bd','priority','dev','kx','ai','topSkills','qualifications'];
+    const sectionOrder = r.sectionOrder || ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
     const sectionEmitters = {
       projects: () => {
         if (!c.projects.length) return;
@@ -12558,17 +12686,14 @@
       sales: () => {
         if (!c.sales.length) return;
         lines.push('## Sales');
+        const m = cribSalesMetrics(c.sales);
+        lines.push(`**Key sales metrics:** Total opps supported ${m.count} · Potential value ${cribFmtMoney(m.potential)} · Won ${cribFmtMoney(m.Won)} · In Progress ${cribFmtMoney(m['In Progress'])} · Lost ${cribFmtMoney(m.Lost)}`);
+        lines.push('');
         lines.push('| Opp ID | Opportunity | Client | Value | Status | Role |');
         lines.push('|---|---|---|---|---|---|');
-        const totals = { Won: 0, 'In Progress': 0, Lost: 0 };
         ordered(c.sales).forEach(s => {
           lines.push(`| ${s.oppId || ''} | ${(s.starred ? '★ ' : '')}${s.opp || ''} | ${s.name || ''} | ${s.value || ''} | ${s.status || ''} | ${s.role || ''} |`);
-          const v = parseFloat(String(s.value || '').replace(/[^0-9.\-]/g, ''));
-          if (!isNaN(v) && totals[s.status] !== undefined) totals[s.status] += v;
         });
-        lines.push('');
-        const fmt = (n) => n >= 1000000 ? '£' + (n/1000000).toFixed(2) + 'M' : n >= 1000 ? '£' + Math.round(n/1000) + 'K' : '£' + n;
-        lines.push(`**Totals:** Won ${fmt(totals.Won)} · In Progress ${fmt(totals['In Progress'])} · Lost ${fmt(totals.Lost)} · ${c.sales.length} opportunities`);
         lines.push('');
       },
       priority: () => {
@@ -12630,6 +12755,17 @@
           if (a.outputs) lines.push(`- **Output / Links:** ${a.outputs}`);
           lines.push('');
         });
+      },
+      relationships: () => {
+        const rels = c.relationships || [];
+        if (!rels.length) return;
+        lines.push('## Key Relationships');
+        lines.push('| Name | Client | Role | Strength | Notes |');
+        lines.push('|---|---|---|---|---|');
+        ordered(rels).forEach(x => {
+          lines.push(`| ${(x.starred ? '★ ' : '')}${x.name || ''} | ${x.client || ''} | ${x.role || ''} | ${x.strength || ''} | ${x.notes || ''} |`);
+        });
+        lines.push('');
       },
       topSkills: () => {
         const skills = c.topSkills || [];
@@ -12716,18 +12852,22 @@
       },
       sales: () => {
         if (!c.sales.length) return null;
-        const totals = { Won: 0, 'In Progress': 0, Lost: 0 };
         const pillClass = { 'Won': 'won', 'In Progress': 'prog', 'Lost': 'lost' };
         const rows = c.sales.map(x => {
           if (x.starred) highlights.push(['Sales', x.opp || x.oppId || 'Opportunity']);
-          const v = parseFloat(String(x.value || '').replace(/[^0-9.\-]/g, ''));
-          if (!isNaN(v) && totals[x.status] !== undefined) totals[x.status] += v;
           const pc = pillClass[x.status] || 'prog';
           return `<tr class="${x.starred ? 'starred' : ''}"><td>${esc(x.oppId)}</td><td>${x.starred ? '★ ' : ''}${esc(x.opp)}</td><td>${esc(x.name)}</td><td>${esc(x.value)}</td><td>${x.status ? `<span class="pill ${pc}">${esc(x.status)}</span>` : ''}</td><td>${esc(x.role)}</td></tr>`;
         }).join('');
-        const tbl = `<table class="tbl"><thead><tr><th>Opp ID</th><th>Opportunity</th><th>Client</th><th>Value</th><th>Status</th><th>Role</th></tr></thead><tbody>${rows}</tbody></table>` +
-          `<div class="totals"><span class="pill won">Won ${fmtMoney(totals.Won)}</span><span class="pill prog">In Progress ${fmtMoney(totals['In Progress'])}</span><span class="pill lost">Lost ${fmtMoney(totals.Lost)}</span> <span class="muted">· ${c.sales.length} opportunities</span></div>`;
-        return { html: panel('Sales', tbl), w: 1.4 + c.sales.length * 0.3 };
+        const m = cribSalesMetrics(c.sales);
+        const kpis = `<div class="kpis">` +
+          `<div class="kpi"><div class="kpi-v">${m.count}</div><div class="kpi-k">Opps supported</div></div>` +
+          `<div class="kpi"><div class="kpi-v">${esc(cribFmtMoney(m.potential))}</div><div class="kpi-k">Potential value</div></div>` +
+          `<div class="kpi kpi-won"><div class="kpi-v">${esc(cribFmtMoney(m.Won))}</div><div class="kpi-k">Won</div></div>` +
+          `<div class="kpi"><div class="kpi-v">${esc(cribFmtMoney(m['In Progress']))}</div><div class="kpi-k">In progress</div></div>` +
+          `<div class="kpi"><div class="kpi-v">${esc(cribFmtMoney(m.Lost))}</div><div class="kpi-k">Lost</div></div>` +
+          `</div>`;
+        const tbl = `<table class="tbl"><thead><tr><th>Opp ID</th><th>Opportunity</th><th>Client</th><th>Value</th><th>Status</th><th>Role</th></tr></thead><tbody>${rows}</tbody></table>`;
+        return { html: panel('Sales', kpis + tbl), w: 1.8 + c.sales.length * 0.3 };
       },
       bd: () => {
         if (!c.bd.length) return null;
@@ -12789,6 +12929,15 @@
         }).join('');
         return { html: panel('AI', cardsWrap(cards)), w: 1 + c.ai.length * 0.6 };
       },
+      relationships: () => {
+        const rels = c.relationships || [];
+        if (!rels.length) return null;
+        const rows = rels.map(x => {
+          if (x.starred) highlights.push(['Key Relationships', x.name || x.client || 'Relationship']);
+          return `<tr class="${x.starred ? 'starred' : ''}"><td>${x.starred ? '★ ' : ''}${esc(x.name)}</td><td>${esc(x.client)}</td><td>${esc(x.role)}</td><td>${esc(x.strength)}</td><td>${esc(x.notes)}</td></tr>`;
+        }).join('');
+        return { html: panel('Key Relationships', `<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Role</th><th>Strength</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`), w: 1 + rels.length * 0.3 };
+      },
       topSkills: () => {
         const skills = c.topSkills || [];
         if (!skills.length) return null;
@@ -12829,7 +12978,7 @@
     // space for content keeps a fully-populated crib to ~1–3 landscape pages.
     const bodyHtml = `<section class="page">` +
       `<div class="cover-band"><h1 class="cover-name">${esc(s.name || owner)}</h1>` +
-      `<div class="cover-sub">Performance Round Crib${r.name ? ' — ' + esc(r.name) : ''}</div>${metaHtml}</div>` +
+      `<div class="cover-sub">Performance Round Crib${r.name ? ' — ' + esc(r.name) : ''}</div>${metaHtml}${r.storyFrame ? `<div class="cover-angle">“${esc(r.storyFrame)}”</div>` : ''}</div>` +
       tilesHtml + hlHtml + acctHtml +
       panels.map(p => p.html).join('') +
       `<div class="foot">Generated ${esc(genDate)} · OmniPad</div></section>`;
@@ -12850,6 +12999,7 @@ a { color: #6d00c9; text-decoration: none; }
 .cover-name { font-size: 30px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
 .cover-sub { font-size: 14.5px; opacity: .92; margin-top: 6px; font-weight: 600; }
 .cover-meta { font-size: 13px; opacity: .9; margin-top: 12px; }
+.cover-angle { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.25); font-size: 14px; font-style: italic; opacity: .95; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
 .tile { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; }
 .tile .t-k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; font-weight: 700; }
@@ -12885,6 +13035,12 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
 .pill.lost { background: #fee2e2; color: #b91c1c; }
 .totals { margin-top: 10px; }
 .totals .pill { margin-right: 6px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.kpi { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; text-align: center; }
+.kpi-v { font-size: 20px; font-weight: 800; color: #18181b; letter-spacing: -.01em; }
+.kpi-k { font-size: 9.5px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; font-weight: 700; margin-top: 3px; }
+.kpi-won { border-color: #A100FF; background: #faf5ff; }
+.kpi-won .kpi-v { color: #7a00c2; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { background: #f3e8ff; color: #6d00c9; border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 700; }
 .kx { margin: 0; padding-left: 18px; }
