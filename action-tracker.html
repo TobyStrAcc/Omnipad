@@ -13021,7 +13021,7 @@
         lines.push('');
       },
       buckets: () => {
-        if (o.skipBuckets || !c.buckets.length) return;
+        if (!c.buckets.length) return;
         lines.push('## Buckets');
         c.buckets.forEach(b => {
           lines.push(`### ${b.title || 'Untitled bucket'}`);
@@ -13343,8 +13343,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
 
   function buildPitchPrompt() {
     const owner = ownerNameFromTitle() || 'the candidate';
-    // Buckets are catch-up working lists, not pitch evidence — keep them out of the LLM prompt
-    const md = cribAsMarkdown({ prioritiseStars: true, skipBuckets: true });
+    const md = cribAsMarkdown({ prioritiseStars: true });
     return [
       `You are a senior pitch coach helping ${owner} present themselves at their best to a senior audience (e.g. promotion panel, partner review, leadership skip-level).`,
       ``,
