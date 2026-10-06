@@ -2892,9 +2892,10 @@
   [data-section-key="dev"]          .crib-section-head { border-left-color:#8b5cf6; background:linear-gradient(90deg,rgba(139,92,246,.1) 0%,transparent 75%); }
   [data-section-key="kx"]           .crib-section-head { border-left-color:#06b6d4; background:linear-gradient(90deg,rgba(6,182,212,.1) 0%,transparent 75%); }
   [data-section-key="ai"]           .crib-section-head { border-left-color:#ec4899; background:linear-gradient(90deg,rgba(236,72,153,.1) 0%,transparent 75%); }
-  [data-section-key="relationships"].crib-section-head { border-left-color:#14b8a6; background:linear-gradient(90deg,rgba(20,184,166,.1) 0%,transparent 75%); }
+  [data-section-key="relationships"] .crib-section-head { border-left-color:#14b8a6; background:linear-gradient(90deg,rgba(20,184,166,.1) 0%,transparent 75%); }
   [data-section-key="topSkills"]    .crib-section-head { border-left-color:#10b981; background:linear-gradient(90deg,rgba(16,185,129,.1) 0%,transparent 75%); }
-  [data-section-key="qualifications"].crib-section-head { border-left-color:#6366f1; background:linear-gradient(90deg,rgba(99,102,241,.1) 0%,transparent 75%); }
+  [data-section-key="qualifications"] .crib-section-head { border-left-color:#6366f1; background:linear-gradient(90deg,rgba(99,102,241,.1) 0%,transparent 75%); }
+  [data-section-key="buckets"]      .crib-section-head { border-left-color:#84cc16; background:linear-gradient(90deg,rgba(132,204,22,.1) 0%,transparent 75%); }
   .crib-pitch-section               .crib-section-head { border-left-color:#a855f7; background:linear-gradient(90deg,rgba(168,85,247,.1) 0%,transparent 75%); }
   .crib-section-head h3 {
     margin: 0;
@@ -3054,6 +3055,43 @@
     background: var(--high);
     border-radius: 10px 0 0 10px;
   }
+  /* Crib buckets — renamable card holding a checklist of items / linked actions */
+  .bucket-items { margin-top: 4px; }
+  .bucket-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+  .bucket-item input[type="checkbox"] { flex-shrink: 0; margin: 0; accent-color: var(--accent); cursor: pointer; }
+  .bucket-item-text {
+    flex: 1; min-width: 0;
+    padding: 3px 6px;
+    border: 1px solid transparent; border-radius: 5px;
+    background: transparent; color: var(--fg);
+    font: inherit; font-size: 13.5px; text-align: left;
+  }
+  .bucket-item-text:hover { border-color: var(--border); }
+  .bucket-item-text:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .bucket-item.is-linked .bucket-item-text { cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bucket-item.is-linked .bucket-item-text::before { content: '↗ '; color: var(--muted-2); }
+  .bucket-item.done .bucket-item-text { text-decoration: line-through; color: var(--muted-2); }
+  .bucket-item .status-pill { flex-shrink: 0; padding: 1px 7px; font-size: 10.5px; cursor: default; }
+  .bucket-item-del {
+    flex-shrink: 0;
+    background: transparent; border: 0; color: var(--muted-2); cursor: pointer;
+    width: 22px; height: 22px; border-radius: 4px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .12s ease;
+  }
+  .bucket-item:hover .bucket-item-del { opacity: 1; }
+  .bucket-item-del:hover { background: #fdecec; color: var(--danger); }
+  html[data-theme="dark"] .bucket-item-del:hover { background: rgba(220,38,38,0.18); }
+  .bucket-item-del svg { width: 12px; height: 12px; }
+  .bucket-add {
+    width: 100%; box-sizing: border-box; margin-top: 6px;
+    padding: 5px 8px;
+    border: 1px dashed var(--border); border-radius: 6px;
+    background: transparent; color: var(--fg);
+    font: inherit; font-size: 13px;
+  }
+  .bucket-add:focus { outline: none; border-style: solid; border-color: var(--accent); }
+  .bucket-hint { font-size: 12px; color: var(--muted-2); padding: 2px 0; }
   .crib-field { margin-bottom: 8px; }
   .crib-field:last-child { margin-bottom: 0; }
   .crib-field-row {
@@ -4509,6 +4547,9 @@
     body.printing-crib .crib-account-del,
     body.printing-crib .crib-star-btn,
     body.printing-crib .sales-star-btn,
+    body.printing-crib .bucket-item-del,
+    body.printing-crib .bucket-add,
+    body.printing-crib .bucket-hint,
     body.printing-crib .crib-accounts-block .btn { display: none !important; }
     body.printing-crib .crib-section { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12pt; }
     body.printing-crib .crib-section-head h3 { font-size: 13pt; margin: 8pt 0 4pt; color: #000; }
@@ -5287,6 +5328,7 @@
           <button class="crib-tray-btn" data-add="kx" type="button"><span class="ctb-icon">📚</span><span>KX</span></button>
           <button class="crib-tray-btn" data-add="ai" type="button"><span class="ctb-icon">🤖</span><span>AI</span></button>
           <button class="crib-tray-btn" data-add="relationships" type="button"><span class="ctb-icon">🔗</span><span>Relationship</span></button>
+          <button class="crib-tray-btn" data-add="buckets" type="button"><span class="ctb-icon">🪣</span><span>Bucket</span></button>
         </div>
       </div>
 
@@ -5384,6 +5426,14 @@
           <button class="btn small" id="cribAddQualBtn" type="button">+ Add</button>
         </div>
         <div class="crib-cards" id="cribQualificationsList"></div>
+      </div>
+
+      <div class="crib-section" id="cribBucketsSection" data-section-key="buckets">
+        <div class="crib-section-head">
+          <span class="crib-section-handle" title="Drag to reorder section">⋮⋮</span><h3>Buckets</h3>
+          <button class="btn small" id="cribAddBucketBtn" type="button">+ Add</button>
+        </div>
+        <div class="crib-cards" id="cribBucketsList"></div>
       </div>
 
       <div class="crib-section crib-pitch-section" id="cribPitchSection">
@@ -5569,7 +5619,7 @@
 
   // ── Release version ─────────────────────────────────────────────────────────
   // When releasing: bump APP_VERSION here, version.json, and CACHE_VERSION in sw.js
-  const APP_VERSION     = '1.1.0';
+  const APP_VERSION     = '1.2.0';
   // After pushing to GitHub, replace YOUR_USER with your GitHub username.
   // Leave as-is for local file use — version polling is skipped automatically.
   const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/tobystracc/Omnipad/main';
@@ -5590,6 +5640,7 @@
   ];
   const STATUSES = ['Open','In Progress','Blocked','Complete'];
   const PRIORITIES = ['Low','Medium','High'];
+  const CRIB_SECTION_ORDER = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications','buckets'];
 
   // --- icons ---
   const ICONS = {
@@ -5644,7 +5695,7 @@
       collapsedProjectIds: [],
       notes: [],
       links: [],
-      counters: { nextActionNumber: 1, nextActionId: 1, nextProjectId: 2, nextCommentId: 1, nextNoteId: 1, nextLinkId: 1, nextOneId: 1, nextOneEntryId: 1, nextCribProjectId: 1, nextCribPracticeId: 1, nextCribSalesId: 1, nextCribKxId: 1, nextCribAiId: 1, nextCribBdId: 1, nextCribPriorityId: 1, nextCribDevId: 1, nextCribRelationshipId: 1, nextCribRoundId: 1 }
+      counters: { nextActionNumber: 1, nextActionId: 1, nextProjectId: 2, nextCommentId: 1, nextNoteId: 1, nextLinkId: 1, nextOneId: 1, nextOneEntryId: 1, nextCribProjectId: 1, nextCribPracticeId: 1, nextCribSalesId: 1, nextCribKxId: 1, nextCribAiId: 1, nextCribBdId: 1, nextCribPriorityId: 1, nextCribDevId: 1, nextCribRelationshipId: 1, nextCribBucketId: 1, nextCribBucketItemId: 1, nextCribRoundId: 1 }
     };
   }
 
@@ -5738,16 +5789,15 @@
         });
       }
       // Ensure each round has all sections + a summary
-      const DEFAULT_SECTION_ORDER = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
       parsed.cribRounds.forEach(r => {
-        ['projects','practice','sales','kx','ai','bd','priority','dev','relationships'].forEach(k => {
+        ['projects','practice','sales','kx','ai','bd','priority','dev','relationships','buckets'].forEach(k => {
           if (!Array.isArray(r[k])) r[k] = [];
         });
         if (!Array.isArray(r.topSkills)) r.topSkills = [];
         if (!Array.isArray(r.qualifications)) r.qualifications = [];
-        if (!Array.isArray(r.sectionOrder)) r.sectionOrder = [...DEFAULT_SECTION_ORDER];
+        if (!Array.isArray(r.sectionOrder)) r.sectionOrder = [...CRIB_SECTION_ORDER];
         // Ensure any newly added section keys are appended to existing orders
-        DEFAULT_SECTION_ORDER.forEach(k => { if (!r.sectionOrder.includes(k)) r.sectionOrder.push(k); });
+        CRIB_SECTION_ORDER.forEach(k => { if (!r.sectionOrder.includes(k)) r.sectionOrder.push(k); });
         if (!r.summary || typeof r.summary !== 'object') r.summary = { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '' };
         ['name','currentPosition','targeting','timeAtLevel','peopleLead'].forEach(f => {
           if (typeof r.summary[f] !== 'string') r.summary[f] = '';
@@ -7850,6 +7900,21 @@
         },
       ];
       if (a.dueAt) menuItems.push({ icon: '✕', label: 'Clear due date', action: () => { a.dueAt = null; save(); render(); } });
+      // Add to / remove from a Crib bucket (active round). Ticked = already in that bucket.
+      if ((state.settings.visibleTabs || {}).crib !== false) {
+        menuItems.push(null, { groupLabel: 'Add to bucket' });
+        activeRound().buckets.forEach(b => {
+          const inBucket = b.items.some(it => it.actionId === a.id);
+          const name = b.title || 'Untitled bucket';
+          menuItems.push({
+            icon: inBucket ? '✓' : '🪣',
+            label: name.length > 40 ? name.slice(0, 39) + '…' : name,
+            checked: inBucket,
+            action: () => toggleActionInBucket(b, a)
+          });
+        });
+        menuItems.push({ icon: '＋', label: 'New bucket', action: () => toggleActionInBucket(newBucket(), a) });
+      }
       menuItems.push(null, { icon: '🗑', label: 'Delete', danger: true, action: () => { pendingDelete = a.id; render(); } });
       showContextMenu(menuItems, e.clientX, e.clientY);
     });
@@ -9163,10 +9228,11 @@
             sortKey: new Date(ar.createdAt || 0).getTime()
           });
         }
-        const sectionMap = { projects: 'Projects', practice: 'Practice', sales: 'Sales', bd: 'BD', priority: 'Priorities', dev: 'Development', kx: 'KX', ai: 'AI' };
+        const sectionMap = { projects: 'Projects', practice: 'Practice', sales: 'Sales', bd: 'BD', priority: 'Priorities', dev: 'Development', kx: 'KX', ai: 'AI', buckets: 'Buckets' };
         Object.keys(sectionMap).forEach(k => {
           (ar[k] || []).forEach(item => {
-            const itemHay = Object.values(item).filter(v => typeof v === 'string').join(' ').toLowerCase();
+            const itemHay = Object.values(item).filter(v => typeof v === 'string')
+              .concat((item.items || []).map(bucketItemText)).join(' ').toLowerCase();
             if (itemHay.includes(q)) {
               const primary = item.title || item.description || item.opp || item.name || sectionMap[k];
               results.push({
@@ -11313,15 +11379,19 @@
       if (!state.counters.nextCribRoundId) state.counters.nextCribRoundId = 2;
     }
     state.cribRounds.forEach(r => {
-      ['projects','practice','sales','kx','ai','bd','priority','dev','relationships'].forEach(k => {
+      ['projects','practice','sales','kx','ai','bd','priority','dev','relationships','buckets'].forEach(k => {
         if (!Array.isArray(r[k])) r[k] = [];
       });
+      r.buckets.forEach(b => { if (!Array.isArray(b.items)) b.items = []; });
+      if (Array.isArray(r.sectionOrder)) CRIB_SECTION_ORDER.forEach(k => { if (!r.sectionOrder.includes(k)) r.sectionOrder.push(k); });
       if (!r.summary || typeof r.summary !== 'object') r.summary = {};
       ['name','currentPosition','targeting','timeAtLevel','peopleLead'].forEach(f => {
         if (typeof r.summary[f] !== 'string') r.summary[f] = '';
       });
       if (typeof r.summary.peopleLeadPersonId !== 'number') r.summary.peopleLeadPersonId = null;
     });
+    if (!state.counters.nextCribBucketId) state.counters.nextCribBucketId = Math.max(0, ...state.cribRounds.flatMap(r => r.buckets.map(b => b.id || 0))) + 1;
+    if (!state.counters.nextCribBucketItemId) state.counters.nextCribBucketItemId = Math.max(0, ...state.cribRounds.flatMap(r => r.buckets.flatMap(b => b.items.map(it => it.id || 0)))) + 1;
     if (!state.cribActiveRoundId || !state.cribRounds.find(r => r.id === state.cribActiveRoundId)) {
       state.cribActiveRoundId = state.cribRounds[0].id;
     }
@@ -11573,6 +11643,66 @@
     setTimeout(() => scrollAndFocus('cribQualificationsSection', 'cribQualificationsList'), 0);
   }
 
+  // Buckets — renamable cards (e.g. "Catch-up with Sarah") holding free-text items and linked actions.
+  // A linked item stores actionId + a text snapshot; while the action exists its live title/status win.
+  function newBucket() {
+    const now = new Date().toISOString();
+    const b = { id: state.counters.nextCribBucketId++, title: 'Bucket', items: [], addedAt: now, updatedAt: now };
+    activeRound().buckets.unshift(b);
+    return b;
+  }
+  function addCribBucket() {
+    ensureCribShape();
+    const b = newBucket();
+    save(); renderCribView();
+    setTimeout(() => {
+      scrollIntoSection('cribBucketsSection');
+      const inp = document.querySelector(`#cribBucketsList .crib-card[data-id="${b.id}"] .crib-title-input`);
+      if (inp) { inp.focus(); inp.select(); }
+    }, 0);
+  }
+  function addBucketItem(b, fields) {
+    const now = new Date().toISOString();
+    b.items.push(Object.assign({ id: state.counters.nextCribBucketItemId++, text: '', done: false, actionId: null, addedAt: now }, fields));
+    b.updatedAt = now;
+  }
+  function bucketAction(it) {
+    return it.actionId == null ? null : (state.actions.find(a => a.id === it.actionId) || null);
+  }
+  function bucketItemText(it) {
+    const a = bucketAction(it);
+    return a ? a.description : (it.text || '');
+  }
+  function bucketItemDone(it) {
+    const a = bucketAction(it);
+    return a ? a.status === 'Complete' : !!it.done;
+  }
+  function toggleActionInBucket(b, a) {
+    const name = b.title || 'Untitled bucket';
+    if (b.items.some(it => it.actionId === a.id)) {
+      b.items = b.items.filter(it => it.actionId !== a.id);
+      b.updatedAt = new Date().toISOString();
+      showSoftToast(`Removed from “${name}”`, '🪣');
+    } else {
+      addBucketItem(b, { text: a.description, actionId: a.id });
+      showSoftToast(`Added to “${name}”`, '🪣');
+    }
+    save();
+  }
+  function setActionCompleteFromBucket(a, complete, anchorEl) {
+    if (complete) {
+      a.status = 'Complete';
+      a.completedAt = new Date().toISOString();
+      fireworks(anchorEl);
+      const isFirst = recordCompletionForStreak();
+      if (isFirst) maybeFirstCompletionToast();
+    } else {
+      a.status = 'Open';
+      a.completedAt = null;
+    }
+    save();
+  }
+
   // Generic card reorder (works for all keyed arrays on a round)
   function reorderCribItem(kind, draggedId, targetId, before) {
     ensureCribRounds();
@@ -11591,7 +11721,7 @@
   function reorderCribSection(draggedKey, targetKey, before) {
     ensureCribRounds();
     const r = activeRound();
-    if (!Array.isArray(r.sectionOrder)) r.sectionOrder = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
+    if (!Array.isArray(r.sectionOrder)) r.sectionOrder = [...CRIB_SECTION_ORDER];
     const fromIdx = r.sectionOrder.indexOf(draggedKey);
     const toIdx = r.sectionOrder.indexOf(targetKey);
     if (fromIdx === -1 || toIdx === -1) return;
@@ -11616,18 +11746,19 @@
     renderCribRelationships();
     renderCribTopSkills();
     renderCribQualifications();
+    renderCribBuckets();
     applyCribSectionOrder();
     renderCribPitch();
   }
 
   function applyCribSectionOrder() {
     const r = activeRound();
-    const order = r.sectionOrder || ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
+    const order = r.sectionOrder || CRIB_SECTION_ORDER;
     const sectionIdMap = {
       projects: 'cribProjectsSection', practice: 'cribPracticeSection', sales: 'cribSalesSection',
       bd: 'cribBdSection', priority: 'cribPrioritySection', dev: 'cribDevSection',
       kx: 'cribKxSection', ai: 'cribAiSection', relationships: 'cribRelationshipsSection', topSkills: 'cribTopSkillsSection',
-      qualifications: 'cribQualificationsSection'
+      qualifications: 'cribQualificationsSection', buckets: 'cribBucketsSection'
     };
     const footer = document.querySelector('#cribView .crib-footer');
     if (!footer) return;
@@ -11874,6 +12005,8 @@
       reseed(cloned.dev, 'nextCribDevId');
       reseed(cloned.relationships || [], 'nextCribRelationshipId');
       reseed(cloned.qualifications || [], 'nextCribQualificationId');
+      reseed(cloned.buckets, 'nextCribBucketId');
+      cloned.buckets.forEach(b => reseed(b.items, 'nextCribBucketItemId'));
       (cloned.summary.clientAccounts || []).forEach(a => { a.id = state.counters.nextCribClientAccountId++; });
       newRound = {
         id,
@@ -11886,9 +12019,10 @@
         relationships: cloned.relationships || [],
         topSkills: cloned.topSkills ? [...cloned.topSkills] : [],
         qualifications: cloned.qualifications || [],
+        buckets: cloned.buckets,
         pitchNotes: cloned.pitchNotes || '',
         storyFrame: cloned.storyFrame || '',
-        sectionOrder: cloned.sectionOrder ? [...cloned.sectionOrder] : ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications']
+        sectionOrder: cloned.sectionOrder ? [...cloned.sectionOrder] : [...CRIB_SECTION_ORDER]
       };
     } else {
       newRound = {
@@ -11897,8 +12031,8 @@
         createdAt: now,
         summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '', chargability: '', clientAccounts: [] },
         projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: [], relationships: [],
-        topSkills: [], qualifications: [], pitchNotes: '', storyFrame: '',
-        sectionOrder: ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications']
+        topSkills: [], qualifications: [], buckets: [], pitchNotes: '', storyFrame: '',
+        sectionOrder: [...CRIB_SECTION_ORDER]
       };
     }
     state.cribRounds.push(newRound);
@@ -12029,7 +12163,7 @@
     return wrap;
   }
 
-  function mkCribCard(item, kind, fieldsBuilder) {
+  function mkCribCard(item, kind, fieldsBuilder, opts) {
     const card = document.createElement('div');
     card.className = 'crib-card';
     card.dataset.id = item.id;
@@ -12074,6 +12208,10 @@
     del.innerHTML = ICONS.x;
     del.addEventListener('click', () => deleteCribItem(kind, item.id));
     card.appendChild(del);
+    if (opts && opts.star === false) {
+      fieldsBuilder(card);
+      return card;
+    }
     // Star / prioritise — highlighted in the HTML export & flagged in the Pitch prompt
     if (item.starred) card.classList.add('is-starred');
     const star = document.createElement('button');
@@ -12422,6 +12560,101 @@
     });
   }
 
+  function renderCribBuckets() {
+    const root = document.getElementById('cribBucketsList');
+    if (!root) return;
+    root.innerHTML = '';
+    const buckets = activeRound().buckets;
+    if (!buckets.length) {
+      root.appendChild(mkEmptySection('No buckets yet — group items for a catch-up. Right-click an action to drop it into a bucket.', addCribBucket));
+      return;
+    }
+    buckets.forEach(b => {
+      const card = mkCribCard(b, 'buckets', (c) => {
+        c.appendChild(mkField('Title', b.title, v => updateCribItem('buckets', b.id, 'title', v), { placeholder: 'e.g. Catch-up with Sarah', titleField: true }));
+        const list = document.createElement('div');
+        list.className = 'bucket-items';
+        if (!b.items.length) {
+          const hint = document.createElement('div');
+          hint.className = 'bucket-hint';
+          hint.textContent = 'Type below, or right-click an action → Add to bucket.';
+          list.appendChild(hint);
+        }
+        b.items.forEach(it => list.appendChild(mkBucketItemRow(b, it)));
+        c.appendChild(list);
+        const add = document.createElement('input');
+        add.type = 'text';
+        add.className = 'bucket-add';
+        add.placeholder = 'Add an item + Enter';
+        add.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter') return;
+          e.preventDefault();
+          const v = add.value.trim();
+          if (!v) return;
+          addBucketItem(b, { text: v });
+          save(); renderCribBuckets();
+          const next = document.querySelector(`#cribBucketsList .crib-card[data-id="${b.id}"] .bucket-add`);
+          if (next) next.focus();
+        });
+        c.appendChild(add);
+      }, { star: false });
+      root.appendChild(card);
+    });
+  }
+
+  function mkBucketItemRow(b, it) {
+    const a = bucketAction(it);
+    const done = bucketItemDone(it);
+    const row = document.createElement('div');
+    row.className = 'bucket-item' + (a ? ' is-linked' : '') + (done ? ' done' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = done;
+    cb.title = a ? (done ? 'Reopen action' : 'Complete action') : (done ? 'Mark not done' : 'Mark done');
+    cb.addEventListener('change', () => {
+      if (a) setActionCompleteFromBucket(a, cb.checked, row);
+      else { it.done = cb.checked; save(); }
+      render();
+    });
+    row.appendChild(cb);
+    let text;
+    if (a) {
+      // Linked action: live title opens the action's detail card
+      text = document.createElement('button');
+      text.type = 'button';
+      text.textContent = a.description;
+      text.title = 'Open action';
+      text.addEventListener('click', () => openActionModal(a.id));
+    } else {
+      text = document.createElement('input');
+      text.type = 'text';
+      text.value = it.text || '';
+      text.addEventListener('input', () => { it.text = text.value; b.updatedAt = new Date().toISOString(); save(); });
+    }
+    text.className = 'bucket-item-text';
+    row.appendChild(text);
+    if (a) {
+      const pill = document.createElement('span');
+      pill.className = 'status-pill';
+      pill.dataset.status = a.status;
+      pill.innerHTML = '<span class="sdot"></span>';
+      pill.appendChild(document.createTextNode(a.status));
+      row.appendChild(pill);
+    }
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'bucket-item-del';
+    del.title = 'Remove from bucket';
+    del.innerHTML = ICONS.x;
+    del.addEventListener('click', () => {
+      b.items = b.items.filter(x => x.id !== it.id);
+      b.updatedAt = new Date().toISOString();
+      save(); renderCribBuckets();
+    });
+    row.appendChild(del);
+    return row;
+  }
+
   function renderCribBd() {
     const root = document.getElementById('cribBdList');
     if (!root) return;
@@ -12539,7 +12772,8 @@
       bd: addCribBd,
       priority: addCribPriority,
       dev: addCribDev,
-      relationships: addCribRelationship
+      relationships: addCribRelationship,
+      buckets: addCribBucket
     };
     document.querySelectorAll('.crib-tray-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -12558,7 +12792,8 @@
       cribAddPriorityBtn: addCribPriority, cribAddDevBtn: addCribDev,
       cribAddKxBtn: addCribKx, cribAddAiBtn: addCribAi,
       cribAddRelationshipsBtn: addCribRelationship,
-      cribAddQualBtn: addCribQualification
+      cribAddQualBtn: addCribQualification,
+      cribAddBucketBtn: addCribBucket
     };
     Object.entries(cribBtnMap).forEach(([id, fn]) => {
       const el = document.getElementById(id);
@@ -12652,7 +12887,7 @@
       lines.push('');
     }
 
-    const sectionOrder = r.sectionOrder || ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications'];
+    const sectionOrder = r.sectionOrder || CRIB_SECTION_ORDER;
     const sectionEmitters = {
       projects: () => {
         if (!c.projects.length) return;
@@ -12784,6 +13019,18 @@
           lines.push(`- ${mark(q)}${parts.join(' — ')}`);
         });
         lines.push('');
+      },
+      buckets: () => {
+        if (o.skipBuckets || !c.buckets.length) return;
+        lines.push('## Buckets');
+        c.buckets.forEach(b => {
+          lines.push(`### ${b.title || 'Untitled bucket'}`);
+          b.items.forEach(it => {
+            const t = bucketItemText(it).trim();
+            if (t) lines.push(`- [${bucketItemDone(it) ? 'x' : ' '}] ${t}`);
+          });
+          lines.push('');
+        });
       }
     };
 
@@ -12952,10 +13199,19 @@
           return `<tr class="${q.starred ? 'starred' : ''}"><td>${q.starred ? '★ ' : ''}${esc(q.name || 'Untitled')}</td><td>${esc(q.issuer)}</td><td>${esc(q.year)}</td></tr>`;
         }).join('');
         return { html: panel('Qualifications', `<table class="tbl"><thead><tr><th>Qualification</th><th>Issuer</th><th>Year</th></tr></thead><tbody>${rows}</tbody></table>`), w: 1 + quals.length * 0.3 };
+      },
+      buckets: () => {
+        if (!c.buckets.length) return null;
+        const cards = c.buckets.map(b => {
+          const items = b.items.filter(it => bucketItemText(it).trim())
+            .map(it => `<li class="${bucketItemDone(it) ? 'done' : ''}">${esc(bucketItemText(it))}</li>`).join('');
+          return card(false, esc(b.title || 'Untitled bucket'), items ? `<ul class="ach bucket">${items}</ul>` : '');
+        }).join('');
+        return { html: panel('Buckets', cardsWrap(cards)), w: 1 + c.buckets.length * 0.5 };
       }
     };
 
-    const sectionOrder = r.sectionOrder || ['projects', 'practice', 'sales', 'bd', 'priority', 'dev', 'kx', 'ai', 'topSkills', 'qualifications'];
+    const sectionOrder = r.sectionOrder || CRIB_SECTION_ORDER;
     const panels = [];
     sectionOrder.forEach(key => { if (builders[key]) { const out = builders[key](); if (out) panels.push(out); } });
 
@@ -13023,6 +13279,7 @@ a { color: #6d00c9; text-decoration: none; }
 .ach-h { font-size: 11px; color: #6b7280; font-weight: 700; margin-top: 6px; }
 .ach { margin: 3px 0 0; padding-left: 18px; }
 .ach li { font-size: 12.5px; margin: 1px 0; }
+.ach.bucket li.done { text-decoration: line-through; color: #9ca3af; }
 table.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 table.tbl th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; font-weight: 800; padding: 7px 10px; background: #f9fafb; border-bottom: 2px solid #ede9fe; }
 table.tbl td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
@@ -13086,7 +13343,8 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
 
   function buildPitchPrompt() {
     const owner = ownerNameFromTitle() || 'the candidate';
-    const md = cribAsMarkdown({ prioritiseStars: true });
+    // Buckets are catch-up working lists, not pitch evidence — keep them out of the LLM prompt
+    const md = cribAsMarkdown({ prioritiseStars: true, skipBuckets: true });
     return [
       `You are a senior pitch coach helping ${owner} present themselves at their best to a senior audience (e.g. promotion panel, partner review, leadership skip-level).`,
       ``,

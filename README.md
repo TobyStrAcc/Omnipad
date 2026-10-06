@@ -33,9 +33,9 @@ That's it. The app is now live at your own URL and will poll your repo for updat
 2. Bump `APP_VERSION` in `action-tracker.html` (e.g. `1.1.0` → `1.2.0`)
 3. Bump `version.json` to match
 4. Bump `CACHE_VERSION` in `sw.js` (e.g. `omnipad-1.1.0` → `omnipad-1.2.0`)
-5. `git add . && git commit -m "v1.2.0: what changed" && git push`
+5. Commit, then get it onto `main` — push directly or merge a PR. Every push to `main` triggers the built-in **pages build and deployment** run (no workflow file needed).
 
-GitHub Pages deploys in ~60 seconds. Users on the hosted app see a "Reload to update" banner via the service worker. Users running a downloaded local file see a blue "OmniPad 1.2.0 available → Download" banner within 3 seconds of next open.
+GitHub Pages deploys in ~60 seconds. Skipping the version bumps still deploys, but local-file users won't be told there's an update. Users on the hosted app see a "Reload to update" banner via the service worker. Users running a downloaded local file see a blue "OmniPad 1.2.0 available → Download" banner within 3 seconds of next open.
 
 ---
 
