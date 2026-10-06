@@ -9,7 +9,7 @@
  * cache reset. Day-to-day HTML edits do NOT need a version bump because
  * the HTML is fetched network-first.
  */
-const CACHE_VERSION = 'omnipad-1.2.0';  // bump to match APP_VERSION on each release
+const CACHE_VERSION = 'omnipad-1.2.1';  // bump to match APP_VERSION on each release
 const APP_SHELL = [
   './',
   './action-tracker.html',
