@@ -184,6 +184,7 @@
     box-shadow: var(--shadow-sm);
   }
   .icon-btn:hover { background: var(--hover); color: var(--fg); border-color: var(--border-strong); }
+  .icon-btn.flash-ring { transition: box-shadow .25s ease; box-shadow: 0 0 0 4px rgba(24,24,27,0.18); }
   .icon-btn.active {
     background: var(--accent);
     color: var(--surface);
@@ -452,9 +453,23 @@
   }
   .admin-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     align-items: center;
   }
+  .admin-row + .admin-row,
+  .admin-row + .toggle-row { margin-top: 8px; }
+  .toggle-row + .toggle-row { margin-top: 4px; }
+  .settings-subhead { margin-bottom: 6px; }
+  .toggle-row + .settings-subhead { margin-top: 14px; }
+  .admin-label { font-size: 12px; color: var(--muted); }
+  .admin-hint { font-size: 12px; color: var(--muted-2); margin-bottom: 8px; }
+  .admin-row + .admin-hint { margin: 8px 0 0; }
+  .project-add-row { margin-bottom: 12px; }
+  .muted-count { color: var(--muted-2); font-size: 11px; margin-left: 4px; }
+  .project-count { color: var(--muted); font-size: 12px; }
+  #captureShortcutInput { cursor: pointer; }
+  .swatch.swatch-lg { width: 22px; height: 22px; border-radius: 6px; }
   .admin input[type="number"] { width: 64px; }
   .admin input[type="text"],
   .admin input[type="number"] {
@@ -492,7 +507,8 @@
     box-shadow: var(--shadow-sm);
   }
   .btn.primary:hover { filter: brightness(1.15); }
-  .btn.small { padding: 3px 10px; font-size: 12px; }
+  .btn.small { padding: 4px 10px; font-size: 12px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .project-list {
     margin-top: 6px;
@@ -605,6 +621,7 @@
     pointer-events: auto;
     transform: translateX(-50%) translateY(0);
   }
+  .update-banner .ub-dot.info { background: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.25); }
   .update-banner .ub-dot {
     width: 8px; height: 8px;
     border-radius: 50%;
@@ -969,6 +986,11 @@
     border-color: var(--accent); color: var(--accent); font-weight: 600;
   }
   .cu-quick-btn.clear { color: var(--muted-2); }
+  .cu-quick-btn:disabled { opacity: .4; cursor: default; }
+  .cu-label svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 5px; }
+  .cu-undo svg { width: 13px; height: 13px; vertical-align: -2px; margin-right: 3px; }
+  .cu-btn svg { width: 16px; height: 16px; }
+  .cu-btn.cu-complete svg { width: 18px; height: 18px; }
   .cu-quick-btn.clear:hover { color: var(--danger); border-color: var(--danger); }
   .cu-due-current {
     font-size: 12px; color: var(--muted); margin-left: 2px;
@@ -1021,7 +1043,10 @@
   .filter-bar.focus-active .filter-divider {
     opacity: 0.5;
   }
-  .chip svg { width: 12px; height: 12px; }
+  .chip svg { width: 13px; height: 13px; }
+  .chips { display: contents; }
+  .filter-bar.sidebar-filter { border: 0; box-shadow: none; padding: 6px 12px 0; background: transparent; }
+  .ones-stale-chip .dot { background: var(--high); }
   .chip-row-label {
     font-size: 10.5px;
     text-transform: uppercase;
@@ -1900,6 +1925,9 @@
     letter-spacing: -0.01em;
   }
   .empty p { margin: 0 0 18px; font-size: 13px; color: var(--muted); }
+  .comments-empty { color: var(--muted-2); font-size: 12px; padding: 4px 0 2px; }
+  .bb-spacer { flex: 1; }
+  .support-status { font-size: 12px; color: var(--muted); margin-left: 8px; }
 
   /* View tabs */
   .view-tabs {
@@ -2164,6 +2192,11 @@
     color: var(--muted-2);
     font-weight: 600;
   }
+  .note-meta .nm-label:not(:first-child) { margin-left: 8px; }
+  .nsp-p { font-size: 13px; }
+  .nsp-h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .nsp-h2 { font-size: 15px; font-weight: 600; }
+  .nsp-h3 { font-size: 13px; font-weight: 600; }
   .nm-colours {
     display: inline-flex;
     gap: 5px;
@@ -2523,6 +2556,8 @@
     cursor: pointer;
   }
   .sp-action-item:hover { background: color-mix(in srgb, var(--surface) 18%, transparent); }
+  .sp-action-item.empty { opacity: .6; cursor: default; }
+  .sp-label { opacity: 0.8; font-style: italic; }
   .sp-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .sp-anum { font-size: 10px; opacity: 0.7; flex-shrink: 0; }
 
@@ -3301,6 +3336,18 @@
     color: var(--muted);
   }
   .crib-auto-note strong { color: var(--fg); }
+  .crib-tip { color: var(--muted-2); }
+  .sales-total-label { color: var(--muted); }
+  .sales-total-label strong { color: var(--fg); }
+  .crib-skill-input {
+    width: 100%; box-sizing: border-box;
+    border: 1px solid transparent; border-radius: 6px;
+    padding: 5px 8px; font: inherit; font-size: 13.5px;
+    background: transparent; color: var(--fg);
+    transition: border-color .12s ease, background .12s ease;
+  }
+  .crib-skill-input:not(:disabled):hover { border-color: var(--border); }
+  .crib-skill-input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
   .crib-auto-link {
     display: inline-flex;
     align-items: center;
@@ -3488,6 +3535,10 @@
     align-items: center;
     gap: 10px;
   }
+  .one-composer-actions .btn { padding: 6px 14px; font-size: 13px; }
+  .one-composer-hint { font-size: 11px; color: var(--muted-2); }
+  .one-entry-actions { margin-left: auto; }
+  .one-meta-field input.one-cadence-input { width: 46px; }
   .one-no-entries {
     margin: 12px 24px;
     color: var(--muted-2);
@@ -4128,6 +4179,7 @@
   .links-add input[type="url"] { flex: 1; min-width: 200px; }
   .links-add input[type="text"] { flex: 1; min-width: 140px; }
   .links-add input:focus { outline: none; border-color: var(--accent); }
+  .links-add input.invalid { border-color: var(--danger); }
   .links-add input::placeholder { color: var(--muted-2); }
   .links-add .la-project {
     border: 1px dashed var(--border-strong);
@@ -4185,6 +4237,7 @@
     width: 8px; height: 8px;
     border-radius: 50%;
   }
+  .links-group-count { color: var(--muted-2); font-weight: 500; margin-left: 4px; }
 
   .link-item {
     display: grid;
@@ -4335,6 +4388,7 @@
   .li-action-btn:hover { background: rgba(0,0,0,0.05); color: var(--fg); }
   .li-action-btn.is-pinned { color: var(--high); opacity: 1; }
   .li-action-btn svg { width: 13px; height: 13px; }
+  .li-action-btn.copied { color: #16a34a; }
   .link-item.is-pinned { background: linear-gradient(90deg, rgba(234,88,12,0.06), transparent); }
 
   .link-edit-form {
@@ -4768,6 +4822,8 @@
     padding: 7px 14px;
     border-top: 1px solid var(--border);
   }
+  .am-subtask-add-icon { color: var(--muted); font-size: 14px; flex-shrink: 0; }
+  .am-project-pill .pdot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .am-subtask-add-input {
     flex: 1;
     font-size: 13px;
@@ -4830,7 +4886,7 @@
   <button id="updateDismiss" class="ub-dismiss" type="button" aria-label="Dismiss">×</button>
 </div>
 <div class="update-banner" id="ghUpdateBanner" role="status" aria-live="polite">
-  <span class="ub-dot" style="background:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.25)"></span>
+  <span class="ub-dot info"></span>
   <span id="ghUpdateMsg">New version available</span>
   <a id="ghUpdateDownload" class="ub-download-btn" href="#" target="_blank" rel="noopener">Download</a>
   <button id="ghUpdateDismiss" class="ub-dismiss" type="button" aria-label="Dismiss">×</button>
@@ -4862,7 +4918,7 @@
       <span class="capture-mode" id="captureMode">Action</span>
       <span class="capture-hint">Enter to save · ⇧Enter for new line</span>
     </div>
-    <textarea id="captureTextarea" placeholder="More text…" style="display:none"></textarea>
+    <textarea id="captureTextarea" placeholder="More text…" hidden></textarea>
     <div class="capture-controls" id="captureControls"></div>
   </div>
 </div>
@@ -4933,7 +4989,7 @@
   <div class="support" id="supportPanel" hidden>
     <div class="support-head">
       <h3>Support &amp; quick fixes</h3>
-      <button class="btn" id="closeSupport" type="button" style="padding:4px 10px; font-size:12px;">Close</button>
+      <button class="btn small" id="closeSupport" type="button">Close</button>
     </div>
 
     <details class="sup-section" open>
@@ -4941,7 +4997,7 @@
       <div class="sup-body">
         <p><strong>Chrome or Edge (recommended):</strong> look for the install icon <strong>⊕</strong> in the address bar — it appears as a small computer-with-arrow icon on the right side. Click it, then <em>Install</em>. OmniPad opens in its own window with no browser chrome, and gets a taskbar / Start menu shortcut.</p>
         <p>If you don't see the icon, click the button below:</p>
-        <p><button class="btn" id="supportInstallBtn" type="button">Install OmniPad</button> <span id="supportInstallStatus" style="font-size:12px; color:var(--muted); margin-left:8px;"></span></p>
+        <p><button class="btn" id="supportInstallBtn" type="button">Install OmniPad</button> <span id="supportInstallStatus" class="support-status"></span></p>
         <p><strong>Safari (iPhone / Mac):</strong> tap the Share icon → <em>Add to Home Screen</em> (iPhone) or <em>Add to Dock</em> (Mac). Safari doesn't support the automatic install prompt.</p>
         <p><strong>Already installed?</strong> Your app icon opens OmniPad in standalone mode. You can safely close this browser tab.</p>
       </div>
@@ -5011,7 +5067,7 @@
   <div class="history" id="historyPanel" hidden>
     <div class="history-head">
       <h3>History <span class="history-sub">automatic daily backups, last 14 days</span></h3>
-      <button class="btn" id="closeHistory" type="button" style="padding:4px 10px; font-size:12px;">Close</button>
+      <button class="btn small" id="closeHistory" type="button">Close</button>
     </div>
     <div id="historyTabs" class="history-tabs"></div>
     <div id="historyDetail" class="history-detail"></div>
@@ -5021,30 +5077,30 @@
 
     <section>
       <h3>Profile</h3>
-      <div class="admin-row" style="flex-wrap:wrap; align-items:center; gap:8px;">
-        <label for="userNameInput" style="font-size:12px; color:var(--muted);">Your name</label>
+      <div class="admin-row">
+        <label for="userNameInput" class="admin-label">Your name</label>
         <input type="text" id="userNameInput" placeholder="e.g. Toby" autocomplete="off" maxlength="40">
       </div>
-      <div class="admin-row" style="flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px;">
-        <label for="captureShortcutInput" style="font-size:12px; color:var(--muted);">Quick-capture shortcut</label>
-        <input type="text" id="captureShortcutInput" placeholder="Click to set" readonly style="cursor:pointer;" maxlength="40">
-        <button class="btn" id="captureShortcutReset" type="button" style="padding:4px 10px; font-size:12px;">Reset</button>
+      <div class="admin-row">
+        <label for="captureShortcutInput" class="admin-label">Quick-capture shortcut</label>
+        <input type="text" id="captureShortcutInput" placeholder="Click to set" readonly maxlength="40">
+        <button class="btn small" id="captureShortcutReset" type="button">Reset</button>
       </div>
     </section>
 
     <section>
       <h3>Navigation</h3>
-      <div style="font-size:12px; color:var(--muted-2); margin-bottom:8px;">Show or hide top-level tabs</div>
+      <div class="admin-hint">Show or hide top-level tabs</div>
       <div class="toggle-row"><input type="checkbox" id="tabActions"><label for="tabActions">Actions</label></div>
-      <div class="toggle-row" style="margin-top:4px;"><input type="checkbox" id="tabNotes"><label for="tabNotes">Notes</label></div>
-      <div class="toggle-row" style="margin-top:4px;"><input type="checkbox" id="tabLinks"><label for="tabLinks">Links</label></div>
-      <div class="toggle-row" style="margin-top:4px;"><input type="checkbox" id="tabOnes"><label for="tabOnes">1‑2‑1s</label></div>
-      <div class="toggle-row" style="margin-top:4px;"><input type="checkbox" id="tabCrib"><label for="tabCrib">Crib Sheet</label></div>
+      <div class="toggle-row"><input type="checkbox" id="tabNotes"><label for="tabNotes">Notes</label></div>
+      <div class="toggle-row"><input type="checkbox" id="tabLinks"><label for="tabLinks">Links</label></div>
+      <div class="toggle-row"><input type="checkbox" id="tabOnes"><label for="tabOnes">1‑2‑1s</label></div>
+      <div class="toggle-row"><input type="checkbox" id="tabCrib"><label for="tabCrib">Crib Sheet</label></div>
     </section>
 
     <section>
       <h3>Projects</h3>
-      <div class="admin-row" style="margin-bottom:12px;">
+      <div class="admin-row project-add-row">
         <input type="text" id="newProjectName" placeholder="New project name…">
         <button class="btn" id="addProjectBtn">Add</button>
       </div>
@@ -5053,36 +5109,36 @@
 
     <section>
       <h3>Appearance</h3>
-      <div class="admin-row" style="flex-wrap:wrap; align-items:center; gap:8px;">
-        <span style="font-size:12px; color:var(--muted);">Theme</span>
+      <div class="admin-row">
+        <span class="admin-label">Theme</span>
         <div class="theme-seg" id="themeSeg">
           <button type="button" data-theme="light">Light</button>
           <button type="button" data-theme="dark">Dark</button>
           <button type="button" data-theme="system">System</button>
         </div>
       </div>
-      <div class="admin-row" style="flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px;">
-        <span style="font-size:12px; color:var(--muted);">Background tint</span>
+      <div class="admin-row">
+        <span class="admin-label">Background tint</span>
         <div id="bgTintSwatches" class="bg-tint-swatches"></div>
-        <span class="swatch" style="width:22px; height:22px; border-radius:6px; background:var(--bg-tint, #fff);" id="bgTintCustomSwatch">
+        <span class="swatch swatch-lg" id="bgTintCustomSwatch">
           <input type="color" id="bgTintPicker">
         </span>
-        <button class="btn" id="bgTintNone" type="button" style="padding:4px 10px; font-size:12px;">None</button>
+        <button class="btn small" id="bgTintNone" type="button">None</button>
       </div>
-      <div class="toggle-row" style="margin-top:8px;">
+      <div class="toggle-row">
         <input type="checkbox" id="compactRows">
         <label for="compactRows">Compact rows (tighter density)</label>
       </div>
-      <div class="settings-subhead" style="margin-top:14px; margin-bottom:6px;">Celebrations</div>
+      <div class="settings-subhead">Celebrations</div>
       <div class="toggle-row">
         <input type="checkbox" id="sparklesToggle">
         <label for="sparklesToggle">✨ Random encouragement on completion</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="fireworksOnComplete">
         <label for="fireworksOnComplete">🎉 Confetti burst when an action is completed</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="sparkleEggToggle">
         <label for="sparkleEggToggle">🌟 Hidden sparkle easter egg</label>
       </div>
@@ -5090,46 +5146,46 @@
 
     <section>
       <h3>Actions</h3>
-      <div class="settings-subhead" style="margin-bottom:6px;">Display</div>
+      <div class="settings-subhead">Display</div>
       <div class="toggle-row">
         <input type="checkbox" id="showActionNumbers">
         <label for="showActionNumbers">Show action numbers (#)</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="showDueColumn">
         <label for="showDueColumn">Show Due column</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="showMatrixView">
         <label for="showMatrixView">Show Eisenhower Matrix view</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="boldHighPriority">
         <label for="boldHighPriority">Bold high-priority actions</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="showTodayPanel">
         <label for="showTodayPanel">Show Today bar</label>
       </div>
-      <div class="settings-subhead" style="margin-top:14px; margin-bottom:6px;">Sorting &amp; filtering</div>
+      <div class="settings-subhead">Sorting &amp; filtering</div>
       <div class="toggle-row">
         <input type="checkbox" id="reverseSort">
         <label for="reverseSort">Reverse date order (newest first)</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="groupByProject">
         <label for="groupByProject">Group by project</label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="hideCompletedAfterDay">
-        <label for="hideCompletedAfterDay">Hide completed actions after the day they're done <span id="hiddenCompletedCount" style="color:var(--muted-2); font-size:11px; margin-left:4px;"></span></label>
+        <label for="hideCompletedAfterDay">Hide completed actions after the day they're done <span id="hiddenCompletedCount" class="muted-count"></span></label>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <label for="staleDaysInput">Flag open actions as stale after</label>
         <input type="number" id="staleDaysInput" min="1" max="60">
         <span>days</span>
       </div>
-      <div class="toggle-row" style="margin-top:4px;">
+      <div class="toggle-row">
         <input type="checkbox" id="openOfficeInApp">
         <label for="openOfficeInApp">Open Office files in desktop app when available</label>
       </div>
@@ -5137,17 +5193,17 @@
 
     <section>
       <h3>Data</h3>
-      <div class="admin-row" style="flex-wrap:wrap; gap:8px;">
+      <div class="admin-row">
         <button class="btn" id="exportBtn">Export JSON</button>
         <button class="btn" id="importBtn">Import JSON</button>
-        <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
         <button class="btn danger" id="wipeBtn">Wipe all data</button>
       </div>
-      <div class="admin-row" style="flex-wrap:wrap; gap:8px; margin-top:10px; align-items:center;">
+      <div class="admin-row">
         <button class="btn" id="checkUpdateBtn" type="button">Check for updates</button>
         <span class="update-status" id="updateStatus"></span>
       </div>
-      <div style="font-size:12px; color:var(--muted-2); margin-top:8px;">
+      <div class="admin-hint">
         Need help moving data between installs, getting updates, or installing the app? Open <strong>Support</strong> from the toolbar (book icon).
       </div>
     </section>
@@ -5170,28 +5226,28 @@
     <button class="btn bb-btn" id="bulkStatusBtn" type="button">Status ▾</button>
     <button class="btn bb-btn" id="bulkPriorityBtn" type="button">Priority ▾</button>
     <button class="btn bb-btn" id="bulkProjectBtn" type="button">Project ▾</button>
-    <span style="flex:1"></span>
+    <span class="bb-spacer"></span>
     <button class="btn danger bb-btn" id="bulkDeleteBtn" type="button">Delete</button>
     <button class="btn bb-btn" id="bulkClearBtn" type="button">Done</button>
   </div>
 
   <div class="filter-bar" id="filterBar">
     <button class="chip focus-chip" id="focusChip" type="button" title="Focus on what matters now">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
       <span>Focus</span>
     </button>
     <button class="chip cleanup-chip" id="cleanupChip" type="button" title="Work through open actions one by one">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>Clean Up</span>
     </button>
     <button class="chip view-chip" id="matrixChip" type="button" hidden title="Eisenhower matrix view (Important × Urgent)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
       <span>Matrix</span>
     </button>
     <div class="filter-divider"></div>
-    <div class="chips" id="chips" style="display:contents"></div>
+    <div class="chips" id="chips"></div>
     <div class="filter-divider"></div>
-    <div class="chips" id="priorityChips" style="display:contents"></div>
+    <div class="chips" id="priorityChips"></div>
   </div>
 
   <div class="card">
@@ -5392,7 +5448,7 @@
     <div class="sp-modal cpm-modal">
       <div class="cpm-head">
         <strong>Crib → Pitch prompt</strong>
-        <button type="button" class="btn" id="cribPitchClose" style="padding:4px 10px; font-size:12px;">Close</button>
+        <button type="button" class="btn small" id="cribPitchClose">Close</button>
       </div>
       <div class="cpm-body">
         <p class="cpm-intro">Copy this prompt + your Crib content into ChatGPT, Claude, Gemini or any LLM. It'll turn it into a tight 3‑4 minute reader-style pitch.</p>
@@ -5419,12 +5475,12 @@
     <div class="cu-modal">
       <div class="cu-header">
         <span class="cu-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px;margin-right:5px;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           Clean Up
         </span>
         <span class="cu-progress" id="cuProgress">0 of 0</span>
         <button class="cu-undo" id="cuUndo" type="button" title="Undo last change (Ctrl+Z)" hidden>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:3px;"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
           Undo
         </button>
         <button class="cu-close" id="cleanupClose" type="button" aria-label="Exit clean up">×</button>
@@ -5440,27 +5496,27 @@
       </div>
       <div class="cu-actions" id="cuActions">
         <button class="cu-btn cu-complete" id="cuComplete" type="button" title="Mark complete (Enter)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           Complete
         </button>
         <button class="cu-btn cu-progress-btn" id="cuInProgress" type="button" title="Mark in progress (I)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           In Progress
         </button>
         <button class="cu-btn cu-blocked" id="cuBlocked" type="button" title="Mark blocked (B)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
           Blocked
         </button>
         <button class="cu-btn cu-high" id="cuHighPriority" type="button" title="Bump to high priority (H)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
           High Priority
         </button>
         <button class="cu-btn cu-skip" id="cuSkip" type="button" title="Skip for now (Space / →)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           Skip
         </button>
         <button class="cu-btn cu-delete" id="cuDelete" type="button" title="Delete action (Del)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           Delete
         </button>
       </div>
@@ -5479,9 +5535,9 @@
         <div class="notes-search">
           <input type="text" id="onesSearchInput" placeholder="Search people…" autocomplete="off">
         </div>
-        <div class="filter-bar" id="onesFilterBar" style="border:0; box-shadow:none; padding:6px 12px 0; background:transparent;">
+        <div class="filter-bar sidebar-filter" id="onesFilterBar">
           <button class="chip ones-stale-chip" id="onesStaleFilter" type="button">
-            <span class="dot" style="background:var(--high)"></span>Due for check-in
+            <span class="dot"></span>Due for check-in
           </button>
           <button class="chip" id="onesArchivedFilter" type="button" hidden>Archived <span id="onesArchivedCount"></span></button>
         </div>
@@ -5494,7 +5550,7 @@
   <div class="view-pane" id="linksView" hidden>
     <div class="filter-bar" id="linksFilterBar">
       <span class="chip-row-label">Project</span>
-      <div class="chips" id="linksProjectChips" style="display:contents"></div>
+      <div class="chips" id="linksProjectChips"></div>
     </div>
     <div class="card">
       <div class="links-add">
@@ -6328,20 +6384,25 @@
   }
 
   // --- rendering ---
+  // Renders the shell plus the current view only; each view re-renders when switched to,
+  // and Settings renders when opened.
   function render() {
     applyActiveView();
+    refreshStreakChip();
+    if (currentView === 'actions') renderActionsView();
+    else if (currentView === 'notes') renderNotesView();
+    else if (currentView === 'links') renderLinksView();
+    else if (currentView === 'ones') renderOnesView();
+    else if (currentView === 'crib') renderCribView();
+    if (!document.getElementById('adminPanel').hidden) renderAdmin();
+  }
+  function renderActionsView() {
     renderChips();
     renderPriorityChips();
     renderTable();
-    renderAdmin();
     renderFocusChip();
     renderBulkBar();
-    refreshStreakChip();
     renderTodayPanel();
-    if (currentView === 'notes') renderNotesView();
-    if (currentView === 'links') renderLinksView();
-    if (currentView === 'ones') renderOnesView();
-    if (currentView === 'crib') renderCribView();
   }
   function renderFocusChip() {
     const chip = document.getElementById('focusChip');
@@ -6527,7 +6588,7 @@
         <button class="cu-quick-btn ${dueK === todayK ? 'active' : ''}" data-due="today" type="button">Today</button>
         <button class="cu-quick-btn ${dueK === tomorrowK ? 'active' : ''}" data-due="tomorrow" type="button">Tomorrow</button>
         <button class="cu-quick-btn ${dueK === nextWeekK ? 'active' : ''}" data-due="week" type="button">Next week</button>
-        <button class="cu-quick-btn clear" data-due="clear" type="button" ${dueK ? '' : 'disabled style="opacity:.4;cursor:default"'}>Clear</button>
+        <button class="cu-quick-btn clear" data-due="clear" type="button" ${dueK ? '' : 'disabled'}>Clear</button>
         ${dueLabel ? `<span class="cu-due-current">${dueLabel}</span>` : ''}
       </div>
       <div class="cu-edit-row">
@@ -6584,11 +6645,11 @@
 
     // show/hide High Priority button based on current priority
     const highBtn = document.getElementById('cuHighPriority');
-    if (highBtn) highBtn.style.display = action.priority === 'High' ? 'none' : '';
+    if (highBtn) highBtn.hidden = action.priority === 'High';
 
-    if (btns) btns.style.display = '';
-    if (hint) hint.style.display = '';
-    if (scope) scope.style.display = '';
+    if (btns) btns.hidden = false;
+    if (hint) hint.hidden = false;
+    if (scope) scope.hidden = false;
     renderCleanupScope();
     renderCleanupProgress();
   }
@@ -6605,8 +6666,8 @@
       project: 'No open actions in this project.'
     };
     if (card) card.innerHTML = `<div class="cu-done-msg"><strong>All done ✓</strong>${scopeMsg[cleanupScope] || scopeMsg.all}</div>`;
-    if (btns) btns.style.display = 'none';
-    if (hint) hint.style.display = 'none';
+    if (btns) btns.hidden = true;
+    if (hint) hint.hidden = true;
     if (prog) prog.textContent = 'Done';
     renderCleanupScope();
   }
@@ -7060,7 +7121,7 @@
     const inMatrix = !!(state.settings && state.settings.showMatrixView && state.settings.actionsViewMode === 'matrix');
     if (matrix) matrix.hidden = !inMatrix;
     if (table) table.hidden = inMatrix;
-    if (addBar) addBar.style.display = inMatrix ? 'none' : '';
+    if (addBar) addBar.hidden = inMatrix;
     if (inMatrix) {
       empty.hidden = true;
       renderActionsMatrix();
@@ -7071,11 +7132,11 @@
     const list = getVisibleActions();
     tbody.innerHTML = '';
     if (state.actions.length === 0) {
-      table.style.display = 'none';
+      table.hidden = true;
       empty.hidden = false;
       return;
     }
-    table.style.display = '';
+    table.hidden = false;
     empty.hidden = true;
     table.classList.toggle('grouped', !!state.settings.groupByProject);
     table.classList.toggle('has-selection', selectedActionIds.size > 0);
@@ -7326,9 +7387,7 @@
     const comments = Array.isArray(a.comments) ? a.comments : (a.comments = []);
     if (comments.length === 0) {
       const empty = document.createElement('div');
-      empty.style.color = 'var(--muted-2)';
-      empty.style.fontSize = '12px';
-      empty.style.padding = '4px 0 2px';
+      empty.className = 'comments-empty';
       empty.textContent = 'No comments yet.';
       wrap.appendChild(empty);
     }
@@ -7378,9 +7437,7 @@
       prompt.innerHTML = '<span>All sub-tasks done.</span>';
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'btn primary';
-      btn.style.padding = '4px 12px';
-      btn.style.fontSize = '12px';
+      btn.className = 'btn primary small';
       btn.textContent = 'Mark action complete';
       btn.addEventListener('click', () => {
         setStatus(a, 'Complete', { anchorEl: btn });
@@ -8302,21 +8359,16 @@
       row.appendChild(nameInput);
 
       const count = document.createElement('span');
-      count.style.color = 'var(--muted)';
-      count.style.fontSize = '12px';
+      count.className = 'project-count';
       const n = state.actions.filter(a => a.projectId === p.id).length;
       count.textContent = `${n} action${n === 1 ? '' : 's'}`;
       row.appendChild(count);
 
       const del = document.createElement('button');
-      del.className = 'btn danger';
+      del.className = 'btn danger small';
       del.textContent = 'Delete';
-      del.style.padding = '4px 10px';
-      del.style.fontSize = '12px';
       if (state.projects.length <= 1) {
         del.disabled = true;
-        del.style.opacity = '0.5';
-        del.style.cursor = 'not-allowed';
         del.title = 'At least one project is required';
       }
       del.addEventListener('click', () => deleteProject(p.id));
@@ -8474,6 +8526,7 @@
     if (!panel.hidden) {
       document.getElementById('historyPanel').hidden = true;
       document.getElementById('supportPanel').hidden = true;
+      renderAdmin();
     }
     syncToolbarStates();
   });
@@ -9295,7 +9348,7 @@
         else if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           const kind = detectCaptureKind(capInp.value);
-          if (kind === 'note' && capTa.style.display !== 'none' && document.activeElement !== capTa) {
+          if (kind === 'note' && !capTa.hidden && document.activeElement !== capTa) {
             capTa.focus();
           } else {
             commitCapture();
@@ -9736,7 +9789,6 @@
     const sep = document.createElement('span');
     sep.className = 'nm-label';
     sep.textContent = 'Project';
-    sep.style.marginLeft = '8px';
     meta.appendChild(sep);
 
     const projPill = document.createElement('span');
@@ -9757,7 +9809,6 @@
     const sep2 = document.createElement('span');
     sep2.className = 'nm-label';
     sep2.textContent = 'Action';
-    sep2.style.marginLeft = '8px';
     meta.appendChild(sep2);
     const linkedAction = note.actionId ? actionById(note.actionId) : null;
     const actionPill = document.createElement('span');
@@ -9811,10 +9862,10 @@
 
     // ── Style picker (Body / Heading 1 / Heading 2 / Sub-heading) ──
     const STYLE_OPTS = [
-      { tag: 'P',  label: 'Body',        preview: 'font-size:13px' },
-      { tag: 'H1', label: 'Heading 1',   preview: 'font-size:17px;font-weight:700;letter-spacing:-0.01em' },
-      { tag: 'H2', label: 'Heading 2',   preview: 'font-size:15px;font-weight:600' },
-      { tag: 'H3', label: 'Sub-heading', preview: 'font-size:13px;font-weight:600' },
+      { tag: 'P',  label: 'Body',        preview: 'nsp-p' },
+      { tag: 'H1', label: 'Heading 1',   preview: 'nsp-h1' },
+      { tag: 'H2', label: 'Heading 2',   preview: 'nsp-h2' },
+      { tag: 'H3', label: 'Sub-heading', preview: 'nsp-h3' },
     ];
     let _styleMenu = null;
     const _closeStyleMenu = () => { if (_styleMenu) { _styleMenu.remove(); _styleMenu = null; } };
@@ -9837,7 +9888,7 @@
       STYLE_OPTS.forEach(opt => {
         const item = document.createElement('div');
         item.className = 'nt-style-item';
-        item.innerHTML = '<span style="' + opt.preview + '">' + opt.label + '</span>';
+        item.innerHTML = '<span class="' + opt.preview + '">' + opt.label + '</span>';
         item.addEventListener('mousedown', (ev) => {
           ev.preventDefault();
           _closeStyleMenu();
@@ -10701,7 +10752,7 @@
         const lbl = document.createElement('div');
         lbl.className = 'links-group-label';
         lbl.innerHTML = `<span class="pdot" style="background:${proj ? proj.colour : 'var(--muted-2)'}"></span>` +
-          `${escapeHtml(proj ? proj.name : 'Untagged')} <span style="color:var(--muted-2); font-weight:500; margin-left:4px;">${items.length}</span>`;
+          `${escapeHtml(proj ? proj.name : 'Untagged')} <span class="links-group-count">${items.length}</span>`;
         root.appendChild(lbl);
         items.forEach(l => root.appendChild(renderLinkItem(l)));
       });
@@ -10763,10 +10814,10 @@
       const titleInp = document.createElement('input');
       titleInp.type = 'text'; titleInp.className = 'lef-title'; titleInp.value = link.title;
       const saveBtn = document.createElement('button');
-      saveBtn.className = 'btn primary'; saveBtn.style.padding = '4px 12px'; saveBtn.style.fontSize = '12px';
+      saveBtn.className = 'btn primary small';
       saveBtn.textContent = 'Save';
       const cancelBtn = document.createElement('button');
-      cancelBtn.className = 'btn'; cancelBtn.style.padding = '4px 12px'; cancelBtn.style.fontSize = '12px';
+      cancelBtn.className = 'btn small';
       cancelBtn.textContent = 'Cancel';
       const commit = () => {
         updateLink(link.id, { url: urlInp.value, title: titleInp.value });
@@ -10896,8 +10947,8 @@
     copyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(link.url);
-        copyBtn.style.color = '#16a34a';
-        setTimeout(() => { copyBtn.style.color = ''; }, 800);
+        copyBtn.classList.add('copied');
+        setTimeout(() => copyBtn.classList.remove('copied'), 800);
       } catch (e) {}
     });
     acts.appendChild(copyBtn);
@@ -10910,8 +10961,8 @@
     copyNameUrlBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(linkNameAndUrl(link));
-        copyNameUrlBtn.style.color = '#16a34a';
-        setTimeout(() => { copyNameUrlBtn.style.color = ''; }, 800);
+        copyNameUrlBtn.classList.add('copied');
+        setTimeout(() => copyNameUrlBtn.classList.remove('copied'), 800);
       } catch (e) {}
     });
     acts.appendChild(copyNameUrlBtn);
@@ -11025,8 +11076,8 @@
         renderLinksView();
         urlInp.focus();
       } else {
-        urlInp.style.borderColor = 'var(--danger)';
-        setTimeout(() => { urlInp.style.borderColor = ''; }, 600);
+        urlInp.classList.add('invalid');
+        setTimeout(() => urlInp.classList.remove('invalid'), 600);
       }
     };
     if (addBtn) addBtn.addEventListener('click', submit);
@@ -12012,8 +12063,8 @@
     const tdTotals = document.createElement('td');
     tdTotals.colSpan = 7;
     tdTotals.innerHTML =
-      `<span style="color:var(--muted)">Total opps: <strong style="color:var(--fg)">${met.count}</strong></span>` +
-      `&nbsp;&nbsp;<span style="color:var(--muted)">Potential: <strong style="color:var(--fg)">${cribFmtMoney(met.potential)}</strong></span>` +
+      `<span class="sales-total-label">Total opps: <strong>${met.count}</strong></span>` +
+      `&nbsp;&nbsp;<span class="sales-total-label">Potential: <strong>${cribFmtMoney(met.potential)}</strong></span>` +
       `&nbsp;&nbsp;<span class="sales-status-pill" data-status="Won">Won: ${cribFmtMoney(met.Won)}</span>` +
       `&nbsp;&nbsp;<span class="sales-status-pill" data-status="In Progress">In Progress: ${cribFmtMoney(met['In Progress'])}</span>` +
       `&nbsp;&nbsp;<span class="sales-status-pill" data-status="Lost">Lost: ${cribFmtMoney(met.Lost)}</span>`;
@@ -12106,7 +12157,7 @@
     if (note) {
       const linksInCrib = state.links.filter(l => l.inCrib);
       if (linksInCrib.length === 0) {
-        note.innerHTML = '<span style="color:var(--muted-2)">Tip: in the Links tab, click the star button to flag a link as KX-worthy and auto-include it here.</span>';
+        note.innerHTML = '<span class="crib-tip">Tip: in the Links tab, click the star button to flag a link as KX-worthy and auto-include it here.</span>';
       } else {
         const html = `<strong>From Links (${linksInCrib.length}):</strong> ` +
           linksInCrib.map(l => `<a class="crib-auto-link" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer"><span class="pdot"></span>${escapeHtml(l.title || urlDomain(l.url))}</a>`).join('');
@@ -12190,11 +12241,7 @@
     inp.type = 'text';
     inp.placeholder = skills.length >= 5 ? 'Max 5 skills reached' : 'Add a skill and press Enter';
     inp.disabled = skills.length >= 5;
-    inp.style.cssText = 'width:100%;border:1px solid transparent;border-radius:6px;padding:5px 8px;font:inherit;font-size:13.5px;background:transparent;color:var(--fg);box-sizing:border-box;transition:border-color .12s ease,background .12s ease;';
-    inp.addEventListener('focus', () => { inp.style.borderColor = 'var(--accent)'; inp.style.background = 'var(--surface)'; });
-    inp.addEventListener('blur', () => { inp.style.borderColor = 'transparent'; inp.style.background = 'transparent'; });
-    inp.addEventListener('mouseover', () => { if (!inp.disabled) inp.style.borderColor = 'var(--border)'; });
-    inp.addEventListener('mouseout', () => { if (document.activeElement !== inp) inp.style.borderColor = 'transparent'; });
+    inp.className = 'crib-skill-input';
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); addTopSkill(inp.value); inp.value = ''; }
     });
@@ -13447,7 +13494,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     avatarWrap.className = 'one-avatar-wrap';
     avatarWrap.title = 'Click to upload photo';
     const avatarFileInp = document.createElement('input');
-    avatarFileInp.type = 'file'; avatarFileInp.accept = 'image/*'; avatarFileInp.style.display = 'none';
+    avatarFileInp.type = 'file'; avatarFileInp.accept = 'image/*'; avatarFileInp.hidden = true;
     avatarFileInp.addEventListener('change', () => {
       const f = avatarFileInp.files[0];
       if (!f) return;
@@ -13493,8 +13540,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const headActions = document.createElement('div');
     headActions.className = 'one-head-actions';
     const pinBtn = document.createElement('button');
-    pinBtn.type = 'button'; pinBtn.className = 'btn';
-    pinBtn.style.cssText = 'padding:4px 10px;font-size:12px;';
+    pinBtn.type = 'button'; pinBtn.className = 'btn small';
     pinBtn.textContent = o.pinned ? '📌 Pinned' : '📌 Pin';
     pinBtn.addEventListener('click', () => { updateOne(o.id, { pinned: !o.pinned }); renderOnesView(); });
     headActions.appendChild(pinBtn);
@@ -13513,8 +13559,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       setTimeout(() => { if (pendingOneDelete === o.id) { pendingOneDelete = null; renderOneEditor(); } }, 4000);
     } else {
       const delBtn = document.createElement('button');
-      delBtn.type = 'button'; delBtn.className = 'btn danger';
-      delBtn.style.cssText = 'padding:4px 10px;font-size:12px;';
+      delBtn.type = 'button'; delBtn.className = 'btn danger small';
       delBtn.textContent = 'Delete';
       delBtn.addEventListener('click', () => { pendingOneDelete = o.id; renderOneEditor(); });
       headActions.appendChild(delBtn);
@@ -13551,7 +13596,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const cadenceInp = document.createElement('input');
     cadenceInp.type = 'number'; cadenceInp.min = '1'; cadenceInp.max = '365';
     cadenceInp.value = String(o.cadenceDays || ONES_STALE_DAYS);
-    cadenceInp.style.width = '46px';
+    cadenceInp.className = 'one-cadence-input';
     cadenceInp.addEventListener('change', () => {
       const n = parseInt(cadenceInp.value, 10);
       updateOne(o.id, { cadenceDays: (n > 0 && n < 1000) ? n : ONES_STALE_DAYS });
@@ -13637,7 +13682,6 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const saveBtn = document.createElement('button');
     saveBtn.type = 'button';
     saveBtn.className = 'btn primary';
-    saveBtn.style.padding = '6px 14px'; saveBtn.style.fontSize = '13px';
     saveBtn.textContent = 'Log meeting note';
     saveBtn.addEventListener('click', () => {
       const html = body.innerHTML.trim();
@@ -13649,8 +13693,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     });
     composerActions.appendChild(saveBtn);
     const composerHint = document.createElement('span');
-    composerHint.style.fontSize = '11px';
-    composerHint.style.color = 'var(--muted-2)';
+    composerHint.className = 'one-composer-hint';
     composerHint.textContent = 'Ctrl + Enter';
     composerActions.appendChild(composerHint);
     composer.appendChild(composerActions);
@@ -13682,7 +13725,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
         ago.textContent = e.date ? `· ${daysBetweenKeys(e.date, dateKey(new Date()))}d ago` : '';
         head.appendChild(ago);
         const headActions = document.createElement('span');
-        headActions.style.marginLeft = 'auto';
+        headActions.className = 'one-entry-actions';
         if (pendingEntryDelete === e.id) {
           const conf = document.createElement('span');
           conf.className = 'confirm-prompt';
@@ -13766,13 +13809,13 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     head.appendChild(caret);
     head.addEventListener('click', () => {
       oneConvTopicsOpen = !oneConvTopicsOpen;
-      body.style.display = oneConvTopicsOpen ? 'block' : 'none';
+      body.hidden = !oneConvTopicsOpen;
       caret.classList.toggle('open', oneConvTopicsOpen);
     });
     wrap.appendChild(head);
     const body = document.createElement('div');
     body.className = 'one-ct-body';
-    body.style.display = oneConvTopicsOpen ? 'block' : 'none';
+    body.hidden = !oneConvTopicsOpen;
     CONV_TOPIC_GROUPS.forEach(g => {
       const group = document.createElement('div');
       group.className = 'one-ct-group';
@@ -13875,7 +13918,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       setTimeout(() => inp.focus(), 0);
     }
     const ta = document.getElementById('captureTextarea');
-    if (ta) { ta.value = ''; ta.style.display = 'none'; }
+    if (ta) { ta.value = ''; ta.hidden = true; }
     updateCaptureUI('action');
   }
   function closeCapture() {
@@ -13891,7 +13934,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       modeEl.dataset.mode = kind;
       modeEl.textContent = kind === 'link' ? 'Save as link' : kind === 'note' ? 'Save as note' : 'Add as action';
     }
-    if (ta) ta.style.display = kind === 'note' ? 'block' : 'none';
+    if (ta) ta.hidden = kind !== 'note';
     if (!ctrls) return;
     ctrls.innerHTML = '';
 
@@ -14000,9 +14043,8 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   function flashSupportButton() {
     const btn = document.getElementById('toggleSupport');
     if (!btn) return;
-    btn.style.transition = 'box-shadow .25s ease';
-    btn.style.boxShadow = '0 0 0 4px rgba(24,24,27,0.18)';
-    setTimeout(() => { btn.style.boxShadow = ''; }, 700);
+    btn.classList.add('flash-ring');
+    setTimeout(() => btn.classList.remove('flash-ring'), 700);
   }
   function matchesCaptureShortcut(e) {
     const combo = (state.settings && state.settings.captureShortcut) || 'Ctrl+Shift+K';
@@ -14137,8 +14179,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     pop.className = 'selection-popover';
     const label = document.createElement('span');
     label.textContent = selectedText.length > 28 ? selectedText.slice(0, 28).trim() + '…' : selectedText;
-    label.style.opacity = '0.8';
-    label.style.fontStyle = 'italic';
+    label.className = 'sp-label';
     pop.appendChild(label);
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -14194,7 +14235,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
         .filter(a => !lc || ('#' + a.number + ' ' + a.description).toLowerCase().includes(lc))
         .slice(0, 8);
       if (!actions.length) {
-        list.innerHTML = '<div class="sp-action-item" style="opacity:.6;cursor:default">No matching actions</div>';
+        list.innerHTML = '<div class="sp-action-item empty">No matching actions</div>';
         return;
       }
       actions.forEach(a => {
@@ -14693,7 +14734,8 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const projPill = document.createElement('span');
     projPill.className = 'am-project-pill';
     const pdot = document.createElement('span');
-    pdot.style.cssText = `width:8px;height:8px;border-radius:50%;background:${project ? project.colour : '#ccc'};display:inline-block;flex-shrink:0`;
+    pdot.className = 'pdot';
+    pdot.style.background = project ? project.colour : '#ccc';
     projPill.appendChild(pdot);
     projPill.appendChild(document.createTextNode(project ? project.name : 'No project'));
     projPill.title = 'Click to change project';
@@ -14784,7 +14826,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const addRow = document.createElement('div');
     addRow.className = 'am-subtask-add';
     const addIcon = document.createElement('span');
-    addIcon.style.cssText = 'color:var(--muted);font-size:14px;flex-shrink:0';
+    addIcon.className = 'am-subtask-add-icon';
     addIcon.textContent = '+';
     const addInp = document.createElement('input');
     addInp.type = 'text';
