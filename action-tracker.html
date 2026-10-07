@@ -2972,6 +2972,8 @@
   #cribProjectsList .crib-field:last-child { margin-bottom: 0; }
   #cribProjectsList .crib-field-row { margin-bottom: 4px; gap: 6px; }
   #cribProjectsList .crib-field textarea { min-height: 40px; }
+  /* Buckets: one full-width card per row; items flow in two columns inside (see .bucket-items) */
+  #cribBucketsList { grid-template-columns: 1fr; }
   .crib-field-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
   /* AI: max 2 columns, more room for description */
   #cribAiList { grid-template-columns: repeat(2, 1fr); }
@@ -3107,7 +3109,8 @@
     border-radius: 10px 0 0 10px;
   }
   /* Crib buckets — renamable card holding a checklist of items / linked actions */
-  .bucket-items { margin-top: 4px; }
+  .bucket-items { margin-top: 4px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
+  @media (max-width: 720px) { .bucket-items { grid-template-columns: 1fr; } }
   .bucket-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
   .bucket-item input[type="checkbox"] { flex-shrink: 0; margin: 0; accent-color: var(--accent); cursor: pointer; }
   .bucket-item-text {
@@ -3141,7 +3144,7 @@
     font: inherit; font-size: 13px;
   }
   .bucket-add:focus { outline: none; border-style: solid; border-color: var(--accent); }
-  .bucket-hint { font-size: 12px; color: var(--muted-2); padding: 2px 0; }
+  .bucket-hint { grid-column: 1 / -1; font-size: 12px; color: var(--muted-2); padding: 2px 0; }
   .crib-field { margin-bottom: 8px; }
   .crib-field:last-child { margin-bottom: 0; }
   .crib-field-row {
@@ -13246,7 +13249,7 @@
             .map(it => `<li class="${bucketItemDone(it) ? 'done' : ''}">${esc(bucketItemText(it))}</li>`).join('');
           return card(false, esc(b.title || 'Untitled bucket'), items ? `<ul class="ach bucket">${items}</ul>` : '');
         }).join('');
-        return { html: panel('Buckets', cardsWrap(cards)), w: 1 + c.buckets.length * 0.5 };
+        return { html: panel('Buckets', `<div class="cards full">${cards}</div>`), w: 1 + c.buckets.length * 0.5 };
       }
     };
 
@@ -13318,6 +13321,8 @@ a { color: #6d00c9; text-decoration: none; }
 .ach-h { font-size: 11px; color: #6b7280; font-weight: 700; margin-top: 6px; }
 .ach { margin: 3px 0 0; padding-left: 18px; }
 .ach li { font-size: 12.5px; margin: 1px 0; }
+.cards.full { grid-template-columns: 1fr; }
+.ach.bucket { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
 .ach.bucket li.done { text-decoration: line-through; color: #9ca3af; }
 table.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 table.tbl th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; font-weight: 800; padding: 7px 10px; background: #f9fafb; border-bottom: 2px solid #ede9fe; }
