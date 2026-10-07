@@ -56,30 +56,6 @@
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
     --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3);
   }
-  /* Auto via system if user is on 'system' theme */
-  @media (prefers-color-scheme: dark) {
-    html[data-theme="system"] {
-      --bg: #0c0c0d;
-      --surface: #18181b;
-      --fg: #fafafa;
-      --muted: #a1a1aa;
-      --muted-2: #71717a;
-      --border: #27272a;
-      --border-strong: #3f3f46;
-      --hover: #1f1f23;
-      --accent: #fafafa;
-      --accent-soft: #27272a;
-      --low: #71717a;
-      --med: #a1a1aa;
-      --high: #fb923c;
-      --complete-bg: #131316;
-      --danger: #ef4444;
-      --danger-border: rgba(239,68,68,0.4);
-      --danger-soft: rgba(220,38,38,0.18);
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
-      --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3);
-    }
-  }
   /* Compact density */
   html[data-compact="true"] {
     --row-height: 28px;
@@ -87,6 +63,7 @@
     --row-font: 13px;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body {
     margin: 0; padding: 0;
     background: var(--bg);
@@ -115,16 +92,6 @@
       radial-gradient(ellipse 1300px 700px at 50% 100%, color-mix(in srgb, var(--bg-tint, transparent) 12%, transparent), transparent 75%),
       var(--bg);
     background-attachment: fixed;
-  }
-  @media (prefers-color-scheme: dark) {
-    html[data-theme="system"] body {
-      background:
-        radial-gradient(ellipse 1500px 900px at 0% 0%, color-mix(in srgb, var(--bg-tint, transparent) 14%, transparent), transparent 70%),
-        radial-gradient(ellipse 1100px 800px at 100% 0%, color-mix(in srgb, var(--bg-tint-2, transparent) 14%, transparent), transparent 65%),
-        radial-gradient(ellipse 1300px 700px at 50% 100%, color-mix(in srgb, var(--bg-tint, transparent) 12%, transparent), transparent 75%),
-        var(--bg);
-      background-attachment: fixed;
-    }
   }
   .sticky-nav {
     position: sticky;
@@ -365,7 +332,7 @@
     padding: 1px 6px;
     border: 1px solid var(--border-strong);
     border-radius: 4px;
-    background: #fff;
+    background: var(--surface);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 11.5px;
     color: var(--fg);
@@ -496,7 +463,7 @@
     border-radius: 6px;
     padding: 6px 10px;
     font: inherit;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
   }
   .admin input[type="text"]:focus {
@@ -519,6 +486,7 @@
     background: var(--accent); border-color: var(--accent); color: var(--surface);
   }
   .btn.primary:hover { filter: brightness(0.95); }
+  .btn.small { padding: 3px 10px; font-size: 12px; }
 
   .project-list {
     margin-top: 6px;
@@ -534,7 +502,7 @@
     padding: 6px 8px;
     border: 1px solid var(--border);
     border-radius: 6px;
-    background: #fff;
+    background: var(--surface);
   }
   .project-item input[type="text"] {
     border: 1px solid transparent;
@@ -693,7 +661,7 @@
   .install-prompt-text strong {
     font-size: 15px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--fg);
   }
   .install-prompt-text span {
     font-size: 12px;
@@ -716,7 +684,7 @@
   .install-prompt-btn:hover { opacity: .88; }
   .install-prompt-safari {
     background: var(--hover);
-    color: var(--text);
+    color: var(--fg);
     border: 1px solid var(--border);
     padding: 9px 16px;
     border-radius: 999px;
@@ -737,7 +705,7 @@
     white-space: nowrap;
     flex-shrink: 0;
   }
-  .install-prompt-dismiss:hover { color: var(--text); }
+  .install-prompt-dismiss:hover { color: var(--fg); }
   @media (max-width: 520px) {
     .install-prompt-inner { flex-wrap: wrap; }
     .install-prompt-text { width: 100%; }
@@ -821,7 +789,7 @@
     padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fff;
+    background: var(--surface);
     font-size: 13px;
   }
   .backup-item .bk-date {
@@ -964,7 +932,7 @@
     font-size: 20px; color: var(--muted); line-height: 1;
     padding: 0 2px; border-radius: 4px;
   }
-  .cu-close:hover { color: var(--text); background: var(--hover); }
+  .cu-close:hover { color: var(--fg); background: var(--hover); }
   .cu-undo {
     display: inline-flex; align-items: center;
     background: var(--hover); border: 1px solid var(--border);
@@ -972,7 +940,7 @@
     font: inherit; font-size: 11px; font-weight: 600;
     color: var(--muted); padding: 3px 10px 3px 8px;
   }
-  .cu-undo:hover { color: var(--text); border-color: var(--muted-2); }
+  .cu-undo:hover { color: var(--fg); border-color: var(--muted-2); }
   .cu-undo[hidden] { display: none; }
   .cu-scope {
     display: flex; gap: 6px; flex-wrap: wrap;
@@ -985,7 +953,7 @@
     color: var(--muted); padding: 4px 12px;
     transition: background .1s, color .1s, border-color .1s;
   }
-  .cu-scope-btn:hover { background: var(--hover); color: var(--text); }
+  .cu-scope-btn:hover { background: var(--hover); color: var(--fg); }
   .cu-scope-btn.active {
     background: #7c3aed; border-color: #7c3aed; color: #fff;
   }
@@ -996,7 +964,7 @@
   }
   .cu-title-edit {
     width: 100%; box-sizing: border-box;
-    font-size: 18px; font-weight: 600; color: var(--text);
+    font-size: 18px; font-weight: 600; color: var(--fg);
     line-height: 1.4; margin-bottom: 14px;
     border: 1px solid transparent; border-radius: 10px;
     background: transparent; resize: none;
@@ -1039,7 +1007,7 @@
     font: inherit; font-size: 12px; color: var(--muted);
     padding: 5px 11px; transition: background .1s, color .1s, border-color .1s;
   }
-  .cu-quick-btn:hover { background: var(--hover); color: var(--text); }
+  .cu-quick-btn:hover { background: var(--hover); color: var(--fg); }
   .cu-quick-btn.active {
     background: var(--accent-soft, rgba(234,88,12,.12));
     border-color: var(--accent); color: var(--accent); font-weight: 600;
@@ -1052,7 +1020,7 @@
   .cu-project-select {
     font: inherit; font-size: 12px;
     border: 1px solid var(--border); border-radius: 8px;
-    background: var(--surface); color: var(--text);
+    background: var(--surface); color: var(--fg);
     padding: 5px 8px; cursor: pointer;
   }
   .cu-project-select:focus { outline: none; border-color: #7c3aed; }
@@ -1066,7 +1034,7 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 6px; padding: 14px 8px;
     border-radius: 12px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--text);
+    background: var(--surface); color: var(--fg);
     font: inherit; font-size: 12px; font-weight: 600;
     cursor: pointer; transition: background .1s, border-color .1s, color .1s;
   }
@@ -1080,7 +1048,7 @@
   .cu-high { border-color: #ef4444; color: #dc2626; }
   .cu-high:hover { background: rgba(239,68,68,.1); }
   .cu-skip { border-color: var(--border); color: var(--muted); }
-  .cu-skip:hover { background: var(--hover); color: var(--text); }
+  .cu-skip:hover { background: var(--hover); color: var(--fg); }
   .cu-delete { border-color: var(--danger); color: var(--danger); }
   .cu-delete:hover { background: rgba(239,68,68,.1); }
   .cu-hint {
@@ -1091,7 +1059,7 @@
     padding: 40px 24px; text-align: center;
     font-size: 15px; color: var(--muted);
   }
-  .cu-done-msg strong { display: block; font-size: 22px; margin-bottom: 8px; color: var(--text); }
+  .cu-done-msg strong { display: block; font-size: 22px; margin-bottom: 8px; color: var(--fg); }
   .filter-bar.focus-active .chips,
   .filter-bar.focus-active .chip-row-label,
   .filter-bar.focus-active .filter-divider {
@@ -1234,7 +1202,7 @@
     padding: 6px 10px;
     font: inherit;
     font-size: 13px;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
   }
   .quick-add-wrap input:focus {
@@ -1279,7 +1247,7 @@
     padding: 5px 10px;
     font: inherit;
     font-size: 13px;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
   }
   .add-project-wrap input:focus { outline: none; }
@@ -1485,8 +1453,7 @@
   }
   .due-chip.future { color: var(--muted); }
   .due-chip.done { opacity: 0.55; }
-  html[data-theme="dark"] .due-chip.today,
-  html[data-theme="system"] @media (prefers-color-scheme: dark) .due-chip.today {
+  html[data-theme="dark"] .due-chip.today {
     background: rgba(14,116,144,0.18); color: #67e8f9;
   }
   html[data-theme="dark"] .due-chip.overdue {
@@ -1530,7 +1497,7 @@
     padding: 3px 5px;
     font: inherit;
     font-size: 12.5px;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
   }
   .co-name-edit:focus { outline: none; }
@@ -1585,7 +1552,7 @@
   }
   tr:hover .tick-btn {
     border-color: var(--border-strong);
-    background: #fff;
+    background: var(--surface);
   }
   tr:hover .tick-btn:hover {
     border-color: #1a7f37;
@@ -1707,6 +1674,13 @@
     border-radius: 50%;
     flex-shrink: 0;
   }
+  .pp-item .pp-remove {
+    margin-left: auto;
+    background: transparent; border: 0; color: var(--muted-2);
+    cursor: pointer; font-size: 14px; line-height: 1; padding: 0 2px;
+  }
+  .pp-item .pp-remove:hover { color: var(--danger); }
+  .pp-item.pp-empty { color: var(--muted-2); font-style: italic; cursor: default; }
   .pp-item .pp-check {
     margin-left: auto;
     color: var(--accent);
@@ -1810,7 +1784,7 @@
     width: 16px; height: 16px;
     border-radius: 4px;
     border: 1.5px solid var(--border-strong);
-    background: #fff;
+    background: var(--surface);
     cursor: pointer;
     flex-shrink: 0;
     display: inline-flex;
@@ -1865,7 +1839,7 @@
     border-radius: 4px;
     padding: 2px 5px;
     font: inherit;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
     resize: vertical;
     min-height: 22px;
@@ -1907,7 +1881,7 @@
     padding: 6px 10px;
     font: inherit;
     font-size: 13px;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
   }
   .add-comment input:focus {
@@ -1931,7 +1905,7 @@
     border-radius: 4px;
     padding: 3px 5px;
     font: inherit;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
   }
   .action-edit:focus { outline: none; }
@@ -2977,7 +2951,7 @@
     line-height: 1.55;
     transition: border-color .12s ease, box-shadow .12s ease;
   }
-  .crib-pitch-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),.12); }
+  .crib-pitch-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
   .crib-pitch-section-inner { padding: 0 2px; }
   .crib-title-input {
     font-size: 15px !important;
@@ -4342,7 +4316,7 @@
     font: inherit;
     font-size: 13.5px;
     font-weight: 500;
-    background: #fff;
+    background: var(--surface);
     color: var(--fg);
   }
   .li-title-edit:focus { outline: none; }
@@ -4471,70 +4445,70 @@
 
   /* ===== Person typeahead (cross-tab linking) ===== */
   .person-typeahead { position: relative; display: inline-flex; align-items: center; gap: 4px; width: 100%; }
-  .person-typeahead .pt-input { width: 100%; padding: 4px 6px; border: 1px solid var(--border, #d0d7de); border-radius: 6px; background: var(--bg, #fff); color: inherit; font: inherit; }
-  .person-typeahead .pt-input:focus { outline: none; border-color: var(--accent, #ea580c); }
-  .pt-list { position: absolute; top: 100%; left: 0; right: 0; z-index: 100; background: var(--bg, #fff); border: 1px solid var(--border, #d0d7de); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); max-height: 220px; overflow: auto; margin-top: 2px; }
+  .person-typeahead .pt-input { width: 100%; padding: 4px 6px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface); color: inherit; font: inherit; }
+  .person-typeahead .pt-input:focus { outline: none; border-color: var(--accent); }
+  .pt-list { position: absolute; top: 100%; left: 0; right: 0; z-index: 100; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); max-height: 220px; overflow: auto; margin-top: 2px; }
   .pt-row { display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; cursor: pointer; font-size: 13px; }
-  .pt-row:hover { background: var(--bg-soft, rgba(0,0,0,0.04)); }
+  .pt-row:hover { background: var(--hover); }
   .pt-name { font-weight: 500; }
-  .pt-meta { font-size: 11px; color: var(--fg-mute, #6a737d); }
-  .pt-linked { display: inline-block; margin-left: 6px; color: var(--accent, #ea580c); cursor: pointer; font-size: 12px; user-select: none; }
+  .pt-meta { font-size: 11px; color: var(--muted); }
+  .pt-linked { display: inline-block; margin-left: 6px; color: var(--accent); cursor: pointer; font-size: 12px; user-select: none; }
   .pt-linked:hover { text-decoration: underline; }
-  .co-name.linked { color: var(--accent, #ea580c); border-bottom: 1px dashed var(--accent, #ea580c); cursor: pointer; }
+  .co-name.linked { color: var(--accent); border-bottom: 1px dashed var(--accent); cursor: pointer; }
   .co-name-edit-wrap { display: inline-block; position: relative; min-width: 120px; }
 
   /* ===== 1-2-1 backlinks ===== */
-  .one-links { border: 1px solid var(--border, #e1e4e8); border-radius: 10px; padding: 8px 10px; margin: 8px 0 4px; background: var(--bg-soft, rgba(0,0,0,0.02)); }
-  .ol-head { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-mute, #6a737d); margin-bottom: 4px; }
-  .ol-sub { font-size: 11px; color: var(--fg-mute, #6a737d); margin: 6px 0 2px; }
+  .one-links { border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin: 8px 0 4px; background: var(--hover); }
+  .ol-head { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .ol-sub { font-size: 11px; color: var(--muted); margin: 6px 0 2px; }
   .ol-link { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 13px; color: inherit; text-decoration: none; }
   .ol-link:hover .ol-text { text-decoration: underline; }
-  .ol-status { font-size: 10px; padding: 1px 5px; border-radius: 4px; background: var(--bg, #fff); border: 1px solid var(--border, #d0d7de); color: var(--fg-mute, #6a737d); }
+  .ol-status { font-size: 10px; padding: 1px 5px; border-radius: 4px; background: var(--surface); border: 1px solid var(--border-strong); color: var(--muted); }
   .ol-status[data-s="Complete"] { color: #1a7f37; border-color: #1a7f3744; }
   .ol-status[data-s="Blocked"]  { color: #c93838; border-color: #c9383844; }
   .ol-status[data-s="In Progress"] { color: #ea580c; border-color: #ea580c44; }
 
   /* ===== 1-2-1 agenda (talking points) ===== */
-  .one-agenda { border: 1px solid var(--border, #e1e4e8); border-radius: 10px; padding: 8px 10px; margin: 8px 0 4px; background: var(--bg, #fff); }
+  .one-agenda { border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin: 8px 0 4px; background: var(--surface); }
   .oa-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .oa-title { font-size: 12px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--fg, #1f2328); }
-  .oa-count { font-size: 11px; color: var(--fg-mute, #6a737d); }
+  .oa-title { font-size: 12px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--fg); }
+  .oa-count { font-size: 11px; color: var(--muted); }
   .oa-pull { margin-left: auto; padding: 3px 8px; font-size: 11px; }
-  .oa-hint { font-size: 12px; color: var(--fg-mute, #6a737d); padding: 2px 0 4px; }
+  .oa-hint { font-size: 12px; color: var(--muted); padding: 2px 0 4px; }
   .oa-item { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
-  .oa-item.done .oa-text { text-decoration: line-through; color: var(--fg-mute, #6a737d); }
+  .oa-item.done .oa-text { text-decoration: line-through; color: var(--muted); }
   .oa-text { flex: 1; padding: 2px 4px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: inherit; font: inherit; font-size: 13px; }
-  .oa-text:focus { outline: none; border-color: var(--border, #d0d7de); background: var(--bg-soft, rgba(0,0,0,0.03)); }
-  .oa-del { background: transparent; border: none; color: var(--fg-mute, #6a737d); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 6px; }
+  .oa-text:focus { outline: none; border-color: var(--border-strong); background: var(--hover); }
+  .oa-del { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 6px; }
   .oa-del:hover { color: #c93838; }
   .oa-add { padding-top: 4px; }
-  .oa-add input { width: 100%; padding: 4px 6px; border: 1px dashed var(--border, #d0d7de); border-radius: 6px; background: transparent; color: inherit; font: inherit; font-size: 13px; }
-  .oa-add input:focus { outline: none; border-style: solid; border-color: var(--accent, #ea580c); }
+  .oa-add input { width: 100%; padding: 4px 6px; border: 1px dashed var(--border-strong); border-radius: 6px; background: transparent; color: inherit; font: inherit; font-size: 13px; }
+  .oa-add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
 
   /* ===== Eisenhower matrix view ===== */
   .actions-matrix { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(180px, auto); gap: 12px; padding: 12px 0; }
-  .matrix-cell { border: 1px solid var(--border, #e1e4e8); border-radius: 12px; background: var(--bg-soft, rgba(0,0,0,0.02)); padding: 10px 12px; display: flex; flex-direction: column; min-height: 200px; }
+  .matrix-cell { border: 1px solid var(--border); border-radius: 12px; background: var(--hover); padding: 10px 12px; display: flex; flex-direction: column; min-height: 200px; }
   .matrix-cell.q1 { border-color: rgba(214, 92, 92, 0.45); }
   .matrix-cell.q2 { border-color: rgba(92, 142, 214, 0.45); }
   .matrix-cell.q3 { border-color: rgba(214, 162, 92, 0.45); }
   .matrix-cell.q4 { border-color: rgba(120, 120, 120, 0.45); }
   .matrix-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
   .mh-label { font-weight: 600; font-size: 13px; }
-  .mh-hint  { font-size: 11px; color: var(--fg-mute, #6a737d); }
-  .mh-count { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 11px; color: var(--fg-mute, #6a737d); }
+  .mh-hint  { font-size: 11px; color: var(--muted); }
+  .mh-count { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 11px; color: var(--muted); }
   .matrix-list { display: flex; flex-direction: column; gap: 6px; overflow: auto; }
-  .matrix-card { border: 1px solid var(--border, #e1e4e8); border-radius: 8px; padding: 6px 8px; cursor: grab; background: var(--bg, #fff); transition: opacity .12s ease, transform .12s ease; }
-  .matrix-card:hover { border-color: var(--accent, #ea580c); }
+  .matrix-card { border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; cursor: grab; background: var(--surface); transition: opacity .12s ease, transform .12s ease; }
+  .matrix-card:hover { border-color: var(--accent); }
   .matrix-card:active { cursor: grabbing; }
   .matrix-card.dragging { opacity: .4; }
   .matrix-cell.is-dragover { background: rgba(234, 88, 12, 0.06); border-style: dashed; }
   .mc-text { font-size: 13px; }
-  .mc-meta { display: flex; gap: 8px; align-items: center; font-size: 11px; color: var(--fg-mute, #6a737d); margin-top: 3px; }
+  .mc-meta { display: flex; gap: 8px; align-items: center; font-size: 11px; color: var(--muted); margin-top: 3px; }
   .mc-proj { display: inline-flex; align-items: center; gap: 4px; }
   .mc-proj .pdot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
   .mc-due[data-state="overdue"] { color: #d65c5c; }
-  .mc-due[data-state="today"]   { color: var(--accent, #ea580c); }
-  .matrix-empty { color: var(--fg-mute, #6a737d); font-size: 12px; padding: 4px 0; }
+  .mc-due[data-state="today"]   { color: var(--accent); }
+  .matrix-empty { color: var(--muted); font-size: 12px; padding: 4px 0; }
   @media (max-width: 720px) { .actions-matrix { grid-template-columns: 1fr; } }
 
   /* ===== Print: clean Crib pitch sheet ===== */
@@ -5660,8 +5634,7 @@
     x:        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>'
   };
 
-  // --- state ---
-  let state = loadState();
+  // --- state --- (`state` itself is loaded after the schema definitions below)
   let activeFilter = 'all'; // projectId or 'all'
   let activePriorityFilter = 'all'; // 'Low' | 'Medium' | 'High' | 'all'
   let focusMode = false;
@@ -5680,7 +5653,17 @@
   let noteSaveTimer = null;
   let notesSearchQuery = '';
   let notesSidebarCollapsed = false;
-  const ALLOWED_TAGS = new Set(['P','BR','STRONG','EM','B','I','U','H2','H3','UL','OL','LI','BLOCKQUOTE','A','DIV','SPAN','IMG','FIGURE','FIGCAPTION']);
+  // What rich-text bodies (notes, 1-2-1 entries) may keep. Must cover everything the
+  // note toolbar can produce: formatBlock H1–H3/BLOCKQUOTE, strikeThrough → STRIKE/S,
+  // foreColor → FONT[color], hiliteColor → SPAN[style], checklist DIV/SPAN, HR, attachments.
+  const SANITISE_RULES = {
+    tags: new Set(['P','BR','STRONG','EM','B','I','U','S','STRIKE','H1','H2','H3','UL','OL','LI','BLOCKQUOTE','A','DIV','SPAN','IMG','HR','FONT','FIGURE','FIGCAPTION']),
+    drop: new Set(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','TEMPLATE','LINK','META']), // removed with their content
+    classes: { DIV: ['task-item'], SPAN: ['task-cb'], A: ['attachment'] },
+    attrs: { A: ['href','download','title'], IMG: ['src','alt','title'], SPAN: ['data-checked','contenteditable','style'], FONT: ['color','style'] },
+    styleProps: ['color', 'background-color'],
+    colourValue: /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.]+%?\s*,\s*[\d.]+%?\s*,\s*[\d.]+%?\s*(,\s*[\d.]+\s*)?\)|transparent)$/i
+  };
   const NOTE_COLOURS = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#a855f7','#ec4899'];
   const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
   let expandedActions = new Set(); // action ids with comments expanded
@@ -5688,11 +5671,31 @@
   let quickAddOpenForProject = null; // projectId currently showing inline add
   let addProjectOpen = false; // inline add-project row active
 
+  // ── Data schema ─────────────────────────────────────────────────────────────
+  // migrate() is the single normaliser for every way data enters the app (load,
+  // import, restore, wipe). It runs before the rest of this script is evaluated,
+  // so it may only use function declarations and constants defined above it.
+  const SCHEMA_VERSION = 2;
+  const PREMIGRATION_KEY = 'actionTracker_v1_premigration_v' + SCHEMA_VERSION;
+  const ONES_STALE_DAYS = 60; // default 1-2-1 check-in cadence for new people
+  const CHECKLIST_ITEM_HTML = '<div class="task-item"><span class="task-cb" contenteditable="false" data-checked="0"></span>&nbsp;</div>';
+  const NOTE_TEMPLATE_SEEDS = [
+    { name: 'Meeting notes', title: 'Meeting · {{date}}',
+      body: '<h2>Attendees</h2><p><br></p><h2>Agenda</h2><ul><li><br></li></ul><h2>Notes</h2><p><br></p><h2>Decisions</h2><ul><li><br></li></ul><h2>Actions</h2>' + CHECKLIST_ITEM_HTML },
+    { name: 'Steerco', title: 'Steerco · {{date}}',
+      body: '<p>Project: {{project}}</p><h2>Status</h2><p>Overall RAG: </p><h2>Progress since last steerco</h2><ul><li><br></li></ul><h2>Risks &amp; issues</h2><ul><li><br></li></ul><h2>Decisions needed</h2><ul><li><br></li></ul><h2>Actions</h2>' + CHECKLIST_ITEM_HTML },
+    { name: 'Client call', title: 'Client call · {{date}}',
+      body: '<h2>Client &amp; attendees</h2><p><br></p><h2>Purpose</h2><p><br></p><h2>Key points</h2><ul><li><br></li></ul><h2>Follow-ups</h2>' + CHECKLIST_ITEM_HTML },
+    { name: 'Decision log', title: 'Decision · {{date}}',
+      body: '<h2>Decision</h2><p><br></p><h2>Context</h2><p><br></p><h2>Options considered</h2><ul><li><br></li></ul><h2>Rationale</h2><p><br></p><h2>Owner &amp; date</h2><p>{{weekday}} {{date}}</p>' }
+  ];
+
   function defaultState() {
     return {
+      schemaVersion: SCHEMA_VERSION,
       projects: [{ id: 1, name: 'General', colour: PALETTE[0] }],
       actions: [],
-      settings: { sortAsc: true, groupByProject: false, title: 'OmniPad', boldHighPriority: true, bgTint: '#fbb87a', activeView: 'actions', hideCompletedAfterDay: true, showActionNumbers: false, staleDays: 5, fireworksOnComplete: true, linksSort: 'recent', linksGroupByProject: false, openOfficeInApp: true, theme: 'system', compactRows: false, sparkles: true, showTodayPanel: true, todayPanelCollapsed: false, sparkleEgg: true, showDueColumn: true, userName: '', captureShortcut: 'Ctrl+Shift+K', visibleTabs: { actions: true, notes: true, links: true, ones: true, crib: true } },
+      settings: { sortAsc: true, groupByProject: false, title: 'OmniPad', boldHighPriority: true, bgTint: '#fbb87a', activeView: 'actions', hideCompletedAfterDay: true, showActionNumbers: false, staleDays: 5, fireworksOnComplete: true, linksSort: 'recent', linksGroupByProject: false, openOfficeInApp: true, theme: 'system', compactRows: false, sparkles: true, showTodayPanel: true, todayPanelCollapsed: false, sparkleEgg: true, showDueColumn: true, userName: '', captureShortcut: 'Ctrl+Shift+K', showMatrixView: false, actionsViewMode: 'list', offerLogAsWin: true, visibleTabs: { actions: true, notes: true, links: true, ones: true, crib: true } },
       streak: { current: 0, longest: 0, lastCompletionDate: null },
       lastFirstCompletionDate: null,
       ones: [],
@@ -5701,151 +5704,163 @@
       collapsedProjectIds: [],
       notes: [],
       links: [],
-      counters: { nextActionNumber: 1, nextActionId: 1, nextProjectId: 2, nextCommentId: 1, nextNoteId: 1, nextLinkId: 1, nextOneId: 1, nextOneEntryId: 1, nextCribProjectId: 1, nextCribPracticeId: 1, nextCribSalesId: 1, nextCribKxId: 1, nextCribAiId: 1, nextCribBdId: 1, nextCribPriorityId: 1, nextCribDevId: 1, nextCribRelationshipId: 1, nextCribBucketId: 1, nextCribBucketItemId: 1, nextCribRoundId: 1 }
+      noteTemplates: null, // seeded by migrate()
+      counters: { nextActionNumber: 1, nextActionId: 1, nextProjectId: 2 }
     };
+  }
+
+  function freshState() { return migrate(defaultState()); }
+
+  function blankRound(id, name) {
+    return {
+      id, name, createdAt: new Date().toISOString(),
+      summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '', peopleLeadPersonId: null, chargability: '', clientAccounts: [] },
+      projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: [], relationships: [],
+      topSkills: [], qualifications: [], buckets: [], evidence: [], pitchNotes: '', storyFrame: '',
+      sectionOrder: [...CRIB_SECTION_ORDER]
+    };
+  }
+
+  function normaliseRound(r) {
+    ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications','buckets','evidence'].forEach(k => {
+      if (!Array.isArray(r[k])) r[k] = [];
+    });
+    r.buckets.forEach(b => { if (!Array.isArray(b.items)) b.items = []; });
+    r.projects.forEach(p => { if (typeof p.lineManager !== 'string') p.lineManager = ''; });
+    r.evidence.forEach(ev => {
+      if (ev.type !== 'feedback') ev.type = 'win';
+      ['text','who','metric','date'].forEach(f => { if (typeof ev[f] !== 'string') ev[f] = ''; });
+      if (typeof ev.personId !== 'number') ev.personId = null;
+      if (typeof ev.section !== 'string' || !CRIB_SECTION_ORDER.includes(ev.section)) ev.section = null;
+      if (!ev.source || typeof ev.source !== 'object') ev.source = { kind: 'manual', id: null };
+    });
+    if (!Array.isArray(r.sectionOrder)) r.sectionOrder = [...CRIB_SECTION_ORDER];
+    r.sectionOrder = r.sectionOrder.filter(k => CRIB_SECTION_ORDER.includes(k));
+    CRIB_SECTION_ORDER.forEach(k => { if (!r.sectionOrder.includes(k)) r.sectionOrder.push(k); });
+    if (!r.summary || typeof r.summary !== 'object') r.summary = {};
+    ['name','currentPosition','targeting','timeAtLevel','peopleLead','chargability'].forEach(f => {
+      if (typeof r.summary[f] !== 'string') r.summary[f] = '';
+    });
+    if (typeof r.summary.peopleLeadPersonId !== 'number') r.summary.peopleLeadPersonId = null;
+    if (!Array.isArray(r.summary.clientAccounts)) r.summary.clientAccounts = [];
+    if (typeof r.pitchNotes !== 'string') r.pitchNotes = '';
+    if (typeof r.storyFrame !== 'string') r.storyFrame = '';
+    if (typeof r.name !== 'string') r.name = 'Round';
+    if (!r.createdAt) r.createdAt = new Date().toISOString();
+  }
+
+  function migrate(s) {
+    if (!s || typeof s !== 'object' || !Array.isArray(s.projects) || !Array.isArray(s.actions)) return null;
+    const d = defaultState();
+    const arr = (v) => (Array.isArray(v) ? v : []);
+    const nextId = (list, key) => list.reduce((m, x) => Math.max(m, Number(x && x[key || 'id']) || 0), 0) + 1;
+
+    if (!s.projects.length) s.projects = d.projects;
+    ['notes','links','ones','cribRounds','collapsedProjectIds'].forEach(k => { s[k] = arr(s[k]); });
+    if (!s.streak || typeof s.streak !== 'object') s.streak = d.streak;
+    if (s.lastFirstCompletionDate === undefined) s.lastFirstCompletionDate = null;
+
+    // Settings: fill missing keys from defaults. bgTint is skipped because an
+    // absent value in old data means "no tint", not the default tint.
+    const st = (s.settings && typeof s.settings === 'object') ? s.settings : {};
+    Object.keys(d.settings).forEach(k => { if (k !== 'bgTint' && st[k] === undefined) st[k] = d.settings[k]; });
+    st.visibleTabs = Object.assign({}, d.settings.visibleTabs, st.visibleTabs || {});
+    if (!(Number(st.staleDays) >= 1)) st.staleDays = d.settings.staleDays;
+    const viewModes = st.showMatrixView ? ['list', 'matrix', 'logbook'] : ['list', 'logbook'];
+    if (!viewModes.includes(st.actionsViewMode)) st.actionsViewMode = 'list';
+    s.settings = st;
+
+    // 1-2-1 people (before actions, which backfill personId by name)
+    s.ones.forEach(o => {
+      if (!Array.isArray(o.nextAgenda)) o.nextAgenda = [];
+      if (!Array.isArray(o.entries)) o.entries = [];
+      if (typeof o.avatar !== 'string') o.avatar = '';
+      if (typeof o.email !== 'string') o.email = '';
+      o.archived = !!o.archived;
+      o.entries.forEach(e => {
+        ['discussed', 'carried', 'actionIds'].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
+      });
+    });
+    const onesByName = new Map();
+    s.ones.forEach(o => {
+      const k = String(o.name || '').trim().toLowerCase();
+      if (k && !onesByName.has(k)) onesByName.set(k, o.id);
+    });
+
+    // Actions
+    s.actions.forEach(a => {
+      if (!STATUSES.includes(a.status)) a.status = 'Open';
+      if (!PRIORITIES.includes(a.priority)) a.priority = 'Medium';
+      if (typeof a.description !== 'string') a.description = String(a.description || '');
+      if (!Array.isArray(a.comments)) a.comments = [];
+      if (typeof a.coName !== 'string') a.coName = '';
+      if (typeof a.personId !== 'number') {
+        const k = a.coName.trim().toLowerCase();
+        a.personId = (k && onesByName.has(k)) ? onesByName.get(k) : null;
+      }
+      if (a.chaseAt === undefined) a.chaseAt = null;
+      if (a.fromEntryId === undefined) a.fromEntryId = null;
+    });
+
+    s.notes.forEach(n => { if (!('actionId' in n)) n.actionId = null; });
+
+    if (!Array.isArray(s.noteTemplates)) {
+      s.noteTemplates = NOTE_TEMPLATE_SEEDS.map((t, i) => Object.assign({ id: i + 1, projectId: null, colour: null }, t));
+    }
+
+    // Crib: wrap the legacy single-crib shape as the first round, then normalise every round
+    if (!s.cribRounds.length && s.crib && typeof s.crib === 'object') {
+      const r = blankRound(1, 'Current round');
+      ['projects','practice','sales','bd','priority','dev','kx','ai','relationships'].forEach(k => { r[k] = arr(s.crib[k]); });
+      s.cribRounds.push(r);
+    }
+    delete s.crib;
+    if (!s.cribRounds.length) s.cribRounds.push(blankRound(1, 'Current round'));
+    s.cribRounds.forEach(normaliseRound);
+    if (!s.cribRounds.some(r => r.id === s.cribActiveRoundId)) s.cribActiveRoundId = s.cribRounds[0].id;
+
+    // Counters never fall behind the highest id in use (protects imports and restores)
+    s.counters = (s.counters && typeof s.counters === 'object') ? s.counters : {};
+    const bump = (key, min) => { if (!(Number(s.counters[key]) >= min)) s.counters[key] = min; };
+    const rounds = s.cribRounds;
+    bump('nextActionId', nextId(s.actions));
+    bump('nextActionNumber', nextId(s.actions, 'number'));
+    bump('nextProjectId', nextId(s.projects));
+    bump('nextCommentId', nextId(s.actions.flatMap(a => a.comments)));
+    bump('nextNoteId', nextId(s.notes));
+    bump('nextLinkId', nextId(s.links));
+    bump('nextOneId', nextId(s.ones));
+    bump('nextOneEntryId', nextId(s.ones.flatMap(o => o.entries)));
+    bump('nextAgendaItemId', nextId(s.ones.flatMap(o => o.nextAgenda)));
+    bump('nextNoteTemplateId', nextId(s.noteTemplates));
+    bump('nextCribRoundId', nextId(rounds));
+    [['projects','nextCribProjectId'], ['practice','nextCribPracticeId'], ['sales','nextCribSalesId'], ['kx','nextCribKxId'],
+     ['ai','nextCribAiId'], ['bd','nextCribBdId'], ['priority','nextCribPriorityId'], ['dev','nextCribDevId'],
+     ['relationships','nextCribRelationshipId'], ['qualifications','nextCribQualificationId'], ['buckets','nextCribBucketId'],
+     ['evidence','nextEvidenceId']].forEach(([k, key]) => bump(key, nextId(rounds.flatMap(r => r[k]))));
+    bump('nextCribBucketItemId', nextId(rounds.flatMap(r => r.buckets.flatMap(b => b.items))));
+    bump('nextCribClientAccountId', nextId(rounds.flatMap(r => r.summary.clientAccounts)));
+
+    s.schemaVersion = SCHEMA_VERSION;
+    return s;
   }
 
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaultState();
+      if (!raw) return freshState();
       const parsed = JSON.parse(raw);
-      if (!parsed || !parsed.projects || !parsed.actions) return defaultState();
-      // basic shape repair
-      parsed.settings = parsed.settings || { sortAsc: true };
-      parsed.counters = parsed.counters || { nextActionNumber: 1, nextActionId: 1, nextProjectId: 1 };
-      if (!Array.isArray(parsed.notes)) parsed.notes = [];
-      if (!Array.isArray(parsed.collapsedProjectIds)) parsed.collapsedProjectIds = [];
-      parsed.notes.forEach(n => { if (!('actionId' in n)) n.actionId = null; });
-      if (!Array.isArray(parsed.links)) parsed.links = [];
-      if (!parsed.counters.nextNoteId) {
-        parsed.counters.nextNoteId = parsed.notes.length
-          ? Math.max(...parsed.notes.map(n => n.id || 0)) + 1
-          : 1;
+      // Keep one untouched copy of the pre-upgrade data the first time a new schema loads
+      if (((parsed && parsed.schemaVersion) || 1) < SCHEMA_VERSION && !localStorage.getItem(PREMIGRATION_KEY)) {
+        try { localStorage.setItem(PREMIGRATION_KEY, raw); } catch (e) { /* quota: daily backups still hold history */ }
       }
-      if (!parsed.counters.nextLinkId) {
-        parsed.counters.nextLinkId = parsed.links.length
-          ? Math.max(...parsed.links.map(l => l.id || 0)) + 1
-          : 1;
-      }
-      if (!parsed.settings.activeView) parsed.settings.activeView = 'actions';
-      if (!parsed.streak) parsed.streak = { current: 0, longest: 0, lastCompletionDate: null };
-      if (parsed.lastFirstCompletionDate === undefined) parsed.lastFirstCompletionDate = null;
-      if (parsed.settings.theme === undefined) parsed.settings.theme = 'system';
-      if (parsed.settings.compactRows === undefined) parsed.settings.compactRows = false;
-      if (parsed.settings.sparkles === undefined) parsed.settings.sparkles = true;
-      if (parsed.settings.showTodayPanel === undefined) parsed.settings.showTodayPanel = true;
-      if (parsed.settings.todayPanelCollapsed === undefined) parsed.settings.todayPanelCollapsed = false;
-      if (parsed.settings.sparkleEgg === undefined) parsed.settings.sparkleEgg = true;
-      if (parsed.settings.showDueColumn === undefined) parsed.settings.showDueColumn = true;
-      if (parsed.settings.userName === undefined) parsed.settings.userName = '';
-      if (parsed.settings.captureShortcut === undefined) parsed.settings.captureShortcut = 'Ctrl+Shift+K';
-      if (parsed.settings.showMatrixView === undefined) parsed.settings.showMatrixView = false;
-      // If matrix view is hidden, force list mode so users aren't stuck in a hidden view
-      if (!parsed.settings.showMatrixView) parsed.settings.actionsViewMode = 'list';
-      else if (parsed.settings.actionsViewMode !== 'matrix') parsed.settings.actionsViewMode = 'list';
-      if (!Array.isArray(parsed.ones)) parsed.ones = [];
-      if (!parsed.counters.nextOneId) parsed.counters.nextOneId = parsed.ones.length ? Math.max(...parsed.ones.map(o => o.id || 0)) + 1 : 1;
-      if (!parsed.counters.nextOneEntryId) parsed.counters.nextOneEntryId = 1;
-      if (!parsed.counters.nextAgendaItemId) parsed.counters.nextAgendaItemId = 1;
-      // Cross-tab linking schema (#1) + 1-2-1 agenda (#8)
-      parsed.ones.forEach(o => {
-        if (!Array.isArray(o.nextAgenda)) o.nextAgenda = [];
-        if (typeof o.avatar !== 'string') o.avatar = '';
-      });
-      // Backfill action.personId from coName when names match an existing 1-2-1 person
-      const onesByLcName = new Map();
-      parsed.ones.forEach(o => {
-        const k = (o.name || '').trim().toLowerCase();
-        if (k && !onesByLcName.has(k)) onesByLcName.set(k, o.id);
-      });
-      parsed.actions.forEach(a => {
-        if (typeof a.personId !== 'number') {
-          const k = (a.coName || '').trim().toLowerCase();
-          a.personId = (k && onesByLcName.has(k)) ? onesByLcName.get(k) : null;
-        }
-      });
-      // Crib sheet
-      // Crib rounds — migrate from older single-crib shape to rounds[]
-      if (!Array.isArray(parsed.cribRounds)) parsed.cribRounds = [];
-      // If we have legacy state.crib but no rounds yet, wrap it as the first round
-      if (parsed.cribRounds.length === 0 && parsed.crib && typeof parsed.crib === 'object') {
-        const legacy = parsed.crib;
-        ['projects','practice','sales','kx','ai','bd','priority','dev','relationships'].forEach(k => {
-          if (!Array.isArray(legacy[k])) legacy[k] = [];
-        });
-        parsed.cribRounds.push({
-          id: 1,
-          name: 'Current round',
-          createdAt: new Date().toISOString(),
-          summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '' },
-          projects: legacy.projects, practice: legacy.practice, sales: legacy.sales,
-          bd: legacy.bd, priority: legacy.priority, dev: legacy.dev,
-          kx: legacy.kx, ai: legacy.ai
-        });
-      }
-      // First-time bootstrap: ensure at least one empty round exists
-      if (parsed.cribRounds.length === 0) {
-        parsed.cribRounds.push({
-          id: 1,
-          name: 'Current round',
-          createdAt: new Date().toISOString(),
-          summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '' },
-          projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: []
-        });
-      }
-      // Ensure each round has all sections + a summary
-      parsed.cribRounds.forEach(r => {
-        ['projects','practice','sales','kx','ai','bd','priority','dev','relationships','buckets'].forEach(k => {
-          if (!Array.isArray(r[k])) r[k] = [];
-        });
-        if (!Array.isArray(r.topSkills)) r.topSkills = [];
-        if (!Array.isArray(r.qualifications)) r.qualifications = [];
-        if (!Array.isArray(r.sectionOrder)) r.sectionOrder = [...CRIB_SECTION_ORDER];
-        // Ensure any newly added section keys are appended to existing orders
-        CRIB_SECTION_ORDER.forEach(k => { if (!r.sectionOrder.includes(k)) r.sectionOrder.push(k); });
-        if (!r.summary || typeof r.summary !== 'object') r.summary = { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '' };
-        ['name','currentPosition','targeting','timeAtLevel','peopleLead'].forEach(f => {
-          if (typeof r.summary[f] !== 'string') r.summary[f] = '';
-        });
-        if (typeof r.summary.peopleLeadPersonId !== 'number') r.summary.peopleLeadPersonId = null;
-        if (typeof r.summary.chargability !== 'string') r.summary.chargability = '';
-        if (!Array.isArray(r.summary.clientAccounts)) r.summary.clientAccounts = [];
-        if (typeof r.pitchNotes !== 'string') r.pitchNotes = '';
-        if (typeof r.storyFrame !== 'string') r.storyFrame = '';
-        r.projects.forEach(p => { if (typeof p.lineManager !== 'string') p.lineManager = ''; });
-      });
-      // Active round id
-      if (!parsed.cribActiveRoundId || !parsed.cribRounds.find(r => r.id === parsed.cribActiveRoundId)) {
-        parsed.cribActiveRoundId = parsed.cribRounds[0].id;
-      }
-      // Counters — id seeds across all rounds
-      const allRounds = parsed.cribRounds;
-      const ids = (k) => allRounds.flatMap(r => (r[k] || []).map(x => x.id || 0));
-      if (!parsed.counters.nextCribProjectId) parsed.counters.nextCribProjectId = (ids('projects').length ? Math.max(...ids('projects')) : 0) + 1;
-      if (!parsed.counters.nextCribPracticeId) parsed.counters.nextCribPracticeId = (ids('practice').length ? Math.max(...ids('practice')) : 0) + 1;
-      if (!parsed.counters.nextCribSalesId) parsed.counters.nextCribSalesId = (ids('sales').length ? Math.max(...ids('sales')) : 0) + 1;
-      if (!parsed.counters.nextCribKxId) parsed.counters.nextCribKxId = (ids('kx').length ? Math.max(...ids('kx')) : 0) + 1;
-      if (!parsed.counters.nextCribAiId) parsed.counters.nextCribAiId = (ids('ai').length ? Math.max(...ids('ai')) : 0) + 1;
-      if (!parsed.counters.nextCribBdId) parsed.counters.nextCribBdId = (ids('bd').length ? Math.max(...ids('bd')) : 0) + 1;
-      if (!parsed.counters.nextCribPriorityId) parsed.counters.nextCribPriorityId = (ids('priority').length ? Math.max(...ids('priority')) : 0) + 1;
-      if (!parsed.counters.nextCribDevId) parsed.counters.nextCribDevId = (ids('dev').length ? Math.max(...ids('dev')) : 0) + 1;
-      if (!parsed.counters.nextCribRelationshipId) parsed.counters.nextCribRelationshipId = (ids('relationships').length ? Math.max(...ids('relationships')) : 0) + 1;
-      if (!parsed.counters.nextCribQualificationId) parsed.counters.nextCribQualificationId = (ids('qualifications').length ? Math.max(...ids('qualifications')) : 0) + 1;
-      if (!parsed.counters.nextCribClientAccountId) parsed.counters.nextCribClientAccountId = (allRounds.flatMap(r => (r.summary.clientAccounts || []).map(x => x.id || 0)).length ? Math.max(...allRounds.flatMap(r => (r.summary.clientAccounts || []).map(x => x.id || 0))) : 0) + 1;
-      if (!parsed.counters.nextCribRoundId) parsed.counters.nextCribRoundId = Math.max(0, ...allRounds.map(r => r.id || 0)) + 1;
-      // Drop legacy state.crib so we don't double-store
-      delete parsed.crib;
-      // Tab visibility
-      if (!parsed.settings.visibleTabs) parsed.settings.visibleTabs = { actions: true, notes: true, links: true, ones: true, crib: true };
-      ['actions','notes','links','ones','crib'].forEach(k => {
-        if (parsed.settings.visibleTabs[k] === undefined) parsed.settings.visibleTabs[k] = true;
-      });
-      return parsed;
+      return migrate(parsed) || freshState();
     } catch (e) {
-      return defaultState();
+      console.error('OmniPad: could not load saved data', e);
+      return freshState();
     }
   }
+  let state = loadState();
 
   let saveTimer = null;
   let saveIndicatorTimer = null;
@@ -5914,7 +5929,9 @@
     if (!snap) return;
     if (!confirm(`Restore backup from ${snap.dateKey}? This replaces your current data.`)) return;
     if (!confirm('Really restore? Your current state will be overwritten.')) return;
-    state = JSON.parse(JSON.stringify(snap.data));
+    const restored = migrate(JSON.parse(JSON.stringify(snap.data)));
+    if (!restored) { alert('That backup could not be read.'); return; }
+    state = restored;
     // reset transient state
     activeFilter = 'all';
     activePriorityFilter = 'all';
@@ -5922,18 +5939,6 @@
     pendingDelete = null;
     quickAddOpenForProject = null;
     addProjectOpen = false;
-    if (!Array.isArray(state.notes)) state.notes = [];
-    if (!Array.isArray(state.links)) state.links = [];
-    if (!Array.isArray(state.ones)) state.ones = [];
-    // Crib rounds normalisation handled by ensureCribRounds() at first use
-    if (!Array.isArray(state.cribRounds)) state.cribRounds = [];
-    if (!state.counters) state.counters = {};
-    if (!state.counters.nextNoteId) state.counters.nextNoteId = state.notes.length ? Math.max(...state.notes.map(n => n.id || 0)) + 1 : 1;
-    if (!state.counters.nextLinkId) state.counters.nextLinkId = state.links.length ? Math.max(...state.links.map(l => l.id || 0)) + 1 : 1;
-    if (!state.counters.nextOneId) state.counters.nextOneId = state.ones.length ? Math.max(...state.ones.map(o => o.id || 0)) + 1 : 1;
-    if (!state.counters.nextOneEntryId) state.counters.nextOneEntryId = 1;
-    if (!state.settings) state.settings = {};
-    if (!state.settings.activeView) state.settings.activeView = 'actions';
     currentNoteId = null;
     currentOneId = null;
     pendingNoteDelete = null;
@@ -6048,6 +6053,24 @@
     state.streak.lastCompletionDate = today;
     state.streak.longest = Math.max(state.streak.longest || 0, state.streak.current);
     return isFirstToday;
+  }
+
+  // The one place an action's status changes, so completedAt, chase dates, streaks and
+  // celebrations behave the same from every UI path. Caller saves and renders.
+  //   opts.anchorEl — element to burst fireworks / encouragement from
+  //   opts.quiet    — skip toasts (bulk edits, the Clean Up overlay)
+  function setStatus(a, status, opts) {
+    const o = opts || {};
+    if (a.status === status) return false;
+    a.status = status;
+    a.completedAt = status === 'Complete' ? new Date().toISOString() : null;
+    if (status !== 'Blocked') a.chaseAt = null;
+    if (status === 'Complete') {
+      const isFirst = recordCompletionForStreak();
+      if (o.anchorEl) { fireworks(o.anchorEl); showEncouragement(o.anchorEl); }
+      if (!o.quiet && isFirst) maybeFirstCompletionToast();
+    }
+    return true;
   }
   function ownerNameFromTitle() {
     // Prefer explicit userName setting; fall back to first word of title
@@ -6266,7 +6289,7 @@
   let priorityRerenderTimer = null;
   let logoClickCount = 0;
   let logoClickTimer = null;
-  setTimeout(() => {
+  function wireLogoEasterEgg() {
     const logo = document.querySelector('header.app .logo');
     if (!logo) return;
     logo.addEventListener('click', () => {
@@ -6279,7 +6302,7 @@
         showSoftToast("✨ You found it.", '🌟');
       }
     });
-  }, 0);
+  }
 
   function fireworks(originEl) {
     if (!state.settings || state.settings.fireworksOnComplete === false) return;
@@ -6665,10 +6688,9 @@
     const action = state.actions.find(a => a.id === id);
     if (!action) { cleanupAdvance(1); return; }
     pushCleanupUndo(action);
-    if (updates) Object.assign(action, updates);
-    if (updates && updates.status === 'Complete') {
-      action.completedAt = new Date().toISOString();
-    }
+    const { status, ...rest } = updates || {};
+    Object.assign(action, rest);
+    if (status) setStatus(action, status, { quiet: true });
     save();
     cleanupAdvance(1);
   }
@@ -7427,8 +7449,7 @@
       btn.style.fontSize = '12px';
       btn.textContent = 'Mark action complete';
       btn.addEventListener('click', () => {
-        a.status = 'Complete';
-        a.completedAt = new Date().toISOString();
+        setStatus(a, 'Complete', { anchorEl: btn });
         save(); render();
       });
       prompt.appendChild(btn);
@@ -7609,21 +7630,14 @@
     tick.title = a.status === 'Complete' ? 'Mark as Open' : 'Mark as Complete';
     tick.innerHTML = ICONS.check;
     tick.addEventListener('click', () => {
-      const wasComplete = a.status === 'Complete';
-      if (wasComplete) {
+      if (a.status === 'Complete') {
         // Un-tick: restore to Open
-        a.status = 'Open';
-        a.completedAt = null;
+        setStatus(a, 'Open');
         save(); render();
         return;
       }
       // Mark complete immediately — single click is enough
-      a.status = 'Complete';
-      a.completedAt = new Date().toISOString();
-      if (state.settings.fireworksOnComplete !== false) fireworks(tick);
-      showEncouragement(tick);
-      const isFirst = recordCompletionForStreak();
-      if (isFirst) maybeFirstCompletionToast();
+      setStatus(a, 'Complete', { anchorEl: tick });
       save();
       render();
       // After render, open the inline "what's next?" input on the same row
@@ -7738,16 +7752,7 @@
     pill.addEventListener('click', (e) => {
       const i = STATUSES.indexOf(a.status);
       const dir = e.shiftKey ? -1 : 1;
-      const prev = a.status;
-      const next = STATUSES[(i + dir + STATUSES.length) % STATUSES.length];
-      a.status = next;
-      a.completedAt = next === 'Complete' ? new Date().toISOString() : null;
-      if (next === 'Complete' && prev !== 'Complete') {
-        fireworks(pill);
-        showEncouragement(pill);
-        const isFirst = recordCompletionForStreak();
-        if (isFirst) maybeFirstCompletionToast();
-      }
+      setStatus(a, STATUSES[(i + dir + STATUSES.length) % STATUSES.length], { anchorEl: pill });
       save(); render();
     });
     tdS.appendChild(pill);
@@ -7894,10 +7899,10 @@
         { icon: '↓', label: 'Low',    checked: a.priority === 'Low',    action: () => { a.priority = 'Low';    save(); render(); } },
         null,
         { groupLabel: 'Status' },
-        { icon: '○', label: 'Open',        checked: a.status === 'Open',        action: () => { a.status = 'Open';        a.completedAt = null; save(); render(); } },
-        { icon: '◑', label: 'In Progress', checked: a.status === 'In Progress', action: () => { a.status = 'In Progress'; a.completedAt = null; save(); render(); } },
-        { icon: '⊘', label: 'Blocked',     checked: a.status === 'Blocked',     action: () => { a.status = 'Blocked';     a.completedAt = null; save(); render(); } },
-        { icon: '✓', label: 'Complete',    checked: a.status === 'Complete',    action: () => { a.status = 'Complete'; a.completedAt = new Date().toISOString(); save(); render(); } },
+        ...STATUSES.map((s, i) => ({
+          icon: ['○', '◑', '⊘', '✓'][i], label: s, checked: a.status === s,
+          action: () => { setStatus(a, s, { anchorEl: tr }); save(); render(); }
+        })),
         null,
         { icon: '📅', label: a.dueAt ? 'Change due date' : 'Set due date', action: () => {
             const chip = tr.querySelector('.due-chip') || tr.querySelector('.col-due span');
@@ -7947,15 +7952,19 @@
     return tr;
   }
 
-  function closeProjectMenu() {
+  function closePicker() {
     if (openMenu) {
       openMenu.remove();
       openMenu = null;
       document.removeEventListener('mousedown', onDocMouseDown, true);
       document.removeEventListener('keydown', onMenuKey, true);
-      window.removeEventListener('scroll', closeProjectMenu, true);
-      window.removeEventListener('resize', closeProjectMenu);
+      window.removeEventListener('scroll', onPickerScroll, true);
+      window.removeEventListener('resize', closePicker);
     }
+  }
+  function onPickerScroll(e) {
+    // scrolling inside the picker (e.g. a long searchable list) must not close it
+    if (openMenu && !openMenu.contains(e.target)) closePicker();
   }
 
   // ===== Context Menu System =====
@@ -7981,7 +7990,7 @@
    */
   function showContextMenu(items, cx, cy) {
     hideCtxMenu();
-    closeProjectMenu();
+    closePicker();
     const menu = document.createElement('div');
     menu.className = 'ctx-menu';
     menu.setAttribute('role', 'menu');
@@ -8040,45 +8049,99 @@
     }, 0);
   }
   function onDocMouseDown(e) {
-    if (openMenu && !openMenu.contains(e.target)) closeProjectMenu();
+    if (openMenu && !openMenu.contains(e.target)) closePicker();
   }
   function onMenuKey(e) {
-    if (e.key === 'Escape') { e.preventDefault(); closeProjectMenu(); }
+    if (e.key === 'Escape') { e.preventDefault(); closePicker(); }
   }
-  function openProjectMenu(anchor, action) {
-    closeProjectMenu();
+  // ===== Shared dropdown picker =====
+  // items: [{ label, value, dot?, prefix?, selected?, onRemove? }], or (when searchable) a
+  // function(query) returning that list. onSelect(value, item) runs after the picker closes.
+  function openPicker(anchor, { items, onSelect, searchable, placeholder, emptyText }) {
+    closePicker();
     const menu = document.createElement('div');
-    menu.className = 'pp-menu';
-    state.projects.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'pp-item' + (p.id === action.projectId ? ' selected' : '');
-      item.innerHTML = `<span class="pdot" style="background:${p.colour}"></span>${escapeHtml(p.name)}` +
-        (p.id === action.projectId ? ICONS.checkSm : '');
-      item.addEventListener('click', () => {
-        action.projectId = p.id;
-        closeProjectMenu();
-        save(); render();
-      });
-      menu.appendChild(item);
-    });
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    let top = r.bottom + 4 + window.scrollY;
-    let left = r.left + window.scrollX;
-    menu.style.top = top + 'px';
-    menu.style.left = left + 'px';
-    // flip horizontally if it overflows
-    const mr = menu.getBoundingClientRect();
-    if (mr.right > window.innerWidth - 8) {
-      menu.style.left = (r.right + window.scrollX - mr.width) + 'px';
+    menu.className = 'pp-menu' + (searchable ? ' na-menu' : '');
+    let search = null;
+    if (searchable) {
+      search = document.createElement('input');
+      search.type = 'text';
+      search.className = 'na-search';
+      search.placeholder = placeholder || 'Search…';
+      menu.appendChild(search);
     }
+    const list = document.createElement('div');
+    if (searchable) list.className = 'na-list';
+    menu.appendChild(list);
+    const renderItems = () => {
+      list.innerHTML = '';
+      const its = typeof items === 'function' ? items(search ? search.value.trim().toLowerCase() : '') : items;
+      if (!its.length) {
+        const empty = document.createElement('div');
+        empty.className = 'pp-item pp-empty';
+        empty.textContent = emptyText || 'No matches';
+        list.appendChild(empty);
+        return;
+      }
+      its.forEach(it => {
+        const el = document.createElement('div');
+        el.className = 'pp-item' + (it.selected ? ' selected' : '');
+        if ('dot' in it) {
+          const dot = document.createElement('span');
+          dot.className = 'pdot';
+          dot.style.background = it.dot || '#d4d4d8';
+          el.appendChild(dot);
+        }
+        if (it.prefix) {
+          const pre = document.createElement('span');
+          pre.className = 'na-num';
+          pre.textContent = it.prefix;
+          el.appendChild(pre);
+        }
+        el.appendChild(document.createTextNode(it.label));
+        if (it.selected) el.insertAdjacentHTML('beforeend', ICONS.checkSm);
+        if (it.onRemove) {
+          const rm = document.createElement('button');
+          rm.type = 'button';
+          rm.className = 'pp-remove';
+          rm.title = 'Remove';
+          rm.textContent = '×';
+          rm.addEventListener('click', (e) => { e.stopPropagation(); closePicker(); it.onRemove(); });
+          el.appendChild(rm);
+        }
+        el.addEventListener('click', () => { closePicker(); onSelect(it.value, it); });
+        list.appendChild(el);
+      });
+    };
+    renderItems();
+    if (search) search.addEventListener('input', renderItems);
+    document.body.appendChild(menu);
+    // Below the anchor; flip left / above when it would leave the viewport
+    const r = anchor.getBoundingClientRect();
+    menu.style.left = (r.left + window.scrollX) + 'px';
+    menu.style.top = (r.bottom + 4 + window.scrollY) + 'px';
+    const mr = menu.getBoundingClientRect();
+    if (mr.right > window.innerWidth - 8) menu.style.left = Math.max(8, r.right + window.scrollX - mr.width) + 'px';
+    if (mr.bottom > window.innerHeight - 8 && r.top - mr.height - 4 > 0) menu.style.top = (r.top - mr.height - 4 + window.scrollY) + 'px';
     openMenu = menu;
     setTimeout(() => {
       document.addEventListener('mousedown', onDocMouseDown, true);
       document.addEventListener('keydown', onMenuKey, true);
-      window.addEventListener('scroll', closeProjectMenu, true);
-      window.addEventListener('resize', closeProjectMenu);
+      window.addEventListener('scroll', onPickerScroll, true);
+      window.addEventListener('resize', closePicker);
+      if (search) search.focus();
     }, 0);
+    return menu;
+  }
+  function projectPickerItems(selectedId, withNone) {
+    const items = state.projects.map(p => ({ label: p.name, value: p.id, dot: p.colour, selected: p.id === selectedId }));
+    if (withNone) items.unshift({ label: 'None', value: null, dot: '#d4d4d8', selected: !selectedId });
+    return items;
+  }
+  function openProjectMenu(anchor, action, onChange) {
+    openPicker(anchor, {
+      items: projectPickerItems(action.projectId, false),
+      onSelect: (id) => { action.projectId = id; save(); render(); if (onChange) onChange(); }
+    });
   }
 
   function beginCoNameEdit(a, span) {
@@ -8147,8 +8210,7 @@
           completedAt: completedAt
         });
         a.description = v;
-        a.status = 'Open';
-        a.completedAt = null;
+        setStatus(a, 'Open');
         showSoftToast(`Iterated: ${v.slice(0, 50)}${v.length > 50 ? '…' : ''}`, '↪');
         save(); render();
       } else {
@@ -8814,44 +8876,9 @@
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const parsed = JSON.parse(reader.result);
-        if (!parsed.projects || !parsed.actions) throw new Error('Invalid file');
-        state = {
-          projects: parsed.projects,
-          actions: parsed.actions,
-          notes: Array.isArray(parsed.notes) ? parsed.notes : [],
-          links: Array.isArray(parsed.links) ? parsed.links : [],
-          ones: Array.isArray(parsed.ones) ? parsed.ones : [],
-          cribRounds: Array.isArray(parsed.cribRounds) ? parsed.cribRounds : [],
-          cribActiveRoundId: parsed.cribActiveRoundId || null,
-          collapsedProjectIds: Array.isArray(parsed.collapsedProjectIds) ? parsed.collapsedProjectIds : [],
-          streak: parsed.streak || { current: 0, longest: 0, lastCompletionDate: null },
-          lastFirstCompletionDate: parsed.lastFirstCompletionDate || null,
-          settings: parsed.settings || { sortAsc: true },
-          counters: parsed.counters || {
-            nextActionNumber: Math.max(0, ...parsed.actions.map(a=>a.number||0)) + 1,
-            nextActionId: Math.max(0, ...parsed.actions.map(a=>a.id||0)) + 1,
-            nextProjectId: Math.max(0, ...parsed.projects.map(p=>p.id||0)) + 1,
-            nextNoteId: Array.isArray(parsed.notes) && parsed.notes.length ? Math.max(0, ...parsed.notes.map(n=>n.id||0)) + 1 : 1,
-            nextLinkId: Array.isArray(parsed.links) && parsed.links.length ? Math.max(0, ...parsed.links.map(l=>l.id||0)) + 1 : 1,
-            nextOneId: Array.isArray(parsed.ones) && parsed.ones.length ? Math.max(0, ...parsed.ones.map(o=>o.id||0)) + 1 : 1,
-            nextOneEntryId: 1
-          }
-        };
-        if (!state.counters.nextNoteId) state.counters.nextNoteId = state.notes.length ? Math.max(...state.notes.map(n => n.id || 0)) + 1 : 1;
-        if (!state.counters.nextLinkId) state.counters.nextLinkId = state.links.length ? Math.max(...state.links.map(l => l.id || 0)) + 1 : 1;
-        if (!state.settings.activeView) state.settings.activeView = 'actions';
-        // Legacy crib import: wrap into a single round
-        if ((!Array.isArray(state.cribRounds) || state.cribRounds.length === 0) && parsed.crib && typeof parsed.crib === 'object') {
-          state.cribRounds = [{
-            id: 1, name: 'Imported round', createdAt: new Date().toISOString(),
-            summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '' },
-            projects: parsed.crib.projects || [], practice: parsed.crib.practice || [],
-            sales: parsed.crib.sales || [], kx: parsed.crib.kx || [], ai: parsed.crib.ai || [],
-            bd: parsed.crib.bd || [], priority: parsed.crib.priority || [], dev: parsed.crib.dev || []
-          }];
-          state.cribActiveRoundId = 1;
-        }
+        const imported = migrate(JSON.parse(reader.result));
+        if (!imported) throw new Error('Invalid file');
+        state = imported;
         activeFilter = 'all';
         currentNoteId = null;
         pendingNoteDelete = null;
@@ -8872,7 +8899,7 @@
   document.getElementById('wipeBtn').addEventListener('click', () => {
     if (!confirm('Wipe ALL data? This cannot be undone.')) return;
     if (!confirm('Really wipe everything? Last chance.')) return;
-    state = defaultState();
+    state = freshState();
     activeFilter = 'all';
     currentNoteId = null;
     pendingNoteDelete = null;
@@ -8885,9 +8912,13 @@
   });
 
   // Theme + density
+  // data-theme always holds the resolved light/dark value, so CSS needs a single dark palette;
+  // the user's choice (light / dark / system) lives in settings.theme.
+  const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
   function applyTheme() {
     const t = (state.settings && state.settings.theme) || 'system';
-    document.documentElement.setAttribute('data-theme', t);
+    const resolved = t === 'system' ? (systemDarkQuery.matches ? 'dark' : 'light') : t;
+    document.documentElement.setAttribute('data-theme', resolved);
     document.documentElement.setAttribute('data-compact', state.settings && state.settings.compactRows ? 'true' : 'false');
     const seg = document.getElementById('themeSeg');
     if (seg) {
@@ -8897,6 +8928,7 @@
     }
   }
   applyTheme();
+  systemDarkQuery.addEventListener('change', () => { if (state.settings.theme === 'system') applyTheme(); });
 
   // Background tint
   function applyBgTint() {
@@ -9061,9 +9093,9 @@
     ids.forEach(id => {
       const a = state.actions.find(x => x.id === id);
       if (!a) return;
-      Object.assign(a, fields);
-      if (fields.status === 'Complete') a.completedAt = new Date().toISOString();
-      else if (fields.status && fields.status !== 'Complete') a.completedAt = null;
+      const { status, ...rest } = fields;
+      Object.assign(a, rest);
+      if (status) setStatus(a, status, { quiet: true });
     });
     save(); render();
     showUndo(`${ids.length} action${ids.length === 1 ? '' : 's'} updated`, () => {
@@ -9091,35 +9123,6 @@
       });
       save(); render();
     });
-  }
-  // Bulk dropdown menus
-  function openBulkMenu(anchor, items, onSelect) {
-    closeProjectMenu();
-    const menu = document.createElement('div');
-    menu.className = 'pp-menu';
-    items.forEach(it => {
-      const item = document.createElement('div');
-      item.className = 'pp-item';
-      item.innerHTML = (it.dot ? `<span class="pdot" style="background:${it.dot}"></span>` : '<span style="width:8px"></span>') + escapeHtml(it.label);
-      item.addEventListener('click', () => {
-        onSelect(it.value);
-        closeProjectMenu();
-      });
-      menu.appendChild(item);
-    });
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    menu.style.top = (r.bottom + 4 + window.scrollY) + 'px';
-    menu.style.left = (r.left + window.scrollX) + 'px';
-    const mr = menu.getBoundingClientRect();
-    if (mr.right > window.innerWidth - 8) {
-      menu.style.left = (r.right + window.scrollX - mr.width) + 'px';
-    }
-    openMenu = menu;
-    setTimeout(() => {
-      document.addEventListener('mousedown', onDocMouseDown, true);
-      document.addEventListener('keydown', onMenuKey, true);
-    }, 0);
   }
 
   // ============== Global search ==============
@@ -9370,7 +9373,7 @@
     }, 50);
   }
   // wire search input + keyboard
-  setTimeout(() => {
+  function wireSearchAndCapture() {
     const inp = document.getElementById('searchInput');
     const backdrop = document.getElementById('searchBackdrop');
     if (inp) {
@@ -9429,7 +9432,7 @@
       });
     }
     if (capBackdrop) capBackdrop.addEventListener('click', closeCapture);
-  }, 0);
+  }
   function updateSearchActiveRow() {
     const root = document.getElementById('searchResults');
     if (!root) return;
@@ -9477,44 +9480,49 @@
     const doc = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
     const root = doc.getElementById('root');
     if (!root) return '';
+    const R = SANITISE_RULES;
+    const keepAttr = (el, name, value) => {
+      if (!(R.attrs[el.tagName] || []).includes(name)) return false;
+      if (name === 'href') return /^(https?:|mailto:)/i.test(value) || (/^data:/i.test(value) && el.hasAttribute('download'));
+      if (name === 'src') return /^data:image\//i.test(value);
+      if (name === 'data-checked') return value === '0' || value === '1';
+      if (name === 'contenteditable') return value === 'false';
+      if (name === 'color') return R.colourValue.test(value.trim());
+      return true; // download, title, alt
+    };
+    const cleanAttributes = (el) => {
+      Array.from(el.attributes).forEach(attr => {
+        const name = attr.name.toLowerCase();
+        if (name === 'class') {
+          const kept = attr.value.split(/\s+/).filter(c => (R.classes[el.tagName] || []).includes(c));
+          if (kept.length) el.setAttribute('class', kept.join(' '));
+          else el.removeAttribute('class');
+        } else if (name === 'style') {
+          const decls = (R.attrs[el.tagName] || []).includes('style')
+            ? R.styleProps.map(p => [p, el.style.getPropertyValue(p).trim()]).filter(([, v]) => v && R.colourValue.test(v))
+            : [];
+          if (decls.length) el.setAttribute('style', decls.map(([p, v]) => `${p}: ${v}`).join('; '));
+          else el.removeAttribute('style');
+        } else if (!keepAttr(el, name, attr.value)) {
+          el.removeAttribute(attr.name);
+        }
+      });
+    };
     const walk = (node) => {
-      // collect children up-front; we mutate as we go
       Array.from(node.children).forEach(child => {
-        if (!ALLOWED_TAGS.has(child.tagName)) {
-          // unwrap: replace element with its children
+        if (R.drop.has(child.tagName)) { child.remove(); return; }
+        walk(child); // clean descendants first, so anything unwrapped below is already safe
+        if (!R.tags.has(child.tagName)) {
           while (child.firstChild) node.insertBefore(child.firstChild, child);
-          node.removeChild(child);
+          child.remove();
           return;
         }
-        // strip every attribute except a strict allow list per tag
-        Array.from(child.attributes).forEach(attr => {
-          const name = attr.name.toLowerCase();
-          const tag = child.tagName;
-          if (tag === 'A' && name === 'href') {
-            if (!/^(https?:|mailto:|data:application\/)/i.test(attr.value)) child.removeAttribute('href');
-          } else if (tag === 'A' && (name === 'download' || name === 'title')) {
-            // keep
-          } else if (tag === 'IMG' && name === 'src') {
-            // only data: image/* URLs
-            if (!/^data:image\//i.test(attr.value)) child.removeAttribute('src');
-          } else if (tag === 'IMG' && (name === 'alt' || name === 'title')) {
-            // keep
-          } else {
-            child.removeAttribute(attr.name);
-          }
-        });
+        cleanAttributes(child);
         if (child.tagName === 'A') {
           child.setAttribute('target', '_blank');
           child.setAttribute('rel', 'noopener noreferrer');
         }
-        if (child.tagName === 'IMG') {
-          // dropped src means strip the element
-          if (!child.getAttribute('src')) {
-            child.parentNode.removeChild(child);
-            return;
-          }
-        }
-        walk(child);
+        if (child.tagName === 'IMG' && !child.getAttribute('src')) child.remove();
       });
     };
     walk(root);
@@ -9568,127 +9576,30 @@
   }
 
   function openNoteProjectMenu(anchor, note) {
-    closeProjectMenu();
-    const menu = document.createElement('div');
-    menu.className = 'pp-menu';
-    // 'None' option
-    const noneItem = document.createElement('div');
-    noneItem.className = 'pp-item' + (!note.projectId ? ' selected' : '');
-    noneItem.innerHTML = '<span class="pdot" style="background:#d4d4d8"></span>None' + (!note.projectId ? ICONS.checkSm : '');
-    noneItem.addEventListener('click', () => {
-      updateNoteFields(note.id, { projectId: null });
-      closeProjectMenu();
-      save();
-      renderNotesView();
+    openPicker(anchor, {
+      items: projectPickerItems(note.projectId, true),
+      onSelect: (id) => { updateNoteFields(note.id, { projectId: id }); save(); renderNotesView(); }
     });
-    menu.appendChild(noneItem);
-    state.projects.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'pp-item' + (p.id === note.projectId ? ' selected' : '');
-      item.innerHTML = `<span class="pdot" style="background:${p.colour}"></span>${escapeHtml(p.name)}` +
-        (p.id === note.projectId ? ICONS.checkSm : '');
-      item.addEventListener('click', () => {
-        updateNoteFields(note.id, { projectId: p.id });
-        closeProjectMenu();
-        save();
-        renderNotesView();
-      });
-      menu.appendChild(item);
-    });
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    let top = r.bottom + 4 + window.scrollY;
-    let left = r.left + window.scrollX;
-    menu.style.top = top + 'px';
-    menu.style.left = left + 'px';
-    const mr = menu.getBoundingClientRect();
-    if (mr.right > window.innerWidth - 8) {
-      menu.style.left = (r.right + window.scrollX - mr.width) + 'px';
-    }
-    openMenu = menu;
-    setTimeout(() => {
-      document.addEventListener('mousedown', onDocMouseDown, true);
-      document.addEventListener('keydown', onMenuKey, true);
-      window.addEventListener('scroll', closeProjectMenu, true);
-      window.addEventListener('resize', closeProjectMenu);
-    }, 0);
   }
 
   function openNoteActionMenu(anchor, note) {
-    closeProjectMenu();
-    const menu = document.createElement('div');
-    menu.className = 'pp-menu na-menu';
-    const search = document.createElement('input');
-    search.className = 'na-search';
-    search.type = 'text';
-    search.placeholder = 'Search actions…';
-    menu.appendChild(search);
-    const noneItem = document.createElement('div');
-    noneItem.className = 'pp-item' + (!note.actionId ? ' selected' : '');
-    noneItem.textContent = 'None';
-    noneItem.addEventListener('click', () => {
-      updateNoteFields(note.id, { actionId: null });
-      closeProjectMenu(); save(); renderNotesView();
+    openPicker(anchor, {
+      searchable: true,
+      placeholder: 'Search actions…',
+      items: (q) => [{ label: 'None', value: null, selected: !note.actionId }].concat(
+        state.actions
+          .filter(a => a.status !== 'Complete')
+          .filter(a => !q || ('#' + a.number + ' ' + a.description).toLowerCase().includes(q))
+          .slice(0, 20)
+          .map(a => {
+            const proj = projectById(a.projectId);
+            return {
+              label: a.description.length > 50 ? a.description.slice(0, 50) + '…' : a.description,
+              value: a.id, dot: proj ? proj.colour : '#ccc', prefix: '#' + a.number, selected: a.id === note.actionId
+            };
+          })),
+      onSelect: (id) => { updateNoteFields(note.id, { actionId: id }); save(); renderNotesView(); }
     });
-    menu.appendChild(noneItem);
-    const listEl = document.createElement('div');
-    listEl.className = 'na-list';
-    menu.appendChild(listEl);
-    const renderList = (filter) => {
-      listEl.innerHTML = '';
-      const lc = (filter || '').toLowerCase();
-      const actions = state.actions
-        .filter(a => a.status !== 'Complete')
-        .filter(a => !lc || ('#' + a.number + ' ' + a.description).toLowerCase().includes(lc))
-        .slice(0, 20);
-      if (!actions.length) {
-        const empty = document.createElement('div');
-        empty.className = 'pp-item';
-        empty.style.color = 'var(--muted-2)';
-        empty.style.fontStyle = 'italic';
-        empty.textContent = 'No matching actions';
-        listEl.appendChild(empty);
-        return;
-      }
-      actions.forEach(a => {
-        const item = document.createElement('div');
-        item.className = 'pp-item' + (a.id === note.actionId ? ' selected' : '');
-        const proj = projectById(a.projectId);
-        const dot = document.createElement('span');
-        dot.className = 'pdot';
-        dot.style.background = proj ? proj.colour : '#ccc';
-        const num = document.createElement('span');
-        num.className = 'na-num';
-        num.textContent = '#' + a.number;
-        const desc = document.createTextNode(a.description.length > 50 ? a.description.slice(0, 50) + '…' : a.description);
-        item.appendChild(dot);
-        item.appendChild(num);
-        item.appendChild(desc);
-        item.addEventListener('click', () => {
-          updateNoteFields(note.id, { actionId: a.id });
-          closeProjectMenu(); save(); renderNotesView();
-        });
-        listEl.appendChild(item);
-      });
-    };
-    renderList('');
-    search.addEventListener('input', () => renderList(search.value));
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    let top = r.bottom + 4 + window.scrollY;
-    let left = r.left + window.scrollX;
-    menu.style.top = top + 'px';
-    menu.style.left = left + 'px';
-    const mr = menu.getBoundingClientRect();
-    if (mr.right > window.innerWidth - 8) menu.style.left = (r.right + window.scrollX - mr.width) + 'px';
-    openMenu = menu;
-    setTimeout(() => {
-      document.addEventListener('mousedown', onDocMouseDown, true);
-      document.addEventListener('keydown', onMenuKey, true);
-      window.addEventListener('scroll', closeProjectMenu, true);
-      window.addEventListener('resize', closeProjectMenu);
-      search.focus();
-    }, 0);
   }
 
   function notesSorted() {
@@ -10077,9 +9988,7 @@
     // Checklist
     const clBtn = mkBtn('☐', 'Insert checklist item', () => {
       body.focus();
-      document.execCommand('insertHTML', false,
-        '<div class="task-item"><span class="task-cb" contenteditable="false" data-checked="0"></span> </div>'
-      );
+      document.execCommand('insertHTML', false, CHECKLIST_ITEM_HTML);
       updateNoteFields(note.id, { body: body.innerHTML });
       debouncedSaveNote();
     });
@@ -10509,24 +10418,15 @@
   });
   const bulkStatusBtnEl = document.getElementById('bulkStatusBtn');
   if (bulkStatusBtnEl) bulkStatusBtnEl.addEventListener('click', () => {
-    openBulkMenu(bulkStatusBtnEl,
-      STATUSES.map(s => ({ label: s, value: s })),
-      v => bulkApply({ status: v })
-    );
+    openPicker(bulkStatusBtnEl, { items: STATUSES.map(s => ({ label: s, value: s })), onSelect: v => bulkApply({ status: v }) });
   });
   const bulkPriorityBtnEl = document.getElementById('bulkPriorityBtn');
   if (bulkPriorityBtnEl) bulkPriorityBtnEl.addEventListener('click', () => {
-    openBulkMenu(bulkPriorityBtnEl,
-      PRIORITIES.map(p => ({ label: p, value: p })),
-      v => bulkApply({ priority: v })
-    );
+    openPicker(bulkPriorityBtnEl, { items: PRIORITIES.map(p => ({ label: p, value: p })), onSelect: v => bulkApply({ priority: v }) });
   });
   const bulkProjectBtnEl = document.getElementById('bulkProjectBtn');
   if (bulkProjectBtnEl) bulkProjectBtnEl.addEventListener('click', () => {
-    openBulkMenu(bulkProjectBtnEl,
-      state.projects.map(p => ({ label: p.name, value: p.id, dot: p.colour })),
-      v => bulkApply({ projectId: v })
-    );
+    openPicker(bulkProjectBtnEl, { items: projectPickerItems(null, false), onSelect: v => bulkApply({ projectId: v }) });
   });
   const bulkDeleteBtnEl = document.getElementById('bulkDeleteBtn');
   if (bulkDeleteBtnEl) bulkDeleteBtnEl.addEventListener('click', bulkDelete);
@@ -11214,81 +11114,21 @@
   }
 
   function openLinkAddProjectMenu(anchor) {
-    closeProjectMenu();
-    const menu = document.createElement('div');
-    menu.className = 'pp-menu';
-    const noneItem = document.createElement('div');
-    noneItem.className = 'pp-item' + (!linksAddProjectId ? ' selected' : '');
-    noneItem.innerHTML = '<span class="pdot" style="background:#d4d4d8"></span>None';
-    noneItem.addEventListener('click', () => {
-      linksAddProjectId = null;
-      closeProjectMenu();
-      syncLinksAddProjectChip();
+    openPicker(anchor, {
+      items: projectPickerItems(linksAddProjectId, true),
+      onSelect: (id) => { linksAddProjectId = id; syncLinksAddProjectChip(); }
     });
-    menu.appendChild(noneItem);
-    state.projects.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'pp-item' + (p.id === linksAddProjectId ? ' selected' : '');
-      item.innerHTML = `<span class="pdot" style="background:${p.colour}"></span>${escapeHtml(p.name)}`;
-      item.addEventListener('click', () => {
-        linksAddProjectId = p.id;
-        closeProjectMenu();
-        syncLinksAddProjectChip();
-      });
-      menu.appendChild(item);
-    });
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    menu.style.top = (r.bottom + 4 + window.scrollY) + 'px';
-    menu.style.left = (r.left + window.scrollX) + 'px';
-    openMenu = menu;
-    setTimeout(() => {
-      document.addEventListener('mousedown', onDocMouseDown, true);
-      document.addEventListener('keydown', onMenuKey, true);
-    }, 0);
   }
 
   function openLinkProjectMenu(anchor, link) {
-    closeProjectMenu();
-    const menu = document.createElement('div');
-    menu.className = 'pp-menu';
-    const noneItem = document.createElement('div');
-    noneItem.className = 'pp-item' + (!link.projectId ? ' selected' : '');
-    noneItem.innerHTML = '<span class="pdot" style="background:#d4d4d8"></span>None';
-    noneItem.addEventListener('click', () => {
-      updateLink(link.id, { projectId: null });
-      closeProjectMenu();
-      renderLinksView();
+    openPicker(anchor, {
+      items: projectPickerItems(link.projectId, true),
+      onSelect: (id) => { updateLink(link.id, { projectId: id }); renderLinksView(); }
     });
-    menu.appendChild(noneItem);
-    state.projects.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'pp-item' + (p.id === link.projectId ? ' selected' : '');
-      item.innerHTML = `<span class="pdot" style="background:${p.colour}"></span>${escapeHtml(p.name)}`;
-      item.addEventListener('click', () => {
-        updateLink(link.id, { projectId: p.id });
-        closeProjectMenu();
-        renderLinksView();
-      });
-      menu.appendChild(item);
-    });
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    menu.style.top = (r.bottom + 4 + window.scrollY) + 'px';
-    menu.style.left = (r.left + window.scrollX) + 'px';
-    const mr = menu.getBoundingClientRect();
-    if (mr.right > window.innerWidth - 8) {
-      menu.style.left = (r.right + window.scrollX - mr.width) + 'px';
-    }
-    openMenu = menu;
-    setTimeout(() => {
-      document.addEventListener('mousedown', onDocMouseDown, true);
-      document.addEventListener('keydown', onMenuKey, true);
-    }, 0);
   }
 
-  // wire links UI once the DOM exists (everything inside the IIFE)
-  setTimeout(() => {
+  // Links UI wiring
+  function wireLinks() {
     const urlInp = document.getElementById('linkAddUrl');
     const titleInp = document.getElementById('linkAddTitle');
     const addBtn = document.getElementById('linkAddBtn');
@@ -11333,7 +11173,7 @@
       linksSearchQuery = searchInp.value;
       renderLinksList();
     });
-  }, 0);
+  }
 
   // ============== Crib Sheet ==============
   const SALES_STATUSES = ['In Progress', 'Won', 'Lost'];
@@ -11372,35 +11212,10 @@
     return m;
   }
 
+  // Shape is guaranteed by migrate(); this only guards the active-round pointer.
   function ensureCribRounds() {
-    if (!Array.isArray(state.cribRounds) || state.cribRounds.length === 0) {
-      state.cribRounds = [{
-        id: 1,
-        name: 'Current round',
-        createdAt: new Date().toISOString(),
-        summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '' },
-        projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: [], relationships: []
-      }];
-      state.cribActiveRoundId = 1;
-      if (!state.counters.nextCribRoundId) state.counters.nextCribRoundId = 2;
-    }
-    state.cribRounds.forEach(r => {
-      ['projects','practice','sales','kx','ai','bd','priority','dev','relationships','buckets'].forEach(k => {
-        if (!Array.isArray(r[k])) r[k] = [];
-      });
-      r.buckets.forEach(b => { if (!Array.isArray(b.items)) b.items = []; });
-      if (Array.isArray(r.sectionOrder)) CRIB_SECTION_ORDER.forEach(k => { if (!r.sectionOrder.includes(k)) r.sectionOrder.push(k); });
-      if (!r.summary || typeof r.summary !== 'object') r.summary = {};
-      ['name','currentPosition','targeting','timeAtLevel','peopleLead'].forEach(f => {
-        if (typeof r.summary[f] !== 'string') r.summary[f] = '';
-      });
-      if (typeof r.summary.peopleLeadPersonId !== 'number') r.summary.peopleLeadPersonId = null;
-    });
-    if (!state.counters.nextCribBucketId) state.counters.nextCribBucketId = Math.max(0, ...state.cribRounds.flatMap(r => r.buckets.map(b => b.id || 0))) + 1;
-    if (!state.counters.nextCribBucketItemId) state.counters.nextCribBucketItemId = Math.max(0, ...state.cribRounds.flatMap(r => r.buckets.flatMap(b => b.items.map(it => it.id || 0)))) + 1;
-    if (!state.cribActiveRoundId || !state.cribRounds.find(r => r.id === state.cribActiveRoundId)) {
-      state.cribActiveRoundId = state.cribRounds[0].id;
-    }
+    if (!state.cribRounds.length) state.cribRounds.push(blankRound(state.counters.nextCribRoundId++, 'Current round'));
+    if (!state.cribRounds.some(r => r.id === state.cribActiveRoundId)) state.cribActiveRoundId = state.cribRounds[0].id;
   }
   function activeRound() {
     ensureCribRounds();
@@ -11695,20 +11510,6 @@
     }
     save();
   }
-  function setActionCompleteFromBucket(a, complete, anchorEl) {
-    if (complete) {
-      a.status = 'Complete';
-      a.completedAt = new Date().toISOString();
-      fireworks(anchorEl);
-      const isFirst = recordCompletionForStreak();
-      if (isFirst) maybeFirstCompletionToast();
-    } else {
-      a.status = 'Open';
-      a.completedAt = null;
-    }
-    save();
-  }
-
   // Generic card reorder (works for all keyed arrays on a round)
   function reorderCribItem(kind, draggedId, targetId, before) {
     ensureCribRounds();
@@ -12026,20 +11827,13 @@
         topSkills: cloned.topSkills ? [...cloned.topSkills] : [],
         qualifications: cloned.qualifications || [],
         buckets: cloned.buckets,
+        evidence: [], // evidence belongs to its own round's period, so it isn't copied forward
         pitchNotes: cloned.pitchNotes || '',
         storyFrame: cloned.storyFrame || '',
         sectionOrder: cloned.sectionOrder ? [...cloned.sectionOrder] : [...CRIB_SECTION_ORDER]
       };
     } else {
-      newRound = {
-        id,
-        name: `Round ${state.cribRounds.length + 1}`,
-        createdAt: now,
-        summary: { name: '', currentPosition: '', targeting: '', timeAtLevel: '', peopleLead: '', chargability: '', clientAccounts: [] },
-        projects: [], practice: [], sales: [], bd: [], priority: [], dev: [], kx: [], ai: [], relationships: [],
-        topSkills: [], qualifications: [], buckets: [], pitchNotes: '', storyFrame: '',
-        sectionOrder: [...CRIB_SECTION_ORDER]
-      };
+      newRound = blankRound(id, `Round ${state.cribRounds.length + 1}`);
     }
     state.cribRounds.push(newRound);
     state.cribActiveRoundId = id;
@@ -12618,8 +12412,9 @@
     cb.checked = done;
     cb.title = a ? (done ? 'Reopen action' : 'Complete action') : (done ? 'Mark not done' : 'Mark done');
     cb.addEventListener('change', () => {
-      if (a) setActionCompleteFromBucket(a, cb.checked, row);
-      else { it.done = cb.checked; save(); }
+      if (a) setStatus(a, cb.checked ? 'Complete' : 'Open', { anchorEl: row });
+      else it.done = cb.checked;
+      save();
       render();
     });
     row.appendChild(cb);
@@ -12768,7 +12563,7 @@
   }
 
   // Wire crib tray, export, and pitch prompt
-  setTimeout(() => {
+  function wireCrib() {
     const trayMap = {
       projects: addCribProject,
       practice: addCribPractice,
@@ -12850,7 +12645,7 @@
       document.body.appendChild(a); a.click();
       setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
     });
-  }, 0);
+  }
 
   function cribAsMarkdown(opts) {
     ensureCribRounds();
@@ -13383,7 +13178,6 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   }
 
   // ============== 1-2-1s tracker ==============
-  const ONES_STALE_DAYS = 90;
   let currentOneId = null;
   let onesSearchQuery = '';
   let onesStaleOnly = false;
@@ -14118,42 +13912,14 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   }
 
   function openOneProjectMenu(anchor, one) {
-    closeProjectMenu();
-    const menu = document.createElement('div');
-    menu.className = 'pp-menu';
-    const noneItem = document.createElement('div');
-    noneItem.className = 'pp-item' + (!one.projectId ? ' selected' : '');
-    noneItem.innerHTML = '<span class="pdot" style="background:#d4d4d8"></span>None';
-    noneItem.addEventListener('click', () => {
-      updateOne(one.id, { projectId: null });
-      closeProjectMenu();
-      renderOnesView();
+    openPicker(anchor, {
+      items: projectPickerItems(one.projectId, true),
+      onSelect: (id) => { updateOne(one.id, { projectId: id }); renderOnesView(); }
     });
-    menu.appendChild(noneItem);
-    state.projects.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'pp-item' + (p.id === one.projectId ? ' selected' : '');
-      item.innerHTML = `<span class="pdot" style="background:${p.colour}"></span>${escapeHtml(p.name)}`;
-      item.addEventListener('click', () => {
-        updateOne(one.id, { projectId: p.id });
-        closeProjectMenu();
-        renderOnesView();
-      });
-      menu.appendChild(item);
-    });
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    menu.style.top = (r.bottom + 4 + window.scrollY) + 'px';
-    menu.style.left = (r.left + window.scrollX) + 'px';
-    openMenu = menu;
-    setTimeout(() => {
-      document.addEventListener('mousedown', onDocMouseDown, true);
-      document.addEventListener('keydown', onMenuKey, true);
-    }, 0);
   }
 
   // Wire ones view controls
-  setTimeout(() => {
+  function wireOnes() {
     const newBtn = document.getElementById('newOneBtn');
     if (newBtn) newBtn.addEventListener('click', addOne);
     const search = document.getElementById('onesSearchInput');
@@ -14166,7 +13932,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       onesStaleOnly = !onesStaleOnly;
       renderOnesSidebar();
     });
-  }, 0);
+  }
 
   // ============== Quick capture (Ctrl+Shift+K) ==============
   let captureProjectId = null;
@@ -14258,38 +14024,10 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     ctrls.appendChild(save);
   }
   function openCaptureProjectMenu(anchor) {
-    closeProjectMenu();
-    const menu = document.createElement('div');
-    menu.className = 'pp-menu';
-    const noneItem = document.createElement('div');
-    noneItem.className = 'pp-item' + (!captureProjectId ? ' selected' : '');
-    noneItem.innerHTML = '<span class="pdot" style="background:#d4d4d8"></span>None';
-    noneItem.addEventListener('click', () => {
-      captureProjectId = null;
-      closeProjectMenu();
-      updateCaptureUI(detectCaptureKind(document.getElementById('captureInput').value));
+    openPicker(anchor, {
+      items: projectPickerItems(captureProjectId, true),
+      onSelect: (id) => { captureProjectId = id; updateCaptureUI(detectCaptureKind(document.getElementById('captureInput').value)); }
     });
-    menu.appendChild(noneItem);
-    state.projects.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'pp-item' + (p.id === captureProjectId ? ' selected' : '');
-      item.innerHTML = `<span class="pdot" style="background:${p.colour}"></span>${escapeHtml(p.name)}`;
-      item.addEventListener('click', () => {
-        captureProjectId = p.id;
-        closeProjectMenu();
-        updateCaptureUI(detectCaptureKind(document.getElementById('captureInput').value));
-      });
-      menu.appendChild(item);
-    });
-    document.body.appendChild(menu);
-    const r = anchor.getBoundingClientRect();
-    menu.style.top = (r.bottom + 4 + window.scrollY) + 'px';
-    menu.style.left = (r.left + window.scrollX) + 'px';
-    openMenu = menu;
-    setTimeout(() => {
-      document.addEventListener('mousedown', onDocMouseDown, true);
-      document.addEventListener('keydown', onMenuKey, true);
-    }, 0);
   }
   function commitCapture() {
     const inp = document.getElementById('captureInput');
@@ -14611,10 +14349,18 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   window.addEventListener('scroll', () => hideSelectionPopover(), true);
   window.addEventListener('resize', () => hideSelectionPopover());
 
-  // initial render
-  render();
-  maybeTakeBackup();
-  setTimeout(() => addInput.focus(), 50);
+  // Startup: everything above is declared, so wiring can reference any of it
+  function init() {
+    wireLogoEasterEgg();
+    wireSearchAndCapture();
+    wireLinks();
+    wireCrib();
+    wireOnes();
+    render();
+    maybeTakeBackup();
+    setTimeout(() => addInput.focus(), 50);
+  }
+  init();
 
 
   // PWA: register service worker only when served over http(s).
@@ -14939,8 +14685,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     statusPill.addEventListener('click', (e) => {
       const i = STATUSES.indexOf(a.status);
       const dir = e.shiftKey ? -1 : 1;
-      a.status = STATUSES[(i + dir + STATUSES.length) % STATUSES.length];
-      a.completedAt = a.status === 'Complete' ? new Date().toISOString() : null;
+      setStatus(a, STATUSES[(i + dir + STATUSES.length) % STATUSES.length], { anchorEl: statusPill });
       save(); render(); renderActionModal();
     });
     statusGroup.appendChild(statusLbl);
@@ -15015,7 +14760,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     projPill.appendChild(pdot);
     projPill.appendChild(document.createTextNode(project ? project.name : 'No project'));
     projPill.title = 'Click to change project';
-    projPill.addEventListener('click', () => openProjectMenu(projPill, a));
+    projPill.addEventListener('click', () => openProjectMenu(projPill, a, renderActionModal));
     projGroup.appendChild(projLbl);
     projGroup.appendChild(projPill);
     pills.appendChild(projGroup);
