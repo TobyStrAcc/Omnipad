@@ -2873,6 +2873,7 @@
   [data-section-key="topSkills"]    .crib-section-head { border-left-color:#10b981; background:linear-gradient(90deg,rgba(16,185,129,.1) 0%,transparent 75%); }
   [data-section-key="qualifications"] .crib-section-head { border-left-color:#6366f1; background:linear-gradient(90deg,rgba(99,102,241,.1) 0%,transparent 75%); }
   [data-section-key="buckets"]      .crib-section-head { border-left-color:#84cc16; background:linear-gradient(90deg,rgba(132,204,22,.1) 0%,transparent 75%); }
+  .crib-evidence-section .crib-section-head { border-left-color:#f59e0b; background:linear-gradient(90deg,rgba(245,158,11,.12) 0%,transparent 75%); }
   .crib-pitch-section               .crib-section-head { border-left-color:#a855f7; background:linear-gradient(90deg,rgba(168,85,247,.1) 0%,transparent 75%); }
   .crib-section-head h3 {
     margin: 0;
@@ -3188,6 +3189,47 @@
     align-items: center;
   }
   .crib-chip-remove:hover { color: var(--danger); }
+  .crib-evidence-count { font-weight: 500; color: var(--muted); text-transform: none; letter-spacing: 0; margin-left: 4px; }
+  .evidence-list { display: flex; flex-direction: column; gap: 8px; }
+  .evidence-item { border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; background: var(--surface); display: flex; flex-direction: column; gap: 6px; }
+  .ev-line { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .ev-line .ev-text { flex: 1; min-width: 220px; }
+  .ev-type {
+    flex-shrink: 0;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: var(--accent-soft); color: var(--fg);
+    padding: 3px 10px; font: inherit; font-size: 12px; cursor: pointer;
+  }
+  .ev-type[data-type="win"] { background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.35); }
+  .ev-type[data-type="feedback"] { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.3); }
+  .evidence-item input, .evidence-item textarea {
+    border: 1px solid transparent; border-radius: 6px;
+    padding: 4px 6px; font: inherit; font-size: 13px;
+    background: transparent; color: var(--fg);
+  }
+  .evidence-item textarea { resize: vertical; }
+  .evidence-item input:hover, .evidence-item textarea:hover { border-color: var(--border); }
+  .evidence-item input:focus, .evidence-item textarea:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .ev-line .ev-who { width: 180px; flex: 0 0 auto; }
+  .evidence-item .person-typeahead .pt-input { border-color: transparent; background: transparent; }
+  .evidence-item .person-typeahead .pt-input:hover { border-color: var(--border); }
+  .evidence-item .person-typeahead .pt-input:focus { border-color: var(--accent); background: var(--surface); }
+  .ev-line .ev-metric { flex: 1; min-width: 160px; }
+  .ev-source { background: none; border: 0; padding: 4px 2px; font: inherit; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .ev-source:hover:not(:disabled) { color: var(--fg); text-decoration: underline; }
+  .ev-source:disabled { cursor: default; opacity: .6; }
+  .ev-del { background: transparent; border: 0; color: var(--muted-2); cursor: pointer; width: 24px; height: 24px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; padding: 0; margin-left: auto; }
+  .ev-del:hover { background: var(--danger-soft); color: var(--danger); }
+  .ev-del svg { width: 12px; height: 12px; }
+  .section-evidence { margin-top: 10px; padding: 8px 12px; border: 1px dashed var(--border); border-radius: 10px; }
+  .se-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; font-size: 13px; }
+  .se-row .se-date { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .se-row .se-text { flex: 1; min-width: 0; }
+  .se-row .ev-del { margin-left: 0; }
+  .one-feedback-form { margin: 8px 0; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--hover); display: flex; flex-direction: column; gap: 6px; }
+  .one-feedback-form textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font: inherit; font-size: 13px; background: var(--surface); color: var(--fg); resize: vertical; }
+  .one-feedback-form textarea:focus { outline: none; border-color: var(--accent); }
+  .one-feedback-actions { display: flex; align-items: center; gap: 6px; }
   .crib-skills-hint {
     font-size: 12px;
     color: var(--muted-2);
@@ -4551,6 +4593,18 @@
   .oa-add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
 
   /* ===== Eisenhower matrix view ===== */
+  .actions-logbook { padding: 6px 14px 14px; }
+  .logbook-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 8px 0; }
+  .logbook-summary { margin-left: auto; font-size: 12px; color: var(--muted); }
+  .logbook-week { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-2); margin: 12px 0 4px; }
+  .logbook-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .logbook-row:last-child { border-bottom: 0; }
+  .logbook-day { width: 52px; flex-shrink: 0; font-size: 12px; color: var(--muted); }
+  .logbook-meta { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; font-size: 12px; color: var(--muted); max-width: 30%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .logbook-meta .pdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .logbook-win { flex-shrink: 0; }
+  .logbook-empty { padding: 24px 0; text-align: center; color: var(--muted-2); font-size: 13px; }
+  .capture-mode[data-mode="evidence"] { background: #f59e0b; color: #fff; }
   .actions-matrix { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(180px, auto); gap: 12px; padding: 12px 0; }
   .matrix-cell { border: 1px solid var(--border); border-radius: 12px; background: var(--hover); padding: 10px 12px; display: flex; flex-direction: column; min-height: 200px; }
   .matrix-cell.q1 { border-color: rgba(214, 92, 92, 0.45); }
@@ -4595,6 +4649,8 @@
     body.printing-crib .bucket-item-del,
     body.printing-crib .bucket-add,
     body.printing-crib .bucket-hint,
+    body.printing-crib #cribEvidenceSection,
+    body.printing-crib .section-evidence button,
     body.printing-crib .crib-accounts-block .btn { display: none !important; }
     body.printing-crib .crib-section { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12pt; }
     body.printing-crib .crib-section-head h3 { font-size: 13pt; margin: 8pt 0 4pt; color: #000; }
@@ -5238,6 +5294,10 @@
         <input type="checkbox" id="showTodayPanel">
         <label for="showTodayPanel">Show Today bar</label>
       </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="offerLogAsWin">
+        <label for="offerLogAsWin">Offer "Log as win" when completing an action</label>
+      </div>
       <div class="settings-subhead">Sorting &amp; filtering</div>
       <div class="toggle-row">
         <input type="checkbox" id="reverseSort">
@@ -5311,6 +5371,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>Clean Up</span>
     </button>
+    <button class="chip view-chip" id="logbookChip" type="button" title="Completed actions by week — log the ones worth remembering as Crib wins">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><polyline points="9 9 11 11 15 7"/></svg>
+      <span>Logbook</span>
+    </button>
     <button class="chip view-chip" id="matrixChip" type="button" hidden title="Eisenhower matrix view (Important × Urgent)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
       <span>Matrix</span>
@@ -5364,6 +5428,7 @@
   </table>
 
   <div class="actions-matrix" id="actionsMatrix" hidden></div>
+  <div class="actions-logbook" id="actionsLogbook" hidden></div>
 
   <div class="empty" id="emptyState" hidden>
     <h2>No actions yet</h2>
@@ -5399,6 +5464,14 @@
       </div>
 
       <div class="crib-summary" id="cribSummary"></div>
+
+      <div class="crib-section crib-evidence-section" id="cribEvidenceSection">
+        <div class="crib-section-head">
+          <h3>Evidence inbox <span class="crib-evidence-count" id="cribEvidenceCount"></span></h3>
+          <button class="btn small" id="cribAddEvidenceBtn" type="button">+ Add</button>
+        </div>
+        <div class="evidence-list" id="cribEvidenceList"></div>
+      </div>
 
       <div class="crib-section" id="cribProjectsSection" data-section-key="projects">
         <div class="crib-section-head">
@@ -5713,6 +5786,8 @@
   const STATUSES = ['Open','In Progress','Blocked','Complete'];
   const PRIORITIES = ['Low','Medium','High'];
   const CRIB_SECTION_ORDER = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications','buckets'];
+  const CRIB_SECTION_LABELS = { projects: 'Projects', practice: 'Practice & Community', sales: 'Sales', bd: 'Business Development', priority: 'Priorities', dev: 'Development Points', kx: 'KX Contributions', ai: 'AI', relationships: 'Key Relationships', topSkills: 'Top Skills', qualifications: 'Qualifications', buckets: 'Buckets' };
+  const EVIDENCE_FILE_TARGETS = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships'];
 
   // --- icons ---
   const ICONS = {
@@ -6162,6 +6237,7 @@
       const isFirst = recordCompletionForStreak();
       if (o.anchorEl) { fireworks(o.anchorEl); showEncouragement(o.anchorEl); }
       if (!o.quiet && isFirst) maybeFirstCompletionToast();
+      if (!o.quiet) offerLogAsWin(a);
     }
     return true;
   }
@@ -6488,6 +6564,8 @@
       mc.hidden = !enabled;
       mc.classList.toggle('active', enabled && state.settings.actionsViewMode === 'matrix');
     }
+    const lc = document.getElementById('logbookChip');
+    if (lc) lc.classList.toggle('active', state.settings.actionsViewMode === 'logbook');
   }
   function clearTodayNarrowing() {
     focusOnDueOnly = false;
@@ -7036,6 +7114,99 @@
     return list;
   }
 
+  // ── Logbook: finished actions by week, the raw material for Crib wins ──
+  let logbookRange = 'round'; // 'round' | '4w' | 'all'
+  function weekStartKey(d) {
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); // Monday
+    return dateKey(x);
+  }
+  function renderLogbook() {
+    const root = document.getElementById('actionsLogbook');
+    if (!root) return;
+    root.innerHTML = '';
+    const round = activeRound();
+    const roundStart = new Date(round.createdAt);
+    const since = logbookRange === 'round' ? roundStart : logbookRange === '4w' ? new Date(Date.now() - 28 * 86400000) : null;
+    let done = state.actions.filter(a => a.status === 'Complete' && a.completedAt);
+    if (activeFilter !== 'all') done = done.filter(a => a.projectId === activeFilter);
+    if (activePriorityFilter !== 'all') done = done.filter(a => a.priority === activePriorityFilter);
+    if (since) done = done.filter(a => new Date(a.completedAt) >= since);
+    done.sort((x, y) => String(y.completedAt).localeCompare(String(x.completedAt)));
+
+    const head = document.createElement('div');
+    head.className = 'logbook-head';
+    const ranges = [
+      ['round', `This round (since ${roundStart.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })})`],
+      ['4w', 'Last 4 weeks'],
+      ['all', 'All']
+    ];
+    ranges.forEach(([key, label]) => {
+      const c = document.createElement('button');
+      c.type = 'button';
+      c.className = 'chip' + (logbookRange === key ? ' active' : '');
+      c.textContent = label;
+      c.addEventListener('click', () => { logbookRange = key; renderLogbook(); });
+      head.appendChild(c);
+    });
+    const summary = document.createElement('span');
+    summary.className = 'logbook-summary';
+    const logged = done.filter(a => evidenceForAction(a.id)).length;
+    summary.textContent = `${done.length} done · ${logged} logged as wins`;
+    head.appendChild(summary);
+    root.appendChild(head);
+
+    if (!done.length) {
+      const empty = document.createElement('div');
+      empty.className = 'logbook-empty';
+      empty.textContent = 'Nothing completed in this range yet.';
+      root.appendChild(empty);
+      return;
+    }
+    let currentWeek = null;
+    done.forEach(a => {
+      const doneAt = new Date(a.completedAt);
+      const wk = weekStartKey(doneAt);
+      if (wk !== currentWeek) {
+        currentWeek = wk;
+        const label = document.createElement('div');
+        label.className = 'logbook-week';
+        label.textContent = 'Week of ' + new Date(wk + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
+        root.appendChild(label);
+      }
+      const row = document.createElement('div');
+      row.className = 'logbook-row';
+      const day = document.createElement('span');
+      day.className = 'logbook-day';
+      day.textContent = doneAt.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit' });
+      const text = document.createElement('button');
+      text.type = 'button';
+      text.className = 'live-action-text';
+      text.textContent = a.description;
+      text.title = 'Open action';
+      text.addEventListener('click', () => openActionModal(a.id));
+      const proj = projectById(a.projectId);
+      const meta = document.createElement('span');
+      meta.className = 'logbook-meta';
+      const pdot = document.createElement('span');
+      pdot.className = 'pdot';
+      pdot.style.background = proj ? proj.colour : '#ccc';
+      meta.append(pdot, (proj ? proj.name : '') + (a.coName ? ' · ' + a.coName : ''));
+      const win = document.createElement('button');
+      win.type = 'button';
+      win.className = 'btn small logbook-win';
+      if (evidenceForAction(a.id)) {
+        win.textContent = 'Logged ✓';
+        win.disabled = true;
+      } else {
+        win.textContent = '🏆 Log as win';
+        win.addEventListener('click', () => logActionAsWin(a));
+      }
+      row.append(day, text, meta, win);
+      root.appendChild(row);
+    });
+  }
+
   function applyMatrixBucket(a, bucketKey) {
     // Mutate priority/dueAt so the action lands in the target Eisenhower quadrant.
     // Minimal-edits rule: only change what's needed.
@@ -7197,13 +7368,17 @@
     const table = document.getElementById('actionsTable');
     const matrix = document.getElementById('actionsMatrix');
     const addBar = document.querySelector('#actionsView .add-bar');
+    const logbook = document.getElementById('actionsLogbook');
     const inMatrix = !!(state.settings && state.settings.showMatrixView && state.settings.actionsViewMode === 'matrix');
+    const inLogbook = state.settings.actionsViewMode === 'logbook';
     if (matrix) matrix.hidden = !inMatrix;
-    if (table) table.hidden = inMatrix;
-    if (addBar) addBar.hidden = inMatrix;
-    if (inMatrix) {
+    if (logbook) logbook.hidden = !inLogbook;
+    if (table) table.hidden = inMatrix || inLogbook;
+    if (addBar) addBar.hidden = inMatrix || inLogbook;
+    if (inMatrix || inLogbook) {
       empty.hidden = true;
-      renderActionsMatrix();
+      if (inMatrix) renderActionsMatrix();
+      else renderLogbook();
       return;
     }
     renderSortHeaders();
@@ -7997,6 +8172,9 @@
           });
         });
         menuItems.push({ icon: '＋', label: 'New bucket', action: () => toggleActionInBucket(newBucket(), a) });
+        menuItems.push(null, evidenceForAction(a.id)
+          ? { icon: '🏆', label: 'Logged as a win', checked: true, action: () => showSoftToast('Already in your Crib evidence', '🏆') }
+          : { icon: '🏆', label: 'Log as win', action: () => logActionAsWin(a) });
       }
       menuItems.push(null, { icon: '🗑', label: 'Delete', danger: true, action: () => { pendingDelete = a.id; render(); } });
       showContextMenu(menuItems, e.clientX, e.clientY);
@@ -8471,6 +8649,7 @@
     document.getElementById('sparklesToggle').checked = state.settings.sparkles !== false;
     document.getElementById('sparkleEggToggle').checked = state.settings.sparkleEgg !== false;
     document.getElementById('showTodayPanel').checked = state.settings.showTodayPanel !== false;
+    document.getElementById('offerLogAsWin').checked = state.settings.offerLogAsWin !== false;
     document.getElementById('staleDaysInput').value = state.settings.staleDays || 5;
     applyTheme(); // ensure seg buttons reflect
     // count of currently-hidden completed actions
@@ -8912,6 +9091,10 @@
     state.settings.sparkleEgg = e.target.checked;
     save();
   });
+  document.getElementById('offerLogAsWin').addEventListener('change', (e) => {
+    state.settings.offerLogAsWin = e.target.checked;
+    save();
+  });
   document.getElementById('showTodayPanel').addEventListener('change', (e) => {
     state.settings.showTodayPanel = e.target.checked;
     save(); renderTodayPanel();
@@ -9327,6 +9510,15 @@
           });
         }
         const sectionMap = { projects: 'Projects', practice: 'Practice', sales: 'Sales', bd: 'BD', priority: 'Priorities', dev: 'Development', kx: 'KX', ai: 'AI', buckets: 'Buckets' };
+        (ar.evidence || []).forEach(ev => {
+          if (![ev.text, ev.who, ev.metric].join(' ').toLowerCase().includes(q)) return;
+          results.push({
+            type: 'crib', id: ar.id, section: ev.section || 'evidence',
+            primary: ev.text || 'Evidence',
+            secondary: `Evidence · ${ev.type === 'feedback' ? 'Feedback' : 'Win'}${ev.section ? ' · ' + CRIB_SECTION_LABELS[ev.section] : ' · inbox'}`,
+            sortKey: new Date(ev.addedAt || 0).getTime()
+          });
+        });
         Object.keys(sectionMap).forEach(k => {
           (ar[k] || []).forEach(item => {
             const itemHay = Object.values(item).filter(v => typeof v === 'string')
@@ -9459,7 +9651,7 @@
     activeFilter = 'all';
     activePriorityFilter = 'all';
     focusMode = false;
-    if (state.settings.actionsViewMode === 'matrix') state.settings.actionsViewMode = 'list';
+    if (state.settings.actionsViewMode !== 'list') state.settings.actionsViewMode = 'list';
     if (r.type === 'comment') expandedActions.add(actionId);
     save(); render();
     setTimeout(() => {
@@ -9552,16 +9744,18 @@
     undoActiveFn = null;
     if (undoTimer) { clearTimeout(undoTimer); undoTimer = null; }
   }
-  function showUndo(label, undoFn) {
+  function showActionToast(label, buttonLabel, fn) {
     const t = document.getElementById('undoToast');
     const lbl = document.getElementById('undoToastLabel');
     if (!t || !lbl) return;
     if (undoTimer) clearTimeout(undoTimer);
     lbl.textContent = label;
-    undoActiveFn = undoFn;
+    document.getElementById('undoToastBtn').textContent = buttonLabel;
+    undoActiveFn = fn;
     t.classList.add('show');
     undoTimer = setTimeout(() => hideUndoToast(), 5000);
   }
+  function showUndo(label, undoFn) { showActionToast(label, 'Undo', undoFn); }
   const _undoBtn = document.getElementById('undoToastBtn');
   if (_undoBtn) _undoBtn.addEventListener('click', () => {
     const fn = undoActiveFn;
@@ -10525,6 +10719,12 @@
   if (cuUndoBtn) cuUndoBtn.addEventListener('click', cleanupUndoLast);
   document.querySelectorAll('.cu-scope-btn').forEach(b => {
     b.addEventListener('click', () => setCleanupScope(b.dataset.scope));
+  });
+  const logbookChipEl = document.getElementById('logbookChip');
+  if (logbookChipEl) logbookChipEl.addEventListener('click', () => {
+    state.settings.actionsViewMode = state.settings.actionsViewMode === 'logbook' ? 'list' : 'logbook';
+    save();
+    render();
   });
   const matrixChipEl = document.getElementById('matrixChip');
   if (matrixChipEl) matrixChipEl.addEventListener('click', () => {
@@ -11697,6 +11897,215 @@
     setTimeout(() => scrollAndFocus('cribQualificationsSection', 'cribQualificationsList'), 0);
   }
 
+  // ── Evidence: dated wins and feedback captured from anywhere, filed into sections later ──
+  function addEvidence(fields) {
+    ensureCribRounds();
+    const ev = Object.assign({
+      id: state.counters.nextEvidenceId++,
+      date: dateKey(new Date()), type: 'win', text: '', who: '', personId: null, metric: '',
+      section: null, source: { kind: 'manual', id: null }, addedAt: new Date().toISOString()
+    }, fields);
+    activeRound().evidence.unshift(ev);
+    save();
+    return ev;
+  }
+  function removeEvidence(id) {
+    state.cribRounds.forEach(r => { r.evidence = r.evidence.filter(ev => ev.id !== id); });
+    save();
+    render();
+  }
+  function deleteEvidence(ev) {
+    const round = state.cribRounds.find(r => r.evidence.includes(ev));
+    if (!round) return;
+    const idx = round.evidence.indexOf(ev);
+    round.evidence.splice(idx, 1);
+    save(); render();
+    showUndo('Evidence deleted', () => { round.evidence.splice(idx, 0, ev); save(); render(); });
+  }
+  function evidenceForAction(actionId) {
+    return state.cribRounds.some(r => r.evidence.some(ev => ev.source && ev.source.kind === 'action' && ev.source.id === actionId));
+  }
+  function logActionAsWin(a) {
+    if (evidenceForAction(a.id)) { showSoftToast('Already logged as a win', '🏆'); return; }
+    const ev = addEvidence({
+      type: 'win', text: a.description,
+      date: a.completedAt ? dateKey(new Date(a.completedAt)) : dateKey(new Date()),
+      who: a.coName || '', personId: a.personId || null,
+      source: { kind: 'action', id: a.id }
+    });
+    render();
+    showUndo('Logged to your Crib evidence inbox', () => removeEvidence(ev.id));
+  }
+  function offerLogAsWin(a) {
+    if (state.settings.offerLogAsWin === false || (state.settings.visibleTabs || {}).crib === false) return;
+    if (evidenceForAction(a.id)) return;
+    showActionToast('Done — worth remembering?', '🏆 Log as win', () => logActionAsWin(a));
+  }
+  function fmtEvidenceDate(key) {
+    const d = new Date((key || '') + 'T00:00:00');
+    return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  function openEvidenceSource(ev) {
+    const s = ev.source || {};
+    if (s.kind === 'action' && actionById(s.id)) openActionModal(s.id);
+    else if (s.kind === 'note' && noteById(s.id)) { currentNoteId = s.id; setView('notes'); }
+    else if (s.kind === 'one' && oneById(s.id)) { if (s.entryId) openEntry(s.id, s.entryId); else { currentOneId = s.id; setView('ones'); } }
+  }
+  function evidenceSourceLabel(ev) {
+    const s = ev.source || {};
+    if (s.kind === 'action') return actionById(s.id) ? '↗ action' : 'action removed';
+    if (s.kind === 'note') return noteById(s.id) ? '↗ note' : 'note removed';
+    if (s.kind === 'one') return oneById(s.id) ? '↗ 1-2-1' : '1-2-1 removed';
+    return '';
+  }
+  function mkEvidenceTypeToggle(ev, onChange) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ev-type';
+    b.dataset.type = ev.type;
+    b.textContent = ev.type === 'feedback' ? '💬 Feedback' : '🏆 Win';
+    b.title = 'Click to switch between win and feedback';
+    b.addEventListener('click', () => {
+      ev.type = ev.type === 'feedback' ? 'win' : 'feedback';
+      save();
+      b.dataset.type = ev.type;
+      b.textContent = ev.type === 'feedback' ? '💬 Feedback' : '🏆 Win';
+      if (onChange) onChange();
+    });
+    return b;
+  }
+  function mkEvidenceItem(ev) {
+    const row = document.createElement('div');
+    row.className = 'evidence-item';
+    const line1 = document.createElement('div');
+    line1.className = 'ev-line';
+    const date = document.createElement('input');
+    date.type = 'date';
+    date.className = 'ev-date';
+    date.value = ev.date;
+    date.addEventListener('change', () => { ev.date = date.value || dateKey(new Date()); save(); });
+    const text = document.createElement('textarea');
+    text.className = 'ev-text';
+    text.rows = 2;
+    text.placeholder = 'What happened, or what did they say?';
+    text.value = ev.text;
+    text.addEventListener('input', () => { ev.text = text.value; save(); });
+    line1.append(mkEvidenceTypeToggle(ev), date, text);
+    const line2 = document.createElement('div');
+    line2.className = 'ev-line';
+    const who = mkPersonTypeahead({
+      initial: ev.who,
+      placeholder: 'Who (optional)',
+      onText: (v) => { ev.who = v; ev.personId = null; save(); },
+      onPick: (m) => { ev.who = m.name || ''; ev.personId = m.id; save(); }
+    });
+    who.wrap.classList.add('ev-who');
+    const metric = document.createElement('input');
+    metric.type = 'text';
+    metric.className = 'ev-metric';
+    metric.placeholder = 'Impact / metric (e.g. £1.2M, 30% faster)';
+    metric.value = ev.metric;
+    metric.addEventListener('input', () => { ev.metric = metric.value; save(); });
+    line2.append(who.wrap, metric);
+    const srcLabel = evidenceSourceLabel(ev);
+    if (srcLabel) {
+      const src = document.createElement('button');
+      src.type = 'button';
+      src.className = 'ev-source';
+      src.textContent = srcLabel;
+      src.disabled = srcLabel.endsWith('removed');
+      src.addEventListener('click', () => openEvidenceSource(ev));
+      line2.appendChild(src);
+    }
+    const file = document.createElement('button');
+    file.type = 'button';
+    file.className = 'btn small';
+    file.textContent = 'File into ▾';
+    file.addEventListener('click', () => openPicker(file, {
+      items: EVIDENCE_FILE_TARGETS.map(k => ({ label: CRIB_SECTION_LABELS[k], value: k })),
+      onSelect: (k) => {
+        ev.section = k;
+        save();
+        renderCribView();
+        showSoftToast(`Filed under ${CRIB_SECTION_LABELS[k]}`, '🗂');
+      }
+    }));
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'ev-del';
+    del.title = 'Delete';
+    del.innerHTML = ICONS.x;
+    del.addEventListener('click', () => deleteEvidence(ev));
+    line2.append(file, del);
+    row.append(line1, line2);
+    return row;
+  }
+  function renderCribEvidence() {
+    const root = document.getElementById('cribEvidenceList');
+    const count = document.getElementById('cribEvidenceCount');
+    if (!root) return;
+    const r = activeRound();
+    const inbox = r.evidence.filter(ev => !ev.section);
+    const filed = r.evidence.length - inbox.length;
+    if (count) count.textContent = inbox.length || filed ? `· ${inbox.length} to file${filed ? ` · ${filed} filed` : ''}` : '';
+    root.innerHTML = '';
+    if (!inbox.length) {
+      root.appendChild(mkEmptySection('Nothing waiting. Log wins as they happen: "Log as win" on a completed action or in the Logbook, "+ Win" on selected note text, "Log feedback" on a 1-2-1 meeting, or the Win toggle in Quick Capture.', () => addManualEvidence()));
+      return;
+    }
+    inbox.forEach(ev => root.appendChild(mkEvidenceItem(ev)));
+  }
+  function addManualEvidence() {
+    addEvidence({});
+    renderCribView();
+    setTimeout(() => { const t = document.querySelector('#cribEvidenceList .ev-text'); if (t) t.focus(); }, 0);
+  }
+  // Filed evidence shows as a compact list at the foot of its section
+  function renderSectionEvidence() {
+    const r = activeRound();
+    CRIB_SECTION_ORDER.forEach(key => {
+      const sec = document.querySelector(`#cribView .crib-section[data-section-key="${key}"]`);
+      if (!sec) return;
+      let box = sec.querySelector(':scope > .section-evidence');
+      const items = r.evidence.filter(ev => ev.section === key);
+      if (!items.length) { if (box) box.remove(); return; }
+      if (!box) {
+        box = document.createElement('div');
+        box.className = 'section-evidence';
+        sec.appendChild(box);
+      }
+      box.innerHTML = '';
+      const label = document.createElement('div');
+      label.className = 'oee-label';
+      label.textContent = `Evidence (${items.length})`;
+      box.appendChild(label);
+      items.forEach(ev => {
+        const row = document.createElement('div');
+        row.className = 'se-row';
+        const when = document.createElement('span');
+        when.className = 'se-date';
+        when.textContent = fmtEvidenceDate(ev.date);
+        const text = document.createElement('span');
+        text.className = 'se-text';
+        text.textContent = `${ev.type === 'feedback' ? '💬' : '🏆'} ${ev.text}${ev.metric ? ' (' + ev.metric + ')' : ''}${ev.who ? ' — ' + ev.who : ''}`;
+        const unfile = document.createElement('button');
+        unfile.type = 'button';
+        unfile.className = 'ev-source';
+        unfile.textContent = '↩ inbox';
+        unfile.title = 'Move back to the evidence inbox to edit';
+        unfile.addEventListener('click', () => { ev.section = null; save(); renderCribView(); });
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'ev-del';
+        del.title = 'Delete';
+        del.innerHTML = ICONS.x;
+        del.addEventListener('click', () => deleteEvidence(ev));
+        row.append(when, text, unfile, del);
+        box.appendChild(row);
+      });
+    });
+  }
+
   // Buckets — renamable cards (e.g. "Catch-up with Sarah") holding free-text items and linked actions.
   // A linked item stores actionId + a text snapshot; while the action exists its live title/status win.
   function newBucket() {
@@ -11788,6 +12197,8 @@
     renderCribQualifications();
     renderCribBuckets();
     applyCribSectionOrder();
+    renderCribEvidence();
+    renderSectionEvidence();
     renderCribPitch();
   }
 
@@ -12816,6 +13227,7 @@
       const copy = confirm('Copy content from the current round into the new one?\n\nOK = Copy current  ·  Cancel = Start blank');
       addCribRound(copy);
     });
+    document.getElementById('cribAddEvidenceBtn').addEventListener('click', addManualEvidence);
     const cribBtnMap = {
       cribAddProjectBtn: addCribProject, cribAddPracticeBtn: addCribPractice,
       cribAddSalesBtn: addCribSales, cribAddBdBtn: addCribBd,
@@ -12914,6 +13326,14 @@
         lines.push('| --- | --- |');
         s.clientAccounts.forEach(a => lines.push(`| ${a.name || ''} | ${a.dayRate || ''} |`));
       }
+      lines.push('');
+    }
+
+    const evLine = (ev) => `- ${fmtEvidenceDate(ev.date)} · ${ev.type === 'feedback' ? '💬 Feedback' : '🏆 Win'}: ${ev.text}${ev.metric ? ` (${ev.metric})` : ''}${ev.who ? ` — ${ev.who}` : ''}`;
+    const inbox = (r.evidence || []).filter(ev => !ev.section && ev.text.trim());
+    if (inbox.length) {
+      lines.push('## Evidence (not yet filed)');
+      inbox.forEach(ev => lines.push(evLine(ev)));
       lines.push('');
     }
 
@@ -13064,7 +13484,16 @@
       }
     };
 
-    sectionOrder.forEach(key => { if (sectionEmitters[key]) sectionEmitters[key](); });
+    sectionOrder.forEach(key => {
+      const before = lines.length;
+      if (sectionEmitters[key]) sectionEmitters[key]();
+      const evs = (r.evidence || []).filter(ev => ev.section === key && ev.text.trim());
+      if (!evs.length) return;
+      if (lines.length === before) lines.push(`## ${CRIB_SECTION_LABELS[key]}`);
+      lines.push('**Evidence:**');
+      evs.forEach(ev => lines.push(evLine(ev)));
+      lines.push('');
+    });
 
     return lines.join('\n').trim() + '\n';
   }
@@ -13101,7 +13530,12 @@
     };
     const card = (starred, titleHtml, inner) =>
       `<div class="card${starred ? ' starred' : ''}">${starred ? '<span class="star-badge">★ Priority</span>' : ''}${titleHtml ? `<div class="card-title">${titleHtml}</div>` : ''}${inner}</div>`;
-    const panel = (title, inner) => `<div class="panel"><h2 class="panel-h">${esc(title)}</h2>${inner}</div>`;
+    const evidenceList = (items) => items.length
+      ? '<ul class="ev">' + items.map(ev => `<li><span class="ev-date">${esc(fmtEvidenceDate(ev.date))}</span> ${ev.type === 'feedback' ? '💬' : '🏆'} ${esc(ev.text)}${ev.metric ? ` <strong>(${esc(ev.metric)})</strong>` : ''}${ev.who ? ` <span class="ev-who">— ${esc(ev.who)}</span>` : ''}</li>`).join('') + '</ul>'
+      : '';
+    const filedEvidence = (key) => (r.evidence || []).filter(ev => ev.section === key && ev.text.trim());
+    let panelKey = null; // section whose filed evidence the next panel() call appends
+    const panel = (title, inner) => `<div class="panel"><h2 class="panel-h">${esc(title)}</h2>${inner}${panelKey ? evidenceList(filedEvidence(panelKey)) : ''}</div>`;
     const cardsWrap = (inner) => `<div class="cards">${inner}</div>`;
 
     const builders = {
@@ -13243,7 +13677,15 @@
 
     const sectionOrder = r.sectionOrder || CRIB_SECTION_ORDER;
     const panels = [];
-    sectionOrder.forEach(key => { if (builders[key]) { const out = builders[key](); if (out) panels.push(out); } });
+    sectionOrder.forEach(key => {
+      panelKey = key;
+      const out = builders[key] ? builders[key]() : null;
+      if (out) panels.push(out);
+      else if (filedEvidence(key).length) panels.push({ html: panel(CRIB_SECTION_LABELS[key], '') });
+    });
+    panelKey = null;
+    const inboxEvidence = (r.evidence || []).filter(ev => !ev.section && ev.text.trim());
+    const inboxHtml = inboxEvidence.length ? `<div class="panel"><h2 class="panel-h">Evidence</h2>${evidenceList(inboxEvidence)}</div>` : '';
 
     // Cover (built after panels so starred highlights are collected)
     const tiles = [];
@@ -13265,7 +13707,7 @@
     const bodyHtml = `<section class="page">` +
       `<div class="cover-band"><h1 class="cover-name">${esc(s.name || owner)}</h1>` +
       `<div class="cover-sub">Performance Round Crib${r.name ? ' — ' + esc(r.name) : ''}</div>${metaHtml}${r.storyFrame ? `<div class="cover-angle">“${esc(r.storyFrame)}”</div>` : ''}</div>` +
-      tilesHtml + hlHtml + acctHtml +
+      tilesHtml + hlHtml + inboxHtml + acctHtml +
       panels.map(p => p.html).join('') +
       `<div class="foot">Generated ${esc(genDate)} · OmniPad</div></section>`;
 
@@ -13333,6 +13775,10 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
 .kx { margin: 0; padding-left: 18px; }
 .kx li { font-size: 12.5px; margin: 3px 0; }
 .kx li.starred { list-style: none; margin-left: -18px; }
+.ev { margin: 8px 0 0; padding-left: 18px; }
+.ev li { font-size: 12.5px; margin: 2px 0; }
+.ev .ev-date { color: #6b7280; font-weight: 700; }
+.ev .ev-who { color: #6b7280; }
 .foot { margin-top: 16px; text-align: right; font-size: 10.5px; color: #9ca3af; }
 @media print {
   body { background: #fff; }
@@ -13389,6 +13835,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       `- Format as flowing prose with at most 3 short paragraph breaks. Avoid bullet points in the final output.`,
       `- Where data is incomplete in the Crib Sheet, lean on what's strongest and don't invent metrics.`,
       `- Items marked with ★ are ${owner}'s flagged priorities — lead with them and give them the most detail and air-time.`,
+      `- Dated Evidence items (🏆 wins, 💬 feedback) are concrete proof points: use the strongest, and quote feedback briefly where it helps.`,
       ``,
       `--- BEGIN CRIB SHEET ---`,
       md,
@@ -13449,6 +13896,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   let onesShowArchived = false;
   let pendingOneDelete = null;
   let pendingEntryDelete = null;
+  let feedbackFormEntryId = null; // 1-2-1 entry showing the inline "Log feedback" form
   let editingEntryId = null;
 
   function oneById(id) { return state.ones.find(o => o.id === id) || null; }
@@ -13732,7 +14180,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
           e.preventDefault();
           state.settings.activeView = 'actions';
           activeFilter = 'all';
-          if (state.settings.actionsViewMode === 'matrix') state.settings.actionsViewMode = 'list';
+          if (state.settings.actionsViewMode !== 'list') state.settings.actionsViewMode = 'list';
           save(); render();
           setTimeout(() => {
             const tr = document.querySelector(`tr[data-id="${a.id}"]`);
@@ -14133,6 +14581,15 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
         head.appendChild(ago);
         const headActions = document.createElement('span');
         headActions.className = 'one-entry-actions';
+        if ((state.settings.visibleTabs || {}).crib !== false) {
+          const fb = document.createElement('button');
+          fb.type = 'button';
+          fb.className = 'btn small';
+          fb.textContent = '💬 Log feedback';
+          fb.title = 'Save praise or feedback from this conversation to your Crib evidence inbox';
+          fb.addEventListener('click', () => { feedbackFormEntryId = feedbackFormEntryId === e.id ? null : e.id; renderOneEditor(); });
+          headActions.appendChild(fb);
+        }
         if (pendingEntryDelete === e.id) {
           const conf = document.createElement('span');
           conf.className = 'confirm-prompt';
@@ -14158,6 +14615,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
         bodyEl.innerHTML = e.notes || '';
         bodyEl.addEventListener('blur', () => updateEntry(o.id, e.id, { notes: bodyEl.innerHTML }));
         card.appendChild(bodyEl);
+        if (feedbackFormEntryId === e.id) card.appendChild(renderFeedbackForm(o, e));
         card.appendChild(renderEntryExtras(o, e));
         list.appendChild(card);
       });
@@ -14166,6 +14624,41 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
 
     // Conversation topics
     root.appendChild(renderOneConvTopics(o));
+  }
+
+  function renderFeedbackForm(o, e) {
+    const draft = { type: 'feedback' };
+    const form = document.createElement('div');
+    form.className = 'one-feedback-form';
+    const type = mkEvidenceTypeToggle(draft);
+    const text = document.createElement('textarea');
+    text.rows = 2;
+    text.placeholder = `What did ${o.name || 'they'} say? A short quote or paraphrase`;
+    const saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'btn primary small';
+    saveBtn.textContent = 'Save to Crib';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'btn small';
+    cancel.textContent = 'Cancel';
+    const commit = () => {
+      const v = text.value.trim();
+      if (!v) return;
+      addEvidence({ type: draft.type, text: v, who: o.name || '', personId: o.id, date: e.date || dateKey(new Date()), source: { kind: 'one', id: o.id, entryId: e.id } });
+      feedbackFormEntryId = null;
+      renderOneEditor();
+      showSoftToast('Logged to your Crib evidence inbox', draft.type === 'feedback' ? '💬' : '🏆');
+    };
+    saveBtn.addEventListener('click', commit);
+    cancel.addEventListener('click', () => { feedbackFormEntryId = null; renderOneEditor(); });
+    text.addEventListener('keydown', (ev) => { if ((ev.ctrlKey || ev.metaKey) && ev.key === 'Enter') { ev.preventDefault(); commit(); } });
+    const actions = document.createElement('div');
+    actions.className = 'one-feedback-actions';
+    actions.append(type, saveBtn, cancel);
+    form.append(text, actions);
+    setTimeout(() => text.focus(), 0);
+    return form;
   }
 
   function renderEntryExtras(o, e) {
@@ -14343,6 +14836,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   // ============== Quick capture (Ctrl+Shift+K) ==============
   let captureProjectId = null;
   let capturePriority = 'Medium';
+  let captureEvidenceType = null; // null | 'win' | 'feedback' — explicit toggle, never inferred from text
   function detectCaptureKind(text) {
     const t = (text || '').trim();
     if (!t) return 'action';
@@ -14359,6 +14853,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     palette.hidden = false;
     captureProjectId = (activeFilter !== 'all' && typeof activeFilter === 'number') ? activeFilter : null;
     capturePriority = 'Medium';
+    captureEvidenceType = null;
     const inp = document.getElementById('captureInput');
     if (inp) {
       inp.value = '';
@@ -14378,12 +14873,43 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const ta = document.getElementById('captureTextarea');
     const ctrls = document.getElementById('captureControls');
     if (modeEl) {
-      modeEl.dataset.mode = kind;
-      modeEl.textContent = kind === 'link' ? 'Save as link' : kind === 'note' ? 'Save as note' : 'Add as action';
+      modeEl.dataset.mode = captureEvidenceType ? 'evidence' : kind;
+      modeEl.textContent = captureEvidenceType ? 'Log to Crib'
+        : kind === 'link' ? 'Save as link' : kind === 'note' ? 'Save as note' : 'Add as action';
     }
-    if (ta) ta.hidden = kind !== 'note';
+    if (ta) ta.hidden = kind !== 'note' || !!captureEvidenceType;
     if (!ctrls) return;
     ctrls.innerHTML = '';
+
+    // Crib evidence toggle: Not a win → 🏆 Win → 💬 Feedback
+    if ((state.settings.visibleTabs || {}).crib !== false) {
+      const evPill = document.createElement('span');
+      evPill.className = 'cap-pill' + (captureEvidenceType ? ' set' : '');
+      evPill.textContent = captureEvidenceType === 'win' ? '🏆 Win' : captureEvidenceType === 'feedback' ? '💬 Feedback' : '🏆 Log to Crib?';
+      evPill.title = 'Click to save this to your Crib evidence inbox instead';
+      evPill.addEventListener('click', () => {
+        captureEvidenceType = captureEvidenceType === null ? 'win' : captureEvidenceType === 'win' ? 'feedback' : null;
+        updateCaptureUI(kind);
+      });
+      ctrls.appendChild(evPill);
+    }
+    if (captureEvidenceType) {
+      const spacerEv = document.createElement('span');
+      spacerEv.className = 'cap-spacer';
+      ctrls.appendChild(spacerEv);
+      const cancelEv = document.createElement('button');
+      cancelEv.className = 'btn';
+      cancelEv.type = 'button';
+      cancelEv.textContent = 'Cancel';
+      cancelEv.addEventListener('click', closeCapture);
+      const saveEv = document.createElement('button');
+      saveEv.className = 'btn primary';
+      saveEv.type = 'button';
+      saveEv.textContent = 'Log to Crib';
+      saveEv.addEventListener('click', commitCapture);
+      ctrls.append(cancelEv, saveEv);
+      return;
+    }
 
     // project pill (always shown)
     const projPill = document.createElement('span');
@@ -14441,6 +14967,13 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const ta = document.getElementById('captureTextarea');
     const text = (inp ? inp.value : '').trim();
     if (!text) { closeCapture(); return; }
+    if (captureEvidenceType) {
+      addEvidence({ type: captureEvidenceType, text, source: { kind: 'capture', id: null } });
+      showSoftToast('Logged to your Crib evidence inbox', captureEvidenceType === 'feedback' ? '💬' : '🏆');
+      closeCapture();
+      render();
+      return;
+    }
     const kind = detectCaptureKind(text);
     if (kind === 'link') {
       const link = addLink(text, '', captureProjectId);
@@ -14652,6 +15185,21 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       showSubActionPicker(pop, selectedText, note);
     });
     pop.appendChild(subBtn);
+    if ((state.settings.visibleTabs || {}).crib !== false) {
+      const winBtn = document.createElement('button');
+      winBtn.type = 'button';
+      winBtn.textContent = '+ Win';
+      winBtn.title = 'Log this to your Crib evidence inbox';
+      winBtn.addEventListener('mousedown', (e) => e.preventDefault());
+      winBtn.addEventListener('click', () => {
+        addEvidence({ type: 'win', text: selectedText.trim(), source: { kind: 'note', id: note ? note.id : null } });
+        pop.innerHTML = '<span class="sp-toast">✓ Logged to Crib</span>';
+        setTimeout(hideSelectionPopover, 1100);
+        const sel = window.getSelection();
+        if (sel && sel.removeAllRanges) sel.removeAllRanges();
+      });
+      pop.appendChild(winBtn);
+    }
     document.body.appendChild(pop);
     pop.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px';
     pop.style.top = (rect.top + window.scrollY) + 'px';
