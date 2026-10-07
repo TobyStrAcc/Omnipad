@@ -4287,6 +4287,20 @@
     text-transform: uppercase;
   }
   .link-item .li-icon svg { width: 14px; height: 14px; }
+  .link-item .li-select { display: none; margin: 0; cursor: pointer; accent-color: var(--accent); }
+  .link-item:hover .li-select,
+  .links-list.has-selection .li-select { display: inline-block; }
+  .link-item:hover .li-initials,
+  .links-list.has-selection .li-initials { display: none; }
+  .link-item.is-selected { background: var(--accent-soft); }
+  .links-select-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--accent-soft);
+    font-size: 13px;
+  }
+  .links-select-bar .lsb-count { font-weight: 600; margin-right: 4px; }
   .link-item .li-body {
     min-width: 0;
   }
@@ -5576,6 +5590,15 @@
         <label class="links-group-toggle">
           <input type="checkbox" id="linksGroupByProject"> Group by project
         </label>
+      </div>
+      <div class="links-select-bar" id="linksSelectBar" hidden>
+        <span class="lsb-count" id="linksSelectCount">0 selected</span>
+        <button class="btn small" id="linksCopyRich" type="button" title="Pastes as titled hyperlinks in Outlook, Teams and Word">Copy as links</button>
+        <button class="btn small" id="linksCopyMarkdown" type="button">Copy as Markdown</button>
+        <button class="btn small" id="linksCopyPlain" type="button">Copy as text</button>
+        <span class="bb-spacer"></span>
+        <button class="btn small" id="linksSelectAll" type="button">Select all</button>
+        <button class="btn small" id="linksSelectClear" type="button">Clear</button>
       </div>
       <div class="links-list" id="linksList"></div>
     </div>
@@ -10552,6 +10575,79 @@
   }
 
   // Clipboard text for "Copy name + URL": title on the first line, URL on the second.
+  // Share formats. "rich" writes text/html too, so Outlook, Teams and Word paste titled
+  // hyperlinks; every format also carries a plain-text version.
+  function linkLabel(l) { return (l.title || '').trim() || l.url; }
+  function linksAsPlain(links) {
+    return links.length === 1 ? linkNameAndUrl(links[0]) : links.map(l => `${linkLabel(l)} — ${l.url}`).join('\n');
+  }
+  function linksAsMarkdown(links) {
+    const md = (l) => `[${linkLabel(l).replace(/([\[\]\\])/g, '\\$1')}](${l.url.replace(/\)/g, '%29')})`;
+    return links.length === 1 ? md(links[0]) : links.map(l => `- ${md(l)}`).join('\n');
+  }
+  function linksAsHtml(links) {
+    const a = (l) => `<a href="${escapeHtml(l.url)}">${escapeHtml(linkLabel(l))}</a>`;
+    return links.length === 1 ? a(links[0]) : '<ul>' + links.map(l => `<li>${a(l)}</li>`).join('') + '</ul>';
+  }
+  async function copyLinks(links, format) {
+    if (!links.length) return false;
+    const plain = format === 'markdown' ? linksAsMarkdown(links) : linksAsPlain(links);
+    if (format === 'rich' && window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({
+          'text/html': new Blob([linksAsHtml(links)], { type: 'text/html' }),
+          'text/plain': new Blob([plain], { type: 'text/plain' })
+        })]);
+        return true;
+      } catch (e) { /* fall back to plain text below */ }
+    }
+    try { await navigator.clipboard.writeText(plain); return true; } catch (e) { return false; }
+  }
+  function copyLinksWithToast(links, format) {
+    const what = links.length === 1 ? 'Link' : `${links.length} links`;
+    const how = format === 'markdown' ? ' as Markdown' : format === 'plain' ? ' as text' : '';
+    copyLinks(links, format).then(ok => showSoftToast(ok ? `${what} copied${how}` : 'Copy failed', ok ? '📋' : '⚠️'));
+  }
+
+  // Multi-select (transient, like the Actions bulk selection)
+  let selectedLinkIds = new Set();
+  let lastSelectedLinkId = null;
+  function selectedLinksInOrder() {
+    const order = new Map(getVisibleLinks().map((l, i) => [l.id, i]));
+    return state.links
+      .filter(l => selectedLinkIds.has(l.id))
+      .sort((a, b) => (order.has(a.id) ? order.get(a.id) : 1e9) - (order.has(b.id) ? order.get(b.id) : 1e9));
+  }
+  function toggleLinkSelection(id, withShift) {
+    const visible = getVisibleLinks().map(l => l.id);
+    if (withShift && lastSelectedLinkId != null && visible.includes(lastSelectedLinkId) && visible.includes(id)) {
+      const [from, to] = [visible.indexOf(lastSelectedLinkId), visible.indexOf(id)].sort((x, y) => x - y);
+      for (let i = from; i <= to; i++) selectedLinkIds.add(visible[i]);
+    } else if (selectedLinkIds.has(id)) {
+      selectedLinkIds.delete(id);
+    } else {
+      selectedLinkIds.add(id);
+    }
+    lastSelectedLinkId = id;
+    renderLinksList();
+  }
+  function clearLinkSelection() {
+    selectedLinkIds = new Set();
+    lastSelectedLinkId = null;
+    renderLinksList();
+  }
+  function renderLinksSelectBar() {
+    // drop ids of links that no longer exist
+    selectedLinkIds.forEach(id => { if (!state.links.some(l => l.id === id)) selectedLinkIds.delete(id); });
+    const bar = document.getElementById('linksSelectBar');
+    const list = document.getElementById('linksList');
+    const n = selectedLinkIds.size;
+    if (bar) bar.hidden = n === 0;
+    if (list) list.classList.toggle('has-selection', n > 0);
+    const count = document.getElementById('linksSelectCount');
+    if (count) count.textContent = `${n} selected`;
+  }
+
   function linkNameAndUrl(link) {
     const name = (link.title || '').trim();
     return name ? `${name}\n${link.url}` : link.url;
@@ -10725,6 +10821,7 @@
   function renderLinksList() {
     const root = document.getElementById('linksList');
     if (!root) return;
+    renderLinksSelectBar();
     root.innerHTML = '';
     const list = getVisibleLinks();
     if (list.length === 0) {
@@ -10764,7 +10861,7 @@
   function renderLinkItem(link) {
     const project = link.projectId ? projectById(link.projectId) : null;
     const row = document.createElement('div');
-    row.className = 'link-item' + (link.pinned ? ' is-pinned' : '');
+    row.className = 'link-item' + (link.pinned ? ' is-pinned' : '') + (selectedLinkIds.has(link.id) ? ' is-selected' : '');
     row.style.setProperty('--row-colour', project ? project.colour : '#d4d4d8');
     row.dataset.id = link.id;
 
@@ -10846,8 +10943,18 @@
 
     const icon = document.createElement('span');
     icon.className = 'li-icon';
-    icon.textContent = urlInitials(link.url);
     icon.title = urlDomain(link.url);
+    const initials = document.createElement('span');
+    initials.className = 'li-initials';
+    initials.textContent = urlInitials(link.url);
+    const select = document.createElement('input');
+    select.type = 'checkbox';
+    select.className = 'li-select';
+    select.title = 'Select to copy several links at once';
+    select.checked = selectedLinkIds.has(link.id);
+    select.addEventListener('click', (e) => { e.stopPropagation(); toggleLinkSelection(link.id, e.shiftKey); });
+    icon.appendChild(initials);
+    icon.appendChild(select);
     row.appendChild(icon);
 
     const body = document.createElement('div');
@@ -10956,14 +11063,13 @@
     const copyNameUrlBtn = document.createElement('button');
     copyNameUrlBtn.type = 'button';
     copyNameUrlBtn.className = 'li-action-btn';
-    copyNameUrlBtn.title = 'Copy name + URL';
+    copyNameUrlBtn.title = 'Copy link — pastes as a titled hyperlink in Outlook, Teams and Word';
     copyNameUrlBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/><line x1="12" y1="12" x2="19" y2="12"/><line x1="12" y1="16" x2="17" y2="16"/></svg>';
     copyNameUrlBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(linkNameAndUrl(link));
+      if (await copyLinks([link], 'rich')) {
         copyNameUrlBtn.classList.add('copied');
         setTimeout(() => copyNameUrlBtn.classList.remove('copied'), 800);
-      } catch (e) {}
+      }
     });
     acts.appendChild(copyNameUrlBtn);
 
@@ -11006,8 +11112,10 @@
       e.preventDefault();
       showContextMenu([
         { icon: '↗', label: 'Open link', action: () => { visitLink(link.id); window.open(link.url, '_blank', 'noopener'); } },
+        { icon: '⧉', label: 'Copy link', hint: 'titled', action: () => copyLinksWithToast([link], 'rich') },
         { icon: '⧉', label: 'Copy URL', action: () => navigator.clipboard.writeText(link.url).then(() => showSoftToast('URL copied')) },
-        { icon: '⧉', label: 'Copy name + URL', action: () => navigator.clipboard.writeText(linkNameAndUrl(link)).then(() => showSoftToast('Name + URL copied')) },
+        { icon: '⧉', label: 'Copy as Markdown', action: () => copyLinksWithToast([link], 'markdown') },
+        { icon: selectedLinkIds.has(link.id) ? '☑' : '☐', label: selectedLinkIds.has(link.id) ? 'Deselect' : 'Select', action: () => toggleLinkSelection(link.id, false) },
         null,
         { icon: '✎', label: 'Rename', action: () => {
             const titleEl = row.querySelector('a.li-title');
@@ -11102,6 +11210,14 @@
       linksSearchQuery = searchInp.value;
       renderLinksList();
     });
+    document.getElementById('linksCopyRich').addEventListener('click', () => copyLinksWithToast(selectedLinksInOrder(), 'rich'));
+    document.getElementById('linksCopyMarkdown').addEventListener('click', () => copyLinksWithToast(selectedLinksInOrder(), 'markdown'));
+    document.getElementById('linksCopyPlain').addEventListener('click', () => copyLinksWithToast(selectedLinksInOrder(), 'plain'));
+    document.getElementById('linksSelectAll').addEventListener('click', () => {
+      getVisibleLinks().forEach(l => selectedLinkIds.add(l.id));
+      renderLinksList();
+    });
+    document.getElementById('linksSelectClear').addEventListener('click', clearLinkSelection);
   }
 
   // ============== Crib Sheet ==============
@@ -14081,10 +14197,9 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       if (sp && !sp.hidden) { closeSearch(); closed = true; }
       const cp = document.getElementById('capturePalette');
       if (cp && !cp.hidden) { closeCapture(); closed = true; }
-      // bulk selection
-      if (typeof clearSelection === 'function' && selectedActionIds && selectedActionIds.size) {
-        clearSelection(); closed = true;
-      }
+      // bulk selections
+      if (selectedActionIds.size) { clearSelection(); closed = true; }
+      if (selectedLinkIds.size) { clearLinkSelection(); closed = true; }
       if (closed) {
         e.preventDefault();
         if (typeof syncToolbarStates === 'function') syncToolbarStates();
