@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>OmniPad self-test</title>
+<style>
+  body { font: 14px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; margin: 24px; color: #18181b; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: #71717a; margin: 0 0 16px; }
+  #results { list-style: none; padding: 0; margin: 0 0 16px; }
+  #results li { padding: 2px 0; }
+  .pass::before { content: '✓ '; color: #16a34a; font-weight: 700; }
+  .fail::before { content: '✗ '; color: #dc2626; font-weight: 700; }
+  .fail { color: #991b1b; }
+  #summary { font-weight: 700; }
+  iframe { width: 1100px; height: 700px; border: 1px solid #e4e4e7; border-radius: 8px; }
+</style>
+</head>
+<body>
+<h1>OmniPad self-test</h1>
+<p class="sub">Runs the app in the frame below against separate, throwaway storage (<code>?selftest</code>), so your real data is never touched.</p>
+<p id="summary">Running…</p>
+<ul id="results"></ul>
+<iframe id="app" title="OmniPad under test"></iframe>
+<script>
+(async () => {
+  const frame = document.getElementById('app');
+  const list = document.getElementById('results');
+  const results = [];
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const record = (name, ok, detail) => {
+    results.push({ name, ok, detail });
+    const li = document.createElement('li');
+    li.className = ok ? 'pass' : 'fail';
+    li.textContent = name + (ok || !detail ? '' : ' — ' + detail);
+    list.appendChild(li);
+  };
+  const test = async (name, fn) => {
+    try { const r = await fn(); record(name, r !== false, r === false ? 'assertion failed' : ''); }
+    catch (e) { record(name, false, e && e.message || String(e)); }
+  };
+  const eq = (a, b, what) => { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`${what || 'value'}: expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`); };
+  const ok = (cond, what) => { if (!cond) throw new Error(what || 'expected true'); };
+  const waitFor = async (fn, what, ms = 8000) => {
+    const end = Date.now() + ms;
+    while (Date.now() < end) { try { const v = fn(); if (v) return v; } catch (e) {} await sleep(50); }
+    throw new Error('timed out waiting for ' + what);
+  };
+
+  // Fresh throwaway storage for this run
+  Object.keys(localStorage).filter(k => k.startsWith('selftest_')).forEach(k => localStorage.removeItem(k));
+  await new Promise(r => { const q = indexedDB.deleteDatabase('omnipad-selftest'); q.onsuccess = q.onerror = q.onblocked = () => r(); });
+
+  // Waits for the *new* page: until it loads, the frame still holds the previous document and its hooks
+  const load = async () => {
+    const token = 'run' + Date.now();
+    frame.src = '../action-tracker.html?selftest=1&t=' + token;
+    await waitFor(() => {
+      const fw = frame.contentWindow;
+      return fw && fw.location.href.includes(token) && fw.__omnipad && fw.__omnipad.ready;
+    }, 'app to start');
+    return { w: frame.contentWindow, d: frame.contentDocument, h: frame.contentWindow.__omnipad };
+  };
+  let { w, d, h } = await load();
+  const key = (el, k, extra) => el.dispatchEvent(new w.KeyboardEvent('keydown', Object.assign({ key: k, bubbles: true }, extra || {})));
+  const tab = async (view) => { d.querySelector(`.view-tab[data-view="${view}"]`).click(); await sleep(60); };
+
+  // ── Unit: pure functions ──
+  await test('money parsing and formatting', () => {
+    eq(h.cribParseMoney('£4.65M'), 4650000, '£4.65M');
+    eq(h.cribParseMoney('850k'), 850000, '850k');
+    eq(h.cribParseMoney('1,200,000'), 1200000, '1,200,000');
+    eq(h.cribFmtMoney(4650000), '£4.65M', 'format 4.65M');
+    eq(h.cribFmtMoney(850000), '£850K', 'format 850K');
+  });
+  await test('link auto-titles', () => {
+    eq(h.autoTitleFromUrl('https://contoso.sharepoint.com/:p:/r/personal/a_b_com/Documents/Q4%20Steerco%20Deck.pptx'), 'Q4 Steerco Deck', 'SharePoint');
+    eq(h.autoTitleFromUrl('https://github.com/tobystracc/Omnipad/pull/4'), 'tobystracc/Omnipad · PR #4', 'GitHub PR');
+    eq(h.autoTitleFromUrl('https://jira.example.com/browse/ABC-123'), 'ABC-123', 'Jira');
+    eq(h.normaliseUrl('example.com'), 'https://example.com/', 'normalise');
+  });
+  await test('dates: day difference and week start', () => {
+    eq(h.daysBetweenKeys('2026-10-01', '2026-10-08'), 7, 'days');
+    eq(h.weekStartKey(new Date(2026, 9, 7)), '2026-10-05', 'Wednesday → Monday');
+  });
+  await test('sanitiser keeps toolbar formatting', () => {
+    const html = '<h1>H</h1><p><strike>s</strike> <span style="background-color: rgb(254, 240, 138)">h</span> <font color="#dc2626">c</font></p>' +
+      '<div class="task-item"><span class="task-cb" contenteditable="false" data-checked="1"></span> t</div><hr>' +
+      '<a class="attachment" href="data:text/csv;base64,AAAA" download="x.csv">x</a>';
+    const out = h.sanitiseHtml(html);
+    ['<h1>', '<strike>', 'background-color', '<font color="#dc2626">', 'class="task-item"', 'data-checked="1"', '<hr>', 'class="attachment"', 'download="x.csv"']
+      .forEach(s => ok(out.includes(s), 'kept ' + s));
+  });
+  await test('sanitiser strips unsafe markup', () => {
+    const out = h.sanitiseHtml('<section><img src="x" onerror="alert(1)"><b onclick="x()">b</b></section><script>alert(2)<\/script><a href="javascript:alert(3)">j</a><span style="position:fixed;color:#000">p</span>');
+    ['onerror', 'onclick', '<script', 'javascript:', 'position'].forEach(s => ok(!out.includes(s), 'removed ' + s));
+    ok(out.includes('<b>b</b>'), 'kept safe content');
+  });
+  await test('migrate upgrades legacy data', () => {
+    const s = h.migrate({
+      projects: [{ id: 1, name: 'General', colour: '#5B8DB8' }],
+      actions: [{ id: 7, number: 7, description: 'a', priority: 'High', status: 'Open', projectId: 1, coName: 'sam', addedAt: '2026-09-01T09:00:00Z' }],
+      ones: [{ id: 3, name: 'Sam', cadenceDays: 90, entries: [{ id: 2, date: '2026-09-10', notes: '' }] }],
+      crib: { projects: [{ id: 4, title: 'Big programme' }] },
+      counters: { nextActionId: 2 }
+    });
+    eq(s.schemaVersion, 2, 'schema');
+    eq(s.cribRounds[0].projects[0].title, 'Big programme', 'legacy crib wrapped');
+    eq(s.actions[0].personId, 3, 'personId backfilled');
+    eq(s.ones[0].cadenceDays, 90, 'existing cadence kept');
+    ok(s.counters.nextActionId >= 8, 'counter raised past highest id');
+    ok(Array.isArray(s.cribRounds[0].evidence) && Array.isArray(s.ones[0].entries[0].discussed), 'new fields defaulted');
+    eq(s.noteTemplates.length, 4, 'templates seeded');
+  });
+  await test('untrusted import is cleaned', () => {
+    const s = h.migrate({
+      projects: [{ id: 1, name: 'P', colour: 'red;"><img src=x onerror=alert(1)>' }], actions: [],
+      notes: [{ id: 1, body: '<img src=x onerror=alert(1)><p>ok</p>' }],
+      links: [{ id: 1, url: 'javascript:alert(1)' }, { id: 2, url: 'https://ok.example' }]
+    }, { untrusted: true });
+    ok(/^#[0-9a-f]{6}$/i.test(s.projects[0].colour), 'colour replaced');
+    eq(s.notes[0].body, '<p>ok</p>', 'note sanitised');
+    eq(s.links.map(l => l.url), ['https://ok.example'], 'unsafe link dropped');
+  });
+  await test('link copy formats', () => {
+    const links = [{ title: 'A [x]', url: 'https://a.example/(1)' }, { title: 'B & C', url: 'https://b.example' }];
+    eq(h.linksAsMarkdown(links), '- [A \\[x\\]](https://a.example/(1%29)\n- [B & C](https://b.example)', 'markdown');
+    ok(h.linksAsHtml(links).includes('<a href="https://b.example">B &amp; C</a>'), 'html escaped');
+  });
+  await test('template tokens', () => {
+    const out = h.fillTemplate('{{project}} · {{weekday}}', 'R&D', true);
+    ok(out.startsWith('R&amp;D · '), 'project escaped in HTML');
+    ok(!out.includes('{{'), 'all tokens replaced');
+  });
+
+  // ── End to end in the app ──
+  await test('data is stored in IndexedDB', () => eq(h.storageKind(), 'IndexedDB', 'storage'));
+
+  await test('add and complete an action; "Log as win" creates evidence', async () => {
+    await tab('actions');
+    const add = d.getElementById('addInput');
+    add.value = 'Self-test action';
+    key(add, 'Enter');
+    const row = await waitFor(() => [...d.querySelectorAll('#actionsBody tr[data-id]')].find(r => r.textContent.includes('Self-test action')), 'new row');
+    row.querySelector('.tick-btn').click();
+    await waitFor(() => d.getElementById('undoToastBtn').textContent.includes('Log as win'), 'Log as win offer');
+    d.getElementById('undoToastBtn').click();
+    await sleep(50);
+    const fu = d.querySelector('.followup-input');
+    if (fu) key(fu, 'Escape');
+    eq(h.getState().cribRounds[0].evidence.length, 1, 'evidence items');
+  });
+
+  await test('note formatting is written to storage', async () => {
+    await tab('notes');
+    d.getElementById('newNoteBtn').click();
+    const body = await waitFor(() => d.getElementById('noteBody'), 'note editor');
+    body.innerHTML = '<h1>Heading</h1><p><strike>old</strike></p><div class="task-item"><span class="task-cb" contenteditable="false" data-checked="1"></span> done</div>';
+    body.dispatchEvent(new w.Event('input', { bubbles: true }));
+    await sleep(500);
+    await h.flushSave();
+  });
+
+  await test('1-2-1: logging a meeting records talking points and creates linked actions', async () => {
+    await tab('ones');
+    d.getElementById('newOneBtn').click();
+    const name = await waitFor(() => d.getElementById('oneNameInput'), 'name input');
+    name.value = 'Test Person';
+    name.dispatchEvent(new w.Event('input', { bubbles: true }));
+    const point = d.querySelector('.one-agenda .oa-add input');
+    point.value = 'Discuss rotation';
+    key(point, 'Enter');
+    const cb = await waitFor(() => d.querySelector('.one-agenda .oa-item input[type=checkbox]'), 'talking point');
+    cb.checked = true;
+    cb.dispatchEvent(new w.Event('change', { bubbles: true }));
+    const act = await waitFor(() => d.querySelector('#oneEditor .one-action-input'), 'action input');
+    act.value = 'Send options';
+    key(act, 'Enter');
+    await sleep(80);
+    [...d.querySelectorAll('.one-composer button')].find(b => b.textContent === 'Log meeting').click();
+    await sleep(150);
+    const o = h.getState().ones.find(x => x.name === 'Test Person');
+    const e = o.entries[o.entries.length - 1];
+    eq(e.discussed, ['Discuss rotation'], 'discussed');
+    const a = h.getState().actions.find(x => x.description === 'Send options');
+    ok(a && a.personId === o.id && a.fromEntryId === e.id, 'action linked to person and meeting');
+    await h.flushSave();
+  });
+
+  await test('everything survives a reload', async () => {
+    ({ w, d, h } = await load());
+    const s = h.getState();
+    const a = s.actions.find(x => x.description === 'Self-test action');
+    ok(a && a.status === 'Complete', 'action still complete');
+    const n = s.notes[s.notes.length - 1];
+    ['<h1>', '<strike>', 'data-checked="1"'].forEach(t => ok(n.body.includes(t), 'note kept ' + t));
+    ok(s.ones.some(o => o.name === 'Test Person'), 'person kept');
+  });
+
+  await test('export → wipe → import round trip is identical', async () => {
+    let exported = null;
+    const origCreate = w.URL.createObjectURL;
+    w.URL.createObjectURL = (b) => { b.text().then(t => { exported = t; }); return 'blob:selftest'; };
+    const origClick = w.HTMLAnchorElement.prototype.click;
+    w.HTMLAnchorElement.prototype.click = function () {};
+    w.confirm = () => true;
+    w.alert = () => {};
+    d.getElementById('exportBtn').click();
+    await waitFor(() => exported, 'export');
+    w.URL.createObjectURL = origCreate;
+    w.HTMLAnchorElement.prototype.click = origClick;
+    d.getElementById('wipeBtn').click();
+    await sleep(100);
+    eq(h.getState().actions.length, 0, 'wiped');
+    const dt = new w.DataTransfer();
+    dt.items.add(new w.File([exported], 'export.json', { type: 'application/json' }));
+    const input = d.getElementById('importFile');
+    input.files = dt.files;
+    input.dispatchEvent(new w.Event('change', { bubbles: true }));
+    await waitFor(() => h.getState().actions.length > 0, 'import');
+    eq(JSON.stringify(h.getState()), JSON.stringify(JSON.parse(exported)), 'state after import');
+  });
+
+  await test('daily backup snapshot exists', async () => {
+    const keys = await new Promise((res, rej) => {
+      const o = indexedDB.open('omnipad-selftest', 1);
+      o.onsuccess = () => { const r = o.result.transaction('kv').objectStore('kv').getAllKeys(); r.onsuccess = () => { res(r.result); o.result.close(); }; r.onerror = () => rej(r.error); };
+      o.onerror = () => rej(o.error);
+    });
+    ok(keys.some(k => String(k).startsWith('backup:')), 'a backup:YYYY-MM-DD key');
+  });
+
+  const failed = results.filter(r => !r.ok);
+  document.getElementById('summary').textContent = failed.length
+    ? `${failed.length} of ${results.length} checks failed`
+    : `All ${results.length} checks passed`;
+  document.body.dataset.result = failed.length ? 'fail' : 'pass';
+  document.body.dataset.report = results.map(r => (r.ok ? 'PASS ' : 'FAIL ') + r.name + (r.detail ? ' — ' + r.detail : '')).join('\n');
+  document.title = failed.length ? 'FAIL — OmniPad self-test' : 'PASS — OmniPad self-test';
+})().catch(e => {
+  document.getElementById('summary').textContent = 'Self-test crashed: ' + (e && e.message || e);
+  document.body.dataset.result = 'fail';
+  document.body.dataset.report = 'CRASH ' + (e && e.stack || e);
+});
+</script>
+</body>
+</html>

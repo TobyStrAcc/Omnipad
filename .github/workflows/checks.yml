@@ -1,0 +1,19 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Static checks (script parses, versions match)
+        run: node scripts/check.mjs
+      - name: Self-test in headless Chrome
+        run: node scripts/selftest.mjs
