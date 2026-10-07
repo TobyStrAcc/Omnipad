@@ -2060,6 +2060,15 @@
   }
   .notes-new-btn:hover { background: var(--hover); border-color: var(--accent); }
   .notes-new-btn .nb-plus { font-size: 14px; font-weight: 300; }
+  .notes-tpl-btn {
+    flex-shrink: 0;
+    width: 30px; height: 32px;
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    background: var(--surface); color: var(--muted);
+    cursor: pointer; font: inherit; font-size: 12px;
+  }
+  .notes-tpl-btn:hover { background: var(--hover); color: var(--fg); border-color: var(--accent); }
+  .notes-sidebar.collapsed .notes-tpl-btn { display: none; }
   .notes-list {
     flex: 1;
     overflow-y: auto;
@@ -5660,6 +5669,7 @@
           <button class="notes-new-btn" id="newNoteBtn" type="button">
             <span class="nb-plus">+</span><span>New note</span>
           </button>
+          <button class="notes-tpl-btn" id="newNoteFromTemplateBtn" type="button" title="New note from a template">▾</button>
           <button class="sidebar-toggle" id="sidebarToggle" type="button" title="Collapse / expand">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
@@ -9698,15 +9708,16 @@
   }
   function noteById(id) { return state.notes.find(n => n.id === id) || null; }
 
-  function addNote(focusBody) {
+  function addNote(focusBody, fields) {
     const now = new Date().toISOString();
-    const note = {
+    const note = Object.assign({
       id: state.counters.nextNoteId++,
       title: '',
       body: '',
+      actionId: null,
       createdAt: now,
       updatedAt: now
-    };
+    }, fields || {});
     state.notes.push(note);
     currentNoteId = note.id;
     state.settings.activeView = 'notes';
@@ -9721,6 +9732,61 @@
         if (t) t.focus();
       }
     }, 0);
+  }
+
+  // ── Note templates ── fixed tokens only, replaced by exact match (no parsing)
+  function fillTemplate(text, projectName, asHtml) {
+    const now = new Date();
+    const values = {
+      '{{date}}': now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      '{{weekday}}': now.toLocaleDateString('en-GB', { weekday: 'long' }),
+      '{{project}}': projectName || ''
+    };
+    return Object.entries(values).reduce((s, [token, v]) => s.split(token).join(asHtml ? escapeHtml(v) : v), text || '');
+  }
+  function addNoteFromTemplate(t) {
+    const proj = t.projectId ? projectById(t.projectId) : null;
+    const projectName = proj ? proj.name : '';
+    addNote(true, {
+      title: fillTemplate(t.title, projectName, false),
+      body: sanitiseHtml(fillTemplate(t.body, projectName, true)),
+      projectId: proj ? proj.id : null,
+      colour: t.colour || null
+    });
+  }
+  function saveNoteAsTemplate(n) {
+    const name = (n.title || '').trim() || 'Untitled template';
+    state.noteTemplates.push({
+      id: state.counters.nextNoteTemplateId++,
+      name, title: n.title || '', body: n.body || '',
+      projectId: n.projectId || null, colour: n.colour || null
+    });
+    save();
+    showSoftToast(`Saved as template “${name}”`, '📄');
+  }
+  function deleteNoteTemplate(id) {
+    const idx = state.noteTemplates.findIndex(t => t.id === id);
+    if (idx === -1) return;
+    const [t] = state.noteTemplates.splice(idx, 1);
+    save();
+    showUndo(`Template “${t.name}” deleted`, () => { state.noteTemplates.splice(idx, 0, t); save(); });
+  }
+  function openTemplatePicker(anchor) {
+    const items = state.noteTemplates
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(t => ({ label: t.name, value: t.id, onRemove: () => deleteNoteTemplate(t.id) }));
+    const current = noteById(currentNoteId);
+    if (current && currentView === 'notes') items.push({ label: 'Save current note as template', value: '__save' });
+    openPicker(anchor, {
+      items,
+      emptyText: 'No templates — right-click a note to save one',
+      onSelect: (id) => {
+        if (id === '__save') { saveNoteAsTemplate(current); return; }
+        const t = state.noteTemplates.find(x => x.id === id);
+        if (t) addNoteFromTemplate(t);
+      }
+    });
   }
 
   function selectNote(id) {
@@ -9858,6 +9924,7 @@
               setTimeout(() => { const t = document.getElementById('noteTitleInput'); if (t) { t.focus(); t.select(); } }, 60);
             }
           },
+          { icon: '📄', label: 'Save as template', action: () => saveNoteAsTemplate(n) },
           { icon: '⧉', label: 'Duplicate', action: () => {
               const copy = JSON.parse(JSON.stringify(n));
               copy.id = state.counters.nextNoteId++;
@@ -10520,6 +10587,8 @@
   // New-note button in sidebar
   const newNoteBtn = document.getElementById('newNoteBtn');
   if (newNoteBtn) newNoteBtn.addEventListener('click', () => addNote(false));
+  const newFromTemplateBtn = document.getElementById('newNoteFromTemplateBtn');
+  if (newFromTemplateBtn) newFromTemplateBtn.addEventListener('click', (e) => { e.stopPropagation(); openTemplatePicker(newFromTemplateBtn); });
   // Quick New Note toolbar button — jumps to Notes and focuses the body
   const quickNewNoteBtn = document.getElementById('quickNewNote');
   if (quickNewNoteBtn) quickNewNoteBtn.addEventListener('click', () => addNote(true));
