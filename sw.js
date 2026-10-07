@@ -5,15 +5,16 @@
  *  - Static assets (icons, manifest): STALE-WHILE-REVALIDATE
  *  - On activate: prune old caches and claim all clients immediately.
  *
- * Bump CACHE_VERSION when you change SW behaviour or want to force a full
- * cache reset. Day-to-day HTML edits do NOT need a version bump because
- * the HTML is fetched network-first.
+ * The page registers this file as sw.js?v=<APP_VERSION>, so every release changes
+ * the script URL (which the browser treats as an update) and the cache name.
+ * Nothing in this file needs editing per release.
  */
-const CACHE_VERSION = 'omnipad-1.3.0';  // bump to match APP_VERSION on each release
+const CACHE_VERSION = 'omnipad-' + (new URL(self.location.href).searchParams.get('v') || 'dev');
 const APP_SHELL = [
   './',
   './action-tracker.html',
   './manifest.webmanifest',
+  './icon.png',
   './icon.svg',
   './icon-maskable.svg'
 ];

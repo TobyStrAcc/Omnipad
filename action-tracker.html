@@ -511,6 +511,9 @@
   .project-add-row { margin-bottom: 12px; }
   .muted-count { color: var(--muted-2); font-size: 11px; margin-left: 4px; }
   .project-count { color: var(--muted); font-size: 12px; }
+  .insights { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+  .insight-row { display: flex; gap: 12px; }
+  .insight-key { width: 190px; flex-shrink: 0; color: var(--muted); }
   #captureShortcutInput { cursor: pointer; }
   .swatch.swatch-lg { width: 22px; height: 22px; border-radius: 6px; }
   .admin input[type="number"] { width: 64px; }
@@ -688,6 +691,18 @@
     color: color-mix(in srgb, var(--surface) 70%, transparent);
     padding: 4px 6px;
   }
+  .storage-banner {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    z-index: 600; width: min(720px, 94vw);
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px;
+    background: var(--danger-soft); color: var(--fg);
+    border: 1px solid var(--danger-border);
+    box-shadow: var(--shadow-md);
+    font-size: 13px;
+  }
+  .storage-banner span { flex: 1; }
+  .storage-banner .sb-dismiss { background: transparent; border: 0; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 4px; }
   /* First-run install prompt ------------------------------------------------- */
   .install-prompt {
     position: fixed;
@@ -876,7 +891,12 @@
     user-select: none;
     transition: all .12s ease;
   }
+  .chip { font-family: inherit; line-height: inherit; }
   .chip:hover { background: var(--hover); color: var(--fg); }
+  button:focus-visible, a:focus-visible, [role="button"]:focus-visible, tr[tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
   .chip.active {
     background: var(--accent);
     border-color: var(--accent);
@@ -5027,6 +5047,12 @@
   <button id="ghUpdateDismiss" class="ub-dismiss" type="button" aria-label="Dismiss">×</button>
 </div>
 
+<div class="storage-banner" id="storageBanner" role="alert" hidden>
+  <span id="storageBannerMsg"></span>
+  <button class="btn small" id="storageBannerDownload" type="button" hidden>Download it</button>
+  <button class="sb-dismiss" id="storageBannerDismiss" type="button" aria-label="Dismiss">×</button>
+</div>
+
 <!-- First-run install prompt banner -->
 <div class="install-prompt" id="installPrompt" hidden role="banner">
   <div class="install-prompt-inner">
@@ -5185,15 +5211,23 @@
       <summary>Backups &amp; data safety</summary>
       <div class="sup-body">
         <p>The app takes a full snapshot once per day, kept for 14 days. Open <em>History</em> (clock icon) to browse them — restore any day, or download as JSON.</p>
-        <p>Snapshots live in your browser's localStorage. For an off-device backup, export a JSON file occasionally via cog → Data → <em>Export JSON</em>.</p>
+        <p>Snapshots are stored with your data in the browser's IndexedDB on this device. For an off-device copy, use cog → Data → <em>Back up to a folder</em> (Chrome or Edge — pick a OneDrive folder and it backs up weekly) or <em>Export JSON</em>. OmniPad reminds you after 7 days without one.</p>
+      </div>
+    </details>
+
+    <details class="sup-section">
+      <summary>Diagnostics</summary>
+      <div class="sup-body">
+        <p>OmniPad keeps a small error log on this device. If something misbehaves, copy the diagnostics — they contain versions, counts and error messages, not your content.</p>
+        <p><button class="btn small" id="copyDiagnosticsBtn" type="button">Copy diagnostics</button> <button class="btn small" id="clearErrorLogBtn" type="button">Clear error log</button> <span class="support-status" id="diagnosticsStatus"></span></p>
       </div>
     </details>
 
     <details class="sup-section">
       <summary>About &amp; privacy</summary>
       <div class="sup-body">
-        <p>OmniPad is a local-first PWA hosted on GitHub Pages. Everything — actions, notes, projects, comments, backups — lives in your browser's localStorage on this device. Nothing is sent to a server.</p>
-        <p>The only network calls are to GitHub (to serve the app and check for new versions). No telemetry, no analytics, no accounts.</p>
+        <p>OmniPad is a local-first PWA hosted on GitHub Pages. Everything — actions, notes, projects, comments, backups — lives in your browser's storage (IndexedDB) on this device. Nothing is sent to a server.</p>
+        <p>The only network calls are to GitHub, to serve the app (and, for a downloaded copy, to check for new versions). No telemetry and no accounts: the usage counts in Settings → Insights stay on this device.</p>
         <p><a href="https://github.com/tobystracc/Omnipad" target="_blank" rel="noopener">View source on GitHub →</a></p>
       </div>
     </details>
@@ -5339,12 +5373,24 @@
         <button class="btn danger" id="wipeBtn">Wipe all data</button>
       </div>
       <div class="admin-row">
+        <button class="btn" id="backupFolderBtn" type="button">Back up to a folder…</button>
+        <button class="btn" id="backupNowBtn" type="button">Back up now</button>
+        <span class="update-status" id="backupStatus"></span>
+      </div>
+      <div class="admin-row">
         <button class="btn" id="checkUpdateBtn" type="button">Check for updates</button>
         <span class="update-status" id="updateStatus"></span>
       </div>
+      <div class="admin-hint" id="storageInfo"></div>
       <div class="admin-hint">
         Need help moving data between installs, getting updates, or installing the app? Open <strong>Support</strong> from the toolbar (book icon).
       </div>
+    </section>
+
+    <section>
+      <h3>Insights</h3>
+      <div class="admin-hint">Worked out on this device from your own data; the usage counts never leave it.</div>
+      <div class="insights" id="insightsPanel"></div>
     </section>
 
   </div>
@@ -5771,16 +5817,39 @@
   'use strict';
 
   // ── Release version ─────────────────────────────────────────────────────────
-  // When releasing: bump APP_VERSION here, version.json, and CACHE_VERSION in sw.js
+  // When releasing: node scripts/release.mjs <version> (updates this and version.json;
+  // sw.js takes the version from its registration URL)
   const APP_VERSION     = '1.3.0';
   // After pushing to GitHub, replace YOUR_USER with your GitHub username.
   // Leave as-is for local file use — version polling is skipped automatically.
   const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/tobystracc/Omnipad/main';
   // ────────────────────────────────────────────────────────────────────────────
 
-  const STORAGE_KEY = 'actionTracker_v1';
-  const BACKUP_KEY = 'actionTracker_v1_backups';
+  // ?selftest runs the app against separate, throwaway storage (see tests/selftest.html)
+  const TEST_MODE = new URLSearchParams(location.search).has('selftest');
+  const LS_PREFIX = TEST_MODE ? 'selftest_' : '';
+  const IDB_NAME = TEST_MODE ? 'omnipad-selftest' : 'omnipad';
+  const STORAGE_KEY = LS_PREFIX + 'actionTracker_v1';          // legacy localStorage key (pre-IndexedDB)
+  const BACKUP_KEY = LS_PREFIX + 'actionTracker_v1_backups';   // legacy localStorage key (pre-IndexedDB)
   const BACKUP_RETENTION_DAYS = 14;
+
+  // ── Diagnostics: a small on-device error log (never sent anywhere) ──
+  const ERROR_LOG_KEY = LS_PREFIX + 'omnipad_errors';
+  function logError(where, err) {
+    try {
+      const list = JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]');
+      list.push({
+        at: new Date().toISOString(), where,
+        message: String((err && err.message) || err),
+        stack: String((err && err.stack) || '').split('\n').slice(0, 4).join(' | ')
+      });
+      while (list.length > 50) list.shift();
+      localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(list));
+    } catch (e) { /* logging must never throw */ }
+    console.error('OmniPad:', where, err);
+  }
+  window.addEventListener('error', (e) => logError('error', e.error || e.message));
+  window.addEventListener('unhandledrejection', (e) => logError('promise', e.reason));
   const PALETTE = ['#5B8DB8','#7BA05B','#C28B5C','#9B7BB8','#B85B7B','#5BA89B','#B8A05B','#7B7B8E'];
   const BG_TINT_PRESETS = [
     { id: 'none',   value: null,      label: 'None' },
@@ -5796,6 +5865,30 @@
   const CRIB_SECTION_ORDER = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships','topSkills','qualifications','buckets'];
   const CRIB_SECTION_LABELS = { projects: 'Projects', practice: 'Practice & Community', sales: 'Sales', bd: 'Business Development', priority: 'Priorities', dev: 'Development Points', kx: 'KX Contributions', ai: 'AI', relationships: 'Key Relationships', topSkills: 'Top Skills', qualifications: 'Qualifications', buckets: 'Buckets' };
   const EVIDENCE_FILE_TARGETS = ['projects','practice','sales','bd','priority','dev','kx','ai','relationships'];
+
+  // ── Keyboard access: clickable non-button elements get role="button", a tab stop, and Enter / Space ──
+  const CLICKABLE_SELECTOR = [
+    '.status-pill:not(.bucket-item .status-pill):not(.live-action .status-pill)', '.project-pill', '.due-chip', '.tp-stat',
+    '.co-name', '.action-text', '.li-project', '.nm-project-pill', '.nm-action-pill', '.cap-pill', '.la-project',
+    '.chase-chip', '.history-tab', '.note-item', '.one-ct-chip', '.one-ct-head'
+  ].join(', ');
+  function makeClickablesAccessible(root) {
+    const els = root.matches && root.matches(CLICKABLE_SELECTOR) ? [root] : [];
+    if (root.querySelectorAll) els.push(...root.querySelectorAll(CLICKABLE_SELECTOR));
+    els.forEach(el => {
+      if (el.hasAttribute('role')) return;
+      el.setAttribute('role', 'button');
+      el.tabIndex = 0;
+    });
+  }
+  new MutationObserver(records => records.forEach(r => r.addedNodes.forEach(n => { if (n.nodeType === 1) makeClickablesAccessible(n); })))
+    .observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button' && e.target.tagName !== 'BUTTON') {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
 
   // --- icons ---
   const ICONS = {
@@ -5821,7 +5914,7 @@
   let focusOnChase = false;
   let pendingDelete = null; // action id awaiting confirm
   let bulkRevealMode = false; // true after first click of master checkbox before any selection
-  let selectedHistorySnap = null; // snapshot id selected in history panel
+  let selectedHistorySnap = null; // date key of the snapshot selected in the history panel
   let currentView = 'actions'; // 'actions' | 'notes'
   let currentNoteId = null;    // selected note id (or null)
   let pendingNoteDelete = null; // note id awaiting confirm
@@ -5852,7 +5945,7 @@
   // import, restore, wipe). It runs before the rest of this script is evaluated,
   // so it may only use function declarations and constants defined above it.
   const SCHEMA_VERSION = 2;
-  const PREMIGRATION_KEY = 'actionTracker_v1_premigration_v' + SCHEMA_VERSION;
+  const PREMIGRATION_KEY = 'premigration_v' + SCHEMA_VERSION;
   const ONES_STALE_DAYS = 60; // default 1-2-1 check-in cadence for new people
   const CHECKLIST_ITEM_HTML = '<div class="task-item"><span class="task-cb" contenteditable="false" data-checked="0"></span>&nbsp;</div>';
   const NOTE_TEMPLATE_SEEDS = [
@@ -5871,7 +5964,7 @@
       schemaVersion: SCHEMA_VERSION,
       projects: [{ id: 1, name: 'General', colour: PALETTE[0] }],
       actions: [],
-      settings: { sortAsc: true, groupByProject: false, title: 'OmniPad', boldHighPriority: true, bgTint: '#fbb87a', activeView: 'actions', hideCompletedAfterDay: true, showActionNumbers: false, staleDays: 5, fireworksOnComplete: true, linksSort: 'recent', linksGroupByProject: false, openOfficeInApp: true, theme: 'system', compactRows: false, sparkles: true, showTodayPanel: true, todayPanelCollapsed: false, sparkleEgg: true, showDueColumn: true, userName: '', captureShortcut: 'Ctrl+Shift+K', showMatrixView: false, actionsViewMode: 'list', offerLogAsWin: true, visibleTabs: { actions: true, notes: true, links: true, ones: true, crib: true } },
+      settings: { sortAsc: true, groupByProject: false, title: 'OmniPad', boldHighPriority: true, bgTint: '#fbb87a', activeView: 'actions', hideCompletedAfterDay: true, showActionNumbers: false, staleDays: 5, fireworksOnComplete: true, linksSort: 'recent', linksGroupByProject: false, openOfficeInApp: true, theme: 'system', compactRows: false, sparkles: true, showTodayPanel: true, todayPanelCollapsed: false, sparkleEgg: true, showDueColumn: true, userName: '', captureShortcut: 'Ctrl+Shift+K', showMatrixView: false, actionsViewMode: 'list', offerLogAsWin: true, lastOffDeviceBackupAt: null, lastOffDeviceBackupHow: null, visibleTabs: { actions: true, notes: true, links: true, ones: true, crib: true } },
       streak: { current: 0, longest: 0, lastCompletionDate: null },
       lastFirstCompletionDate: null,
       ones: [],
@@ -5881,6 +5974,7 @@
       notes: [],
       links: [],
       noteTemplates: null, // seeded by migrate()
+      usage: {},           // on-device weekly usage counts (see track())
       counters: { nextActionNumber: 1, nextActionId: 1, nextProjectId: 2 }
     };
   }
@@ -5925,7 +6019,28 @@
     if (!r.createdAt) r.createdAt = new Date().toISOString();
   }
 
-  function migrate(s) {
+  // An imported file is untrusted: colours and URLs end up in markup, bodies in the editor.
+  function cleanUntrusted(s) {
+    const colour = /^#[0-9a-f]{3,8}$/i;
+    const safeUrl = /^(https?:|mailto:)/i;
+    s.projects.forEach((p, i) => {
+      if (!colour.test(String(p.colour || ''))) p.colour = PALETTE[i % PALETTE.length];
+      p.name = String(p.name || 'Project');
+    });
+    if (s.settings.bgTint != null && !colour.test(String(s.settings.bgTint))) s.settings.bgTint = null;
+    s.notes.forEach(n => {
+      n.body = sanitiseHtml(String(n.body || ''));
+      if (n.colour && !colour.test(String(n.colour))) n.colour = null;
+    });
+    s.noteTemplates.forEach(t => { t.body = sanitiseHtml(String(t.body || '')); });
+    s.ones.forEach(o => {
+      if (o.avatar && !/^data:image\//i.test(o.avatar)) o.avatar = '';
+      o.entries.forEach(e => { e.notes = sanitiseHtml(String(e.notes || '')); });
+    });
+    s.links = s.links.filter(l => safeUrl.test(String(l.url || '')));
+  }
+
+  function migrate(s, opts) {
     if (!s || typeof s !== 'object' || !Array.isArray(s.projects) || !Array.isArray(s.actions)) return null;
     const d = defaultState();
     const arr = (v) => (Array.isArray(v) ? v : []);
@@ -6017,65 +6132,153 @@
     bump('nextCribBucketItemId', nextId(rounds.flatMap(r => r.buckets.flatMap(b => b.items))));
     bump('nextCribClientAccountId', nextId(rounds.flatMap(r => r.summary.clientAccounts)));
 
+    if (!s.usage || typeof s.usage !== 'object' || Array.isArray(s.usage)) s.usage = {};
+    if (opts && opts.untrusted) cleanUntrusted(s);
     s.schemaVersion = SCHEMA_VERSION;
     return s;
   }
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return freshState();
-      const parsed = JSON.parse(raw);
-      // Keep one untouched copy of the pre-upgrade data the first time a new schema loads
-      if (((parsed && parsed.schemaVersion) || 1) < SCHEMA_VERSION && !localStorage.getItem(PREMIGRATION_KEY)) {
-        try { localStorage.setItem(PREMIGRATION_KEY, raw); } catch (e) { /* quota: daily backups still hold history */ }
-      }
-      return migrate(parsed) || freshState();
-    } catch (e) {
-      console.error('OmniPad: could not load saved data', e);
-      return freshState();
+  // ── Storage ─────────────────────────────────────────────────────────────────
+  // Data lives in IndexedDB (a key-value store; large quota) under these keys:
+  //   'state'                the app data as a JSON string
+  //   'backup:YYYY-MM-DD'    daily snapshots, last BACKUP_RETENTION_DAYS kept
+  //   'premigration_vN'      untouched copy of the data before a schema upgrade
+  //   'quarantine:<ms>'      raw data that couldn't be read (kept, never overwritten)
+  //   'backupFolder'         folder handle for off-device backups
+  // If IndexedDB can't be opened the same keys go to localStorage instead.
+  const STORAGE_MOVED_FLAG = LS_PREFIX + 'omnipad_storage'; // 'idb' once data has moved out of localStorage
+  const THEME_HINT_KEY = LS_PREFIX + 'omnipad_hint';        // tiny copy of theme/tint/title to avoid a flash on load
+  const idbStore = (() => {
+    let opening = null;
+    const open = () => opening || (opening = new Promise((resolve, reject) => {
+      if (!window.indexedDB) { reject(new Error('IndexedDB unavailable')); return; }
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('kv');
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+      req.onblocked = () => reject(new Error('IndexedDB is blocked by another tab'));
+    }));
+    const run = (mode, fn) => open().then(db => new Promise((resolve, reject) => {
+      const t = db.transaction('kv', mode);
+      const req = fn(t.objectStore('kv'));
+      t.oncomplete = () => resolve(req ? req.result : undefined);
+      t.onerror = t.onabort = () => reject(t.error || new Error('IndexedDB transaction failed'));
+    }));
+    return {
+      kind: 'IndexedDB',
+      ready: open,
+      get: (k) => run('readonly', os => os.get(k)),
+      set: (k, v) => run('readwrite', os => { os.put(v, k); }),
+      del: (k) => run('readwrite', os => { os.delete(k); }),
+      keys: () => run('readonly', os => os.getAllKeys())
+    };
+  })();
+  const localKey = (k) => (k === 'state' ? STORAGE_KEY : LS_PREFIX + 'omnipad_kv_' + k);
+  const localStore = {
+    kind: 'localStorage',
+    ready: async () => {},
+    get: async (k) => { const v = localStorage.getItem(localKey(k)); return v == null ? undefined : (k === 'state' ? v : JSON.parse(v)); },
+    set: async (k, v) => localStorage.setItem(localKey(k), k === 'state' ? v : JSON.stringify(v)),
+    del: async (k) => localStorage.removeItem(localKey(k)),
+    keys: async () => Object.keys(localStorage)
+      .filter(k => k.startsWith(LS_PREFIX + 'omnipad_kv_'))
+      .map(k => k.slice((LS_PREFIX + 'omnipad_kv_').length))
+  };
+  let db = null;              // the store in use, set during boot
+  let storageProblem = null;  // null | { kind: 'corrupt', key } | { kind: 'unavailable' } | { kind: 'save' }
+
+  async function openStorage() {
+    try { await idbStore.ready(); return idbStore; }
+    catch (e) {
+      logError('storage', e);
+      // Data already moved to IndexedDB: refuse to start empty and overwrite nothing
+      if (localStorage.getItem(STORAGE_MOVED_FLAG) === 'idb') storageProblem = { kind: 'unavailable' };
+      return localStore;
     }
   }
-  let state = loadState();
+
+  // First run on IndexedDB: copy the old localStorage data across, check it, then free localStorage.
+  async function moveLegacyStorage() {
+    const rawState = localStorage.getItem(STORAGE_KEY);
+    if (rawState != null && (await db.get('state')) == null) {
+      await db.set('state', rawState);
+      if ((await db.get('state')) !== rawState) throw new Error('state copy did not verify');
+    }
+    const rawBackups = localStorage.getItem(BACKUP_KEY);
+    if (rawBackups) {
+      const snaps = (JSON.parse(rawBackups) || {}).snapshots || [];
+      for (const s of snaps) if (s && s.dateKey && !(await db.get('backup:' + s.dateKey))) await db.set('backup:' + s.dateKey, s);
+    }
+    const legacyPre = localStorage.getItem(STORAGE_KEY + '_premigration_v' + SCHEMA_VERSION);
+    if (legacyPre && !(await db.get(PREMIGRATION_KEY))) await db.set(PREMIGRATION_KEY, legacyPre);
+    localStorage.setItem(STORAGE_MOVED_FLAG, 'idb');
+    [STORAGE_KEY, BACKUP_KEY, STORAGE_KEY + '_premigration_v' + SCHEMA_VERSION].forEach(k => localStorage.removeItem(k));
+  }
+
+  async function loadState() {
+    db = await openStorage();
+    if (storageProblem) { saveDisabled = true; return freshState(); }
+    if (db === idbStore && (localStorage.getItem(STORAGE_KEY) != null || localStorage.getItem(BACKUP_KEY) != null)) {
+      try { await moveLegacyStorage(); } catch (e) { logError('storage-move', e); }
+    }
+    const raw = await db.get('state');
+    if (raw == null) return freshState();
+    let parsed = null;
+    try { parsed = JSON.parse(raw); } catch (e) { logError('load', e); }
+    const migrated = parsed && migrate(parsed);
+    if (!migrated) {
+      const key = 'quarantine:' + Date.now();
+      await db.set(key, raw);
+      storageProblem = { kind: 'corrupt', key };
+      return freshState();
+    }
+    // Keep one untouched copy of the pre-upgrade data the first time a new schema loads
+    if ((parsed.schemaVersion || 1) < SCHEMA_VERSION && !(await db.get(PREMIGRATION_KEY))) {
+      await db.set(PREMIGRATION_KEY, raw);
+    }
+    return migrated;
+  }
+  // Placeholder until boot() loads the real data; seeded with the theme hint so the first paint matches.
+  let state = (() => {
+    const s = freshState();
+    try { Object.assign(s.settings, JSON.parse(localStorage.getItem(THEME_HINT_KEY) || '{}')); } catch (e) {}
+    return s;
+  })();
 
   let saveTimer = null;
   let saveIndicatorTimer = null;
+  let savePending = false;
+  let saveDisabled = true; // until boot() has loaded the real data
   function save() {
+    savePending = true;
     if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        const ind = document.getElementById('saveIndicator');
-        ind.textContent = 'Saved';
-        ind.classList.add('show');
-        if (saveIndicatorTimer) clearTimeout(saveIndicatorTimer);
-        saveIndicatorTimer = setTimeout(() => ind.classList.remove('show'), 900);
-      } catch (e) {
-        const ind = document.getElementById('saveIndicator');
-        ind.textContent = 'Save failed';
-        ind.classList.add('show');
-      }
-    }, 60);
+    saveTimer = setTimeout(flushSave, 60);
+  }
+  function flushSave() {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    if (!savePending || saveDisabled || !db) return Promise.resolve();
+    savePending = false;
+    const s = state.settings;
+    try { localStorage.setItem(THEME_HINT_KEY, JSON.stringify({ theme: s.theme, bgTint: s.bgTint, title: s.title, compactRows: s.compactRows })); } catch (e) {}
+    return db.set('state', JSON.stringify(state)).then(() => {
+      if (storageProblem && storageProblem.kind === 'save') { storageProblem = null; renderStorageBanner(); }
+      const ind = document.getElementById('saveIndicator');
+      ind.textContent = 'Saved';
+      ind.classList.add('show');
+      if (saveIndicatorTimer) clearTimeout(saveIndicatorTimer);
+      saveIndicatorTimer = setTimeout(() => ind.classList.remove('show'), 900);
+    }, (e) => {
+      savePending = true;
+      logError('save', e);
+      storageProblem = { kind: 'save', message: String(e && e.message || e) };
+      renderStorageBanner();
+    });
   }
 
-  // --- backups ---
-  function loadBackups() {
-    try {
-      const raw = localStorage.getItem(BACKUP_KEY);
-      if (!raw) return { version: 1, snapshots: [] };
-      const parsed = JSON.parse(raw);
-      if (!parsed || !Array.isArray(parsed.snapshots)) return { version: 1, snapshots: [] };
-      return parsed;
-    } catch (e) { return { version: 1, snapshots: [] }; }
-  }
-  function writeBackups(b) {
-    try { localStorage.setItem(BACKUP_KEY, JSON.stringify(b)); return true; }
-    catch (e) {
-      // try shedding oldest snapshots until it fits
-      const trimmed = { version: 1, snapshots: b.snapshots.slice(-Math.max(1, Math.floor(b.snapshots.length / 2))) };
-      try { localStorage.setItem(BACKUP_KEY, JSON.stringify(trimmed)); return true; }
-      catch (e2) { return false; }
-    }
+  // --- backups (daily snapshots in the same store) ---
+  async function listBackups() {
+    const keys = (await db.keys()).filter(k => String(k).startsWith('backup:')).sort();
+    return (await Promise.all(keys.map(k => db.get(k)))).filter(Boolean);
   }
   function dateKeyLocal(d) {
     const y = d.getFullYear();
@@ -6083,25 +6286,20 @@
     const dd = String(d.getDate()).padStart(2,'0');
     return `${y}-${m}-${dd}`;
   }
-  function maybeTakeBackup() {
-    const today = dateKeyLocal(new Date());
-    const b = loadBackups();
-    if (b.snapshots.some(s => s.dateKey === today)) return;
-    const snap = {
-      id: (b.snapshots.length ? Math.max(...b.snapshots.map(s => s.id || 0)) : 0) + 1,
-      takenAt: new Date().toISOString(),
-      dateKey: today,
-      data: JSON.parse(JSON.stringify(state))
-    };
-    b.snapshots.push(snap);
-    // keep last N by date
-    b.snapshots.sort((a, b2) => a.dateKey.localeCompare(b2.dateKey));
-    while (b.snapshots.length > BACKUP_RETENTION_DAYS) b.snapshots.shift();
-    writeBackups(b);
+  async function maybeTakeBackup() {
+    if (!db || saveDisabled) return;
+    try {
+      const today = dateKeyLocal(new Date());
+      const keys = (await db.keys()).filter(k => String(k).startsWith('backup:')).sort();
+      if (keys.includes('backup:' + today)) return;
+      await db.set('backup:' + today, { dateKey: today, takenAt: new Date().toISOString(), data: JSON.parse(JSON.stringify(state)) });
+      keys.push('backup:' + today);
+      keys.sort();
+      while (keys.length > BACKUP_RETENTION_DAYS) await db.del(keys.shift());
+    } catch (e) { logError('backup', e); }
   }
-  function restoreBackup(snapId) {
-    const b = loadBackups();
-    const snap = b.snapshots.find(s => s.id === snapId);
+  async function restoreBackup(dateKeyToRestore) {
+    const snap = await db.get('backup:' + dateKeyToRestore);
     if (!snap) return;
     if (!confirm(`Restore backup from ${snap.dateKey}? This replaces your current data.`)) return;
     if (!confirm('Really restore? Your current state will be overwritten.')) return;
@@ -6126,32 +6324,233 @@
     render();
     alert('Restore complete.');
   }
-  function downloadBackup(snapId) {
-    const b = loadBackups();
-    const snap = b.snapshots.find(s => s.id === snapId);
-    if (!snap) return;
-    const blob = new Blob([JSON.stringify(snap.data, null, 2)], { type: 'application/json' });
+  function downloadJson(data, filename) {
+    const blob = new Blob([typeof data === 'string' ? data : JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `actionTracker-backup-${snap.dateKey}.json`;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     setTimeout(() => { URL.revokeObjectURL(url); link.remove(); }, 100);
   }
+  async function downloadBackup(dateKeyToGet) {
+    const snap = await db.get('backup:' + dateKeyToGet);
+    if (snap) downloadJson(snap.data, `actionTracker-backup-${snap.dateKey}.json`);
+  }
 
-  // Persist on tab close / hide as a belt-and-braces autosave
-  window.addEventListener('beforeunload', () => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-  });
+  // Persist on hide / close as a belt-and-braces flush of any pending save
+  window.addEventListener('pagehide', () => { flushSave(); });
+  window.addEventListener('beforeunload', () => { flushSave(); });
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-    } else if (document.visibilityState === 'visible') {
-      maybeTakeBackup();
-    }
+    if (document.visibilityState === 'hidden') flushSave();
+    else if (document.visibilityState === 'visible') maybeTakeBackup();
   });
   window.addEventListener('focus', () => { maybeTakeBackup(); });
+
+  // Ask the browser not to clear our storage under pressure (granted silently for installed apps)
+  let persistentStorage = false;
+  async function requestPersistentStorage() {
+    try {
+      if (navigator.storage && navigator.storage.persist) {
+        persistentStorage = (await navigator.storage.persisted()) || (await navigator.storage.persist());
+      }
+    } catch (e) { logError('persist', e); }
+  }
+  function fmtBytes(n) {
+    if (!(n >= 0)) return '?';
+    if (n < 1024 * 1024) return Math.max(1, Math.round(n / 1024)) + ' KB';
+    if (n < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(1) + ' MB';
+    return (n / 1024 / 1024 / 1024).toFixed(1) + ' GB';
+  }
+  async function storageEstimate() {
+    try { return navigator.storage && navigator.storage.estimate ? await navigator.storage.estimate() : null; }
+    catch (e) { return null; }
+  }
+  async function renderStorageInfo() {
+    const el = document.getElementById('storageInfo');
+    if (!el) return;
+    const est = await storageEstimate();
+    el.textContent = `Stored in ${db ? db.kind : '—'} on this device${est ? ` · ${fmtBytes(est.usage)} used of about ${fmtBytes(est.quota)}` : ''}${persistentStorage ? ' · protected from automatic clean-up' : ''}.`;
+  }
+
+  // ── Off-device backup: a folder you pick (Chrome / Edge), e.g. one synced by OneDrive ──
+  const FOLDER_BACKUP_KEEP = 8;
+  const canBackupToFolder = () => 'showDirectoryPicker' in window && db === idbStore;
+  function markOffDeviceBackup(how) {
+    state.settings.lastOffDeviceBackupAt = new Date().toISOString();
+    state.settings.lastOffDeviceBackupHow = how;
+    save();
+  }
+  function daysSinceOffDeviceBackup() {
+    const at = state.settings.lastOffDeviceBackupAt;
+    return at ? daysSince(at) : Infinity;
+  }
+  async function backupToFolder(interactive) {
+    const handle = await db.get('backupFolder');
+    if (!handle) return false;
+    let perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted' && interactive) perm = await handle.requestPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') return false;
+    const file = await handle.getFileHandle(`omnipad-backup-${dateKey(new Date())}.json`, { create: true });
+    const w = await file.createWritable();
+    await w.write(JSON.stringify(state, null, 2));
+    await w.close();
+    const names = [];
+    for await (const [name, entry] of handle.entries()) {
+      if (entry.kind === 'file' && /^omnipad-backup-\d{4}-\d{2}-\d{2}\.json$/.test(name)) names.push(name);
+    }
+    names.sort();
+    while (names.length > FOLDER_BACKUP_KEEP) await handle.removeEntry(names.shift());
+    markOffDeviceBackup('folder');
+    if (interactive) showSoftToast(`Backed up to “${handle.name}”`, '💾');
+    return true;
+  }
+  async function chooseBackupFolder() {
+    try {
+      const handle = await window.showDirectoryPicker({ id: 'omnipad-backups', mode: 'readwrite' });
+      await db.set('backupFolder', handle);
+      await backupToFolder(true);
+    } catch (e) {
+      if (!e || e.name !== 'AbortError') { logError('folder', e); showSoftToast('Could not use that folder', '⚠️'); }
+    }
+    renderBackupStatus();
+  }
+  async function backupNow() {
+    if (canBackupToFolder() && await db.get('backupFolder')) {
+      try { if (await backupToFolder(true)) { renderBackupStatus(); return; } } catch (e) { logError('folder', e); }
+    }
+    exportJson();
+    renderBackupStatus();
+  }
+  async function renderBackupStatus() {
+    const status = document.getElementById('backupStatus');
+    const folderBtn = document.getElementById('backupFolderBtn');
+    if (!status || !db) return;
+    const handle = canBackupToFolder() ? await db.get('backupFolder') : null;
+    folderBtn.hidden = !canBackupToFolder();
+    folderBtn.textContent = handle ? `Folder: ${handle.name} — change…` : 'Back up to a folder…';
+    const d = daysSinceOffDeviceBackup();
+    status.textContent = d === Infinity ? 'No off-device backup yet'
+      : `Last off-device backup ${d === 0 ? 'today' : d + 'd ago'} (${state.settings.lastOffDeviceBackupHow === 'folder' ? 'folder' : 'export'})`;
+  }
+  // After startup: weekly folder backup when the browser allows it, otherwise a reminder (once a day)
+  async function afterBoot() {
+    await requestPersistentStorage();
+    if (TEST_MODE) { exposeTestHooks(); return; }
+    const hasData = state.actions.length + state.notes.length + state.ones.length + state.links.length > 0;
+    if (!hasData || daysSinceOffDeviceBackup() < 7) return;
+    if (canBackupToFolder() && await db.get('backupFolder')) {
+      try { if (await backupToFolder(false)) return; } catch (e) { logError('folder', e); }
+    }
+    const nudgeKey = LS_PREFIX + 'omnipad_backupNudge';
+    if (localStorage.getItem(nudgeKey) === dateKey(new Date())) return;
+    localStorage.setItem(nudgeKey, dateKey(new Date()));
+    const d = daysSinceOffDeviceBackup();
+    showActionToast(d === Infinity ? 'No off-device backup of your data yet' : `Last off-device backup was ${d} days ago`, 'Back up now', backupNow);
+  }
+
+  // ── On-device usage counts: weekly tallies kept in your data, never sent anywhere ──
+  const USAGE_LABELS = {
+    action_added: 'Actions added', action_completed: 'Completed', cleanup_opened: 'Clean Up', logbook_opened: 'Logbook',
+    matrix_opened: 'Matrix', note_added: 'Notes', template_used: 'Templates', link_added: 'Links added', link_copied: 'Links copied',
+    meeting_logged: '1-2-1s logged', evidence_logged: 'Evidence', crib_exported: 'Crib exports', search_opened: 'Searches', capture_used: 'Quick captures'
+  };
+  function track(name) {
+    const week = weekStartKey(new Date());
+    const w = state.usage[week] || (state.usage[week] = {});
+    w[name] = (w[name] || 0) + 1;
+    const weeks = Object.keys(state.usage).sort();
+    while (weeks.length > 26) delete state.usage[weeks.shift()];
+  }
+  function renderInsights() {
+    const root = document.getElementById('insightsPanel');
+    if (!root) return;
+    const DAY = 86400000;
+    const now = Date.now();
+    const todayK = dateKey(new Date());
+    const added30 = state.actions.filter(a => now - new Date(a.addedAt) < 30 * DAY).length;
+    const done30 = state.actions.filter(a => a.status === 'Complete' && a.completedAt && now - new Date(a.completedAt) < 30 * DAY);
+    const ages = done30.map(a => (new Date(a.completedAt) - new Date(a.addedAt)) / DAY).filter(n => n >= 0).sort((x, y) => x - y);
+    const median = ages.length ? Math.round(ages[Math.floor(ages.length / 2)]) : null;
+    const open = state.actions.filter(a => a.status !== 'Complete');
+    const overdue = open.filter(a => a.dueAt && daysBetweenKeys(todayK, a.dueAt) < 0).length;
+    const people = state.ones.filter(o => !o.archived);
+    const onSchedule = people.filter(o => !isOneStale(o)).length;
+    const ev = activeRound().evidence;
+    const lastEvidence = ev.reduce((m, e) => (e.addedAt > m ? e.addedAt : m), '');
+    const weeks = Object.keys(state.usage).sort().slice(-4);
+    const totals = {};
+    weeks.forEach(w => Object.entries(state.usage[w]).forEach(([k, n]) => { totals[k] = (totals[k] || 0) + n; }));
+    const usage = Object.keys(USAGE_LABELS).filter(k => totals[k]).map(k => `${USAGE_LABELS[k]} ${totals[k]}`).join(' · ');
+    const rows = [
+      ['Last 30 days', `${added30} added · ${done30.length} completed`],
+      ['Typical time to complete', median == null ? '—' : `${median} day${median === 1 ? '' : 's'}`],
+      ['Open now', `${open.length} open · ${overdue} overdue · ${open.filter(isChaseDue).length} to chase`],
+      ['1-2-1s on schedule', people.length ? `${onSchedule} of ${people.length}` : '—'],
+      ['Crib evidence this round', `${ev.filter(e => e.type === 'win').length} wins · ${ev.filter(e => e.type === 'feedback').length} feedback${lastEvidence ? ` · last added ${daysSince(lastEvidence) === 0 ? 'today' : daysSince(lastEvidence) + 'd ago'}` : ''}`],
+      ['Your usage, last 4 weeks', usage || 'Nothing recorded yet']
+    ];
+    root.innerHTML = '';
+    rows.forEach(([k, v]) => {
+      const row = document.createElement('div');
+      row.className = 'insight-row';
+      const key = document.createElement('span');
+      key.className = 'insight-key';
+      key.textContent = k;
+      const val = document.createElement('span');
+      val.textContent = v;
+      row.append(key, val);
+      root.appendChild(row);
+    });
+  }
+
+  // ── Diagnostics text for the Support panel: versions, counts and errors — no content ──
+  async function diagnosticsText() {
+    const est = await storageEstimate();
+    let errors = [];
+    try { errors = JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]'); } catch (e) {}
+    return [
+      `OmniPad ${APP_VERSION} · schema ${state.schemaVersion}`,
+      `Storage: ${db ? db.kind : 'not open'}${est ? ` · ${fmtBytes(est.usage)} of ${fmtBytes(est.quota)}` : ''}${persistentStorage ? ' · persistent' : ''} · problem: ${storageProblem ? storageProblem.kind : 'none'}`,
+      `Data: ${state.actions.length} actions · ${state.notes.length} notes · ${state.links.length} links · ${state.ones.length} people · ${state.cribRounds.length} rounds · ${activeRound().evidence.length} evidence`,
+      `Browser: ${navigator.userAgent}`,
+      `Errors logged: ${errors.length}${errors.length ? ' (newest last)' : ''}`,
+      ...errors.slice(-15).map(e => `  ${e.at} [${e.where}] ${e.message}${e.stack ? ' — ' + e.stack : ''}`)
+    ].join('\n');
+  }
+
+  // Hooks for tests/selftest.html (only in ?selftest mode, which uses throwaway storage)
+  function exposeTestHooks() {
+    window.__omnipad = {
+      ready: true, migrate, sanitiseHtml, autoTitleFromUrl, cribParseMoney, cribFmtMoney, daysBetweenKeys,
+      linksAsMarkdown, linksAsHtml, linksAsPlain, fillTemplate, weekStartKey, normaliseUrl, isChaseDue,
+      flushSave, getState: () => state, storageKind: () => db && db.kind
+    };
+  }
+
+  // Banner for storage problems (unreadable data, storage unavailable, failed save)
+  function renderStorageBanner() {
+    const el = document.getElementById('storageBanner');
+    if (!el) return;
+    el.hidden = !storageProblem;
+    if (!storageProblem) return;
+    const msg = document.getElementById('storageBannerMsg');
+    const dl = document.getElementById('storageBannerDownload');
+    dl.hidden = storageProblem.kind !== 'corrupt';
+    if (storageProblem.kind === 'corrupt') {
+      msg.textContent = "Your saved data couldn't be read, so OmniPad started empty. The original was kept safely — download it and send it for recovery, or Import it if it's a valid export.";
+    } else if (storageProblem.kind === 'unavailable') {
+      msg.textContent = "Browser storage couldn't be opened, so your data isn't shown and nothing will be saved this session. Close other OmniPad tabs and reload.";
+    } else {
+      msg.textContent = 'Saving failed (' + (storageProblem.message || 'storage error') + '). Your last change is not saved yet — free some space or export your data.';
+    }
+  }
+  async function downloadQuarantined() {
+    if (!storageProblem || !storageProblem.key) return;
+    const raw = await db.get(storageProblem.key);
+    if (raw != null) downloadJson(String(raw), 'omnipad-unreadable-data.json');
+  }
 
   // --- helpers ---
   function projectById(id) { return state.projects.find(p => p.id === id); }
@@ -6242,6 +6641,7 @@
     a.completedAt = status === 'Complete' ? new Date().toISOString() : null;
     if (status !== 'Blocked') a.chaseAt = null;
     if (status === 'Complete') {
+      track('action_completed');
       const isFirst = recordCompletionForStreak();
       if (o.anchorEl) { fireworks(o.anchorEl); showEncouragement(o.anchorEl); }
       if (!o.quiet && isFirst) maybeFirstCompletionToast();
@@ -6629,6 +7029,8 @@
   }
 
   function startCleanup() {
+    track('cleanup_opened');
+    save();
     cleanupScope = 'all';
     cleanupScopeProject = null;
     cleanupQueue  = buildCleanupQueue();
@@ -6984,7 +7386,8 @@
     root.appendChild(lbl);
 
     const mk = (key, label, colour) => {
-      const c = document.createElement('span');
+      const c = document.createElement('button');
+      c.type = 'button';
       c.className = 'chip' + (activePriorityFilter === key ? ' active' : '');
       if (colour) c.innerHTML = `<span class="dot" style="background:${colour}"></span>${escapeHtml(label)}`;
       else c.textContent = label;
@@ -7007,14 +7410,16 @@
     lbl.className = 'chip-row-label';
     lbl.textContent = 'Project';
     root.appendChild(lbl);
-    const all = document.createElement('span');
+    const all = document.createElement('button');
+    all.type = 'button';
     all.className = 'chip' + (activeFilter === 'all' ? ' active' : '');
     all.textContent = 'All';
     all.addEventListener('click', () => { clearTodayNarrowing(); activeFilter = 'all'; render(); });
     root.appendChild(all);
 
     state.projects.forEach(p => {
-      const c = document.createElement('span');
+      const c = document.createElement('button');
+      c.type = 'button';
       c.className = 'chip' + (activeFilter === p.id ? ' active' : '');
       c.innerHTML = `<span class="dot" style="background:${p.colour}"></span>${escapeHtml(p.name)}`;
       c.addEventListener('click', () => {
@@ -8677,6 +9082,9 @@
       cntEl.textContent = '';
     }
     renderBgTintSwatches();
+    renderStorageInfo();
+    renderBackupStatus();
+    renderInsights();
     const list = document.getElementById('projectList');
     list.innerHTML = '';
     state.projects.forEach(p => {
@@ -8731,14 +9139,14 @@
     });
   }
 
-  function renderHistory() {
+  async function renderHistory() {
     const tabs = document.getElementById('historyTabs');
     const detail = document.getElementById('historyDetail');
-    if (!tabs || !detail) return;
-    const b = loadBackups();
+    if (!tabs || !detail || !db) return;
+    const snapshots = await listBackups();
     tabs.innerHTML = '';
     detail.innerHTML = '';
-    if (!b.snapshots.length) {
+    if (!snapshots.length) {
       const empty = document.createElement('div');
       empty.className = 'history-empty';
       empty.textContent = 'No backups yet — one will be taken automatically when you next use the app.';
@@ -8746,25 +9154,25 @@
       return;
     }
     const today = dateKeyLocal(new Date());
-    const sorted = b.snapshots.slice().sort((a, b2) => b2.dateKey.localeCompare(a.dateKey));
-    if (selectedHistorySnap == null || !sorted.find(s => s.id === selectedHistorySnap)) {
-      selectedHistorySnap = sorted[0].id;
+    const sorted = snapshots.slice().sort((a, b2) => b2.dateKey.localeCompare(a.dateKey));
+    if (selectedHistorySnap == null || !sorted.find(s => s.dateKey === selectedHistorySnap)) {
+      selectedHistorySnap = sorted[0].dateKey;
     }
     sorted.forEach(snap => {
       const tab = document.createElement('div');
-      tab.className = 'history-tab' + (snap.id === selectedHistorySnap ? ' active' : '');
+      tab.className = 'history-tab' + (snap.dateKey === selectedHistorySnap ? ' active' : '');
       const d = new Date(snap.dateKey + 'T00:00:00');
       const day = String(d.getDate()).padStart(2, '0');
       const mon = d.toLocaleString('en-GB', { month: 'short' });
       tab.innerHTML = `<span class="ht-day">${day}</span><span class="ht-mon">${mon}</span>` +
         (snap.dateKey === today ? '<span class="ht-today">today</span>' : '');
       tab.addEventListener('click', () => {
-        selectedHistorySnap = snap.id;
+        selectedHistorySnap = snap.dateKey;
         renderHistory();
       });
       tabs.appendChild(tab);
     });
-    const sel = sorted.find(s => s.id === selectedHistorySnap);
+    const sel = sorted.find(s => s.dateKey === selectedHistorySnap);
     if (sel) {
       const meta = document.createElement('div');
       meta.className = 'hd-meta';
@@ -8778,11 +9186,11 @@
       const dl = document.createElement('button');
       dl.className = 'btn';
       dl.textContent = 'Download';
-      dl.addEventListener('click', () => downloadBackup(sel.id));
+      dl.addEventListener('click', () => downloadBackup(sel.dateKey));
       const rs = document.createElement('button');
       rs.className = 'btn';
       rs.textContent = 'Restore this day';
-      rs.addEventListener('click', () => restoreBackup(sel.id));
+      rs.addEventListener('click', () => restoreBackup(sel.dateKey));
       actions.appendChild(dl);
       actions.appendChild(rs);
       detail.appendChild(meta);
@@ -8853,6 +9261,7 @@
       fromEntryId: null
     };
     state.actions.push(a);
+    track('action_added');
     save(); render();
     return a;
   }
@@ -9115,17 +9524,13 @@
   });
 
   // Export
-  document.getElementById('exportBtn').addEventListener('click', () => {
-    const data = JSON.stringify(state, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `actionTracker-export-${todayStamp()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
-  });
+  function exportJson() {
+    markOffDeviceBackup('export');
+    downloadJson(JSON.stringify(state, null, 2), `actionTracker-export-${todayStamp()}.json`);
+  }
+  document.getElementById('exportBtn').addEventListener('click', exportJson);
+  document.getElementById('backupFolderBtn').addEventListener('click', chooseBackupFolder);
+  document.getElementById('backupNowBtn').addEventListener('click', backupNow);
 
   // Import
   document.getElementById('importBtn').addEventListener('click', () => {
@@ -9141,7 +9546,7 @@
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const imported = migrate(JSON.parse(reader.result));
+        const imported = migrate(JSON.parse(reader.result), { untrusted: true });
         if (!imported) throw new Error('Invalid file');
         state = imported;
         activeFilter = 'all';
@@ -9255,7 +9660,7 @@
   titleEl.addEventListener('paste', (e) => {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData('text');
-    document.execCommand('insertText', false, text.replace(/\s+/g, ' '));
+    editorCommand('insertText', text.replace(/\s+/g, ' '));
   });
 
   // ============== Forward declarations (filled later) ==============
@@ -9394,6 +9799,7 @@
   let searchActiveIndex = 0;
   let searchResults = [];
   function openSearch() {
+    track('search_opened');
     const palette = document.getElementById('searchPalette');
     if (!palette) return;
     palette.hidden = false;
@@ -9775,6 +10181,17 @@
 
   // ============== Notes ==============
 
+  // Rich-text editing goes through these two functions. document.execCommand is
+  // deprecated but still supported by every browser; if it ever needs replacing,
+  // this is the only place that changes (the self-test covers the formatting round-trip).
+  function editorCommand(cmd, value) {
+    try { return document.execCommand(cmd, false, value == null ? null : value); }
+    catch (e) { logError('editor', e); return false; }
+  }
+  function editorState(cmd) {
+    try { return document.queryCommandState(cmd); } catch (e) { return false; }
+  }
+
   function sanitiseHtml(html) {
     const doc = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
     const root = doc.getElementById('root');
@@ -9871,7 +10288,7 @@
       }
       return;
     }
-    document.execCommand('insertHTML', false, html);
+    editorCommand('insertHTML', html);
   }
 
   function openNoteProjectMenu(anchor, note) {
@@ -9921,6 +10338,7 @@
       updatedAt: now
     }, fields || {});
     state.notes.push(note);
+    track('note_added');
     currentNoteId = note.id;
     state.settings.activeView = 'notes';
     save();
@@ -9947,6 +10365,7 @@
     return Object.entries(values).reduce((s, [token, v]) => s.split(token).join(asHtml ? escapeHtml(v) : v), text || '');
   }
   function addNoteFromTemplate(t) {
+    track('template_used');
     const proj = t.projectId ? projectById(t.projectId) : null;
     const projectName = proj ? proj.name : '';
     addNote(true, {
@@ -10257,7 +10676,7 @@
     const exec = (cmd, value) => {
       const body = document.getElementById('noteBody');
       if (body) body.focus();
-      document.execCommand(cmd, false, value || null);
+      editorCommand(cmd, value || null);
       // commit immediately
       if (body) {
         updateNoteFields(note.id, { body: body.innerHTML });
@@ -10342,7 +10761,7 @@
     // Checklist
     const clBtn = mkBtn('☐', 'Insert checklist item', () => {
       body.focus();
-      document.execCommand('insertHTML', false, CHECKLIST_ITEM_HTML);
+      editorCommand('insertHTML', CHECKLIST_ITEM_HTML);
       updateNoteFields(note.id, { body: body.innerHTML });
       debouncedSaveNote();
     });
@@ -10390,8 +10809,8 @@
         { label: 'Remove',  none: true },
       ], (colour) => {
         body.focus();
-        try { document.execCommand('hiliteColor', false, colour === undefined ? 'transparent' : colour); } catch (_) {}
-        try { document.execCommand('backColor',   false, colour === undefined ? 'transparent' : colour); } catch (_) {}
+        editorCommand('hiliteColor', colour === undefined ? 'transparent' : colour);
+        editorCommand('backColor', colour === undefined ? 'transparent' : colour);
         updateNoteFields(note.id, { body: body.innerHTML }); debouncedSaveNote();
       });
     }, { html: true });
@@ -10409,8 +10828,8 @@
         { label: 'Gray',    value: '#71717A' },
       ], (colour) => {
         body.focus();
-        if (colour === undefined) { document.execCommand('removeFormat'); }
-        else { document.execCommand('foreColor', false, colour); }
+        if (colour === undefined) { editorCommand('removeFormat'); }
+        else { editorCommand('foreColor', colour); }
         updateNoteFields(note.id, { body: body.innerHTML }); debouncedSaveNote();
       });
     }, { html: true });
@@ -10423,7 +10842,7 @@
     // ── Extras ──
     toolbar.appendChild(mkBtn('―', 'Insert horizontal divider', () => {
       body.focus();
-      document.execCommand('insertHTML', false, '<hr><p><br></p>');
+      editorCommand('insertHTML', '<hr><p><br></p>');
       updateNoteFields(note.id, { body: body.innerHTML }); debouncedSaveNote();
     }));
     toolbar.appendChild(mkBtn('🔗', 'Insert link', () => {
@@ -10458,7 +10877,7 @@
       }
       e.preventDefault();
       const text = dt.getData('text');
-      document.execCommand('insertText', false, text);
+      editorCommand('insertText', text);
     });
     body.addEventListener('keyup', updateToolbarState);
     body.addEventListener('mouseup', updateToolbarState);
@@ -10470,12 +10889,12 @@
       if (e.key === 'Tab') {
         e.preventDefault();
         let inList = false;
-        try { inList = document.queryCommandState('insertUnorderedList') || document.queryCommandState('insertOrderedList'); } catch (_) {}
+        inList = editorState('insertUnorderedList') || editorState('insertOrderedList');
         if (inList) {
-          document.execCommand(e.shiftKey ? 'outdent' : 'indent');
+          editorCommand(e.shiftKey ? 'outdent' : 'indent');
         } else {
           // Insert 4 non-breaking spaces as a soft indent
-          document.execCommand('insertText', false, '    ');
+          editorCommand('insertText', '    ');
         }
         updateNoteFields(note.id, { body: body.innerHTML });
         debouncedSaveNote();
@@ -10505,8 +10924,8 @@
                   // Select from block start to cursor and delete, then insert list
                   sel.removeAllRanges();
                   sel.addRange(r);
-                  document.execCommand('delete');
-                  document.execCommand('insertUnorderedList');
+                  editorCommand('delete');
+                  editorCommand('insertUnorderedList');
                   updateNoteFields(note.id, { body: body.innerHTML });
                   debouncedSaveNote();
                   updateToolbarState();
@@ -10568,7 +10987,7 @@
             }
             if (textBefore === '' || /[.!?]\s$/.test(textBefore)) {
               e.preventDefault();
-              document.execCommand('insertText', false, e.key.toUpperCase());
+              editorCommand('insertText', e.key.toUpperCase());
               updateNoteFields(note.id, { body: body.innerHTML });
               debouncedSaveNote();
             }
@@ -10649,7 +11068,7 @@
     cmds.forEach(c => {
       const btn = document.querySelector('.nt-btn[data-cmd="' + c + '"]');
       if (!btn) return;
-      try { btn.classList.toggle('active', !!document.queryCommandState(c)); } catch (e) {}
+      btn.classList.toggle('active', !!editorState(c));
     });
     // Update style pill label to reflect current block
     const stylePill = document.querySelector('.nt-style-pill');
@@ -10731,6 +11150,7 @@
   const logbookChipEl = document.getElementById('logbookChip');
   if (logbookChipEl) logbookChipEl.addEventListener('click', () => {
     state.settings.actionsViewMode = state.settings.actionsViewMode === 'logbook' ? 'list' : 'logbook';
+    if (state.settings.actionsViewMode === 'logbook') track('logbook_opened');
     save();
     render();
   });
@@ -10738,6 +11158,7 @@
   if (matrixChipEl) matrixChipEl.addEventListener('click', () => {
     const cur = (state.settings && state.settings.actionsViewMode) || 'list';
     state.settings.actionsViewMode = cur === 'matrix' ? 'list' : 'matrix';
+    if (state.settings.actionsViewMode === 'matrix') track('matrix_opened');
     save();
     render();
   });
@@ -10948,6 +11369,7 @@
       lastVisitedAt: null
     };
     state.links.push(link);
+    track('link_added');
     save();
     return link;
   }
@@ -11001,6 +11423,8 @@
   }
   async function copyLinks(links, format) {
     if (!links.length) return false;
+    track('link_copied');
+    save();
     const plain = format === 'markdown' ? linksAsMarkdown(links) : linksAsPlain(links);
     if (format === 'rich' && window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
       try {
@@ -11160,13 +11584,15 @@
     const root = document.getElementById('linksProjectChips');
     if (!root) return;
     root.innerHTML = '';
-    const all = document.createElement('span');
+    const all = document.createElement('button');
+    all.type = 'button';
     all.className = 'chip' + (linksFilterProject === 'all' ? ' active' : '');
     all.textContent = 'All';
     all.addEventListener('click', () => { linksFilterProject = 'all'; renderLinksView(); });
     root.appendChild(all);
     state.projects.forEach(p => {
-      const c = document.createElement('span');
+      const c = document.createElement('button');
+      c.type = 'button';
       c.className = 'chip' + (linksFilterProject === p.id ? ' active' : '');
       c.innerHTML = `<span class="dot" style="background:${p.colour}"></span>${escapeHtml(p.name)}`;
       c.addEventListener('click', () => {
@@ -11176,7 +11602,8 @@
       root.appendChild(c);
     });
     // "Untagged" chip
-    const ut = document.createElement('span');
+    const ut = document.createElement('button');
+    ut.type = 'button';
     ut.className = 'chip' + (linksFilterProject === '__untagged' ? ' active' : '');
     ut.innerHTML = '<span class="dot" style="background:var(--muted-2)"></span>Untagged';
     ut.addEventListener('click', () => {
@@ -11914,6 +12341,7 @@
       section: null, source: { kind: 'manual', id: null }, addedAt: new Date().toISOString()
     }, fields);
     activeRound().evidence.unshift(ev);
+    track('evidence_logged');
     save();
     return ev;
   }
@@ -13279,7 +13707,7 @@
         showSoftToast('Pitch prompt copied — paste into your LLM', '📋');
       } catch (e) {
         ta.select();
-        document.execCommand('copy');
+        editorCommand('copy');
         showSoftToast('Pitch prompt copied', '📋');
       }
     });
@@ -13507,6 +13935,7 @@
   }
 
   function exportCrib() {
+    track('crib_exported');
     const md = cribAsMarkdown();
     const blob = new Blob([md], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -13815,6 +14244,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   }
 
   function exportCribHtml() {
+    track('crib_exported');
     const html = cribAsHTML();
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -14497,7 +14927,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     body.addEventListener('paste', (e) => {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData).getData('text');
-      document.execCommand('insertText', false, text);
+      editorCommand('insertText', text);
     });
     const logMeeting = () => {
       const html = body.innerHTML.trim();
@@ -14505,6 +14935,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       const ticked = o.nextAgenda.some(it => it.done);
       if (!hasNotes && !ticked && !draft.actions.length) return;
       const entry = addEntry(o.id, dateInp.value, hasNotes ? html : '');
+      track('meeting_logged');
       draft.actions.forEach(t => addActionFromMeeting(o, entry, t));
       const n = draft.actions.length;
       oneDrafts.delete(o.id);
@@ -14973,6 +15404,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     });
   }
   function commitCapture() {
+    track('capture_used');
     const inp = document.getElementById('captureInput');
     const ta = document.getElementById('captureTextarea');
     const text = (inp ? inp.value : '').trim();
@@ -15318,11 +15750,34 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     wireLinks();
     wireCrib();
     wireOnes();
+    document.getElementById('storageBannerDownload').addEventListener('click', downloadQuarantined);
+    document.getElementById('copyDiagnosticsBtn').addEventListener('click', async () => {
+      const text = await diagnosticsText();
+      const status = document.getElementById('diagnosticsStatus');
+      try { await navigator.clipboard.writeText(text); status.textContent = 'Copied.'; }
+      catch (e) { status.textContent = "Couldn't copy — check clipboard permissions."; }
+    });
+    document.getElementById('clearErrorLogBtn').addEventListener('click', () => {
+      localStorage.removeItem(ERROR_LOG_KEY);
+      document.getElementById('diagnosticsStatus').textContent = 'Error log cleared.';
+    });
+    document.getElementById('storageBannerDismiss').addEventListener('click', () => { document.getElementById('storageBanner').hidden = true; });
     render();
     maybeTakeBackup();
     setTimeout(() => addInput.focus(), 50);
   }
-  init();
+  async function boot() {
+    try { state = await loadState(); }
+    catch (e) { logError('boot', e); storageProblem = { kind: 'unavailable' }; }
+    saveDisabled = !!(storageProblem && storageProblem.kind === 'unavailable');
+    applyTheme();
+    applyBgTint();
+    applyTitle();
+    init();
+    renderStorageBanner();
+    if (!saveDisabled) afterBoot();
+  }
+  boot();
 
 
   // PWA: register service worker only when served over http(s).
@@ -15396,7 +15851,9 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     return false;
   }
 
+  // Only a downloaded copy (file://) needs this: the hosted app updates via its service worker.
   async function checkGitHubVersion() {
+    if (location.protocol !== 'file:') return;
     if (!GITHUB_RAW_BASE || GITHUB_RAW_BASE.includes('YOUR_USER')) return;
     try {
       const res = await fetch(`${GITHUB_RAW_BASE}/version.json?t=${Date.now()}`, { cache: 'no-store' });
@@ -15556,7 +16013,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   if (supportVersionDisplay) supportVersionDisplay.textContent = APP_VERSION;
 
   // Show the install prompt on load (after a brief delay so the page settles)
-  setTimeout(maybeShowInstallPrompt, 1500);
+  if (!TEST_MODE) setTimeout(maybeShowInstallPrompt, 1500);
   // ============================================================================
 
   // ===== Action Detail Modal =====
@@ -15914,10 +16371,11 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     }
   });
 
-  if ('serviceWorker' in navigator &&
+  if ('serviceWorker' in navigator && !TEST_MODE &&
       (location.protocol === 'http:' || location.protocol === 'https:')) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').then((reg) => {
+      // The version in the URL makes each release an SW update and names its cache
+      navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(APP_VERSION)).then((reg) => {
         swRegistration = reg;
         if (reg.waiting && navigator.serviceWorker.controller) showUpdateBanner();
         if (reg.installing) trackInstalling(reg.installing);
@@ -15934,12 +16392,10 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         if (swRegistration) swRegistration.update().catch(() => {});
-        checkGitHubVersion();
       }
     });
     window.addEventListener('focus', () => {
       if (swRegistration) swRegistration.update().catch(() => {});
-      checkGitHubVersion();
     });
   }
 })();
