@@ -4769,6 +4769,7 @@
     font-family: inherit;
   }
   .am-coname-input:focus { border-color: var(--accent); background: var(--bg); }
+  .am-coname-row .person-typeahead { flex: 1; }
   .am-subtasks { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
   .am-subtasks-head {
     display: flex; align-items: center; justify-content: space-between;
@@ -4996,20 +4997,20 @@
       <button class="btn" id="closeSupport" type="button" style="padding:4px 10px; font-size:12px;">Close</button>
     </div>
 
-    <details class=”sup-section” open>
+    <details class="sup-section" open>
       <summary>Install OmniPad as an app</summary>
-      <div class=”sup-body”>
+      <div class="sup-body">
         <p><strong>Chrome or Edge (recommended):</strong> look for the install icon <strong>⊕</strong> in the address bar — it appears as a small computer-with-arrow icon on the right side. Click it, then <em>Install</em>. OmniPad opens in its own window with no browser chrome, and gets a taskbar / Start menu shortcut.</p>
         <p>If you don't see the icon, click the button below:</p>
-        <p><button class=”btn” id=”supportInstallBtn” type=”button”>Install OmniPad</button> <span id=”supportInstallStatus” style=”font-size:12px; color:var(--muted); margin-left:8px;”></span></p>
+        <p><button class="btn" id="supportInstallBtn" type="button">Install OmniPad</button> <span id="supportInstallStatus" style="font-size:12px; color:var(--muted); margin-left:8px;"></span></p>
         <p><strong>Safari (iPhone / Mac):</strong> tap the Share icon → <em>Add to Home Screen</em> (iPhone) or <em>Add to Dock</em> (Mac). Safari doesn't support the automatic install prompt.</p>
         <p><strong>Already installed?</strong> Your app icon opens OmniPad in standalone mode. You can safely close this browser tab.</p>
       </div>
     </details>
 
-    <details class=”sup-section”>
+    <details class="sup-section">
       <summary>Moving data from a previous install</summary>
-      <div class=”sup-body”>
+      <div class="sup-body">
         <p>Browser storage is <strong>per origin</strong>. If you were using OmniPad from a local file (<code>file://</code>) or a different URL, your data won't appear automatically — you need to export and re-import it.</p>
         <ol>
           <li>Open the <strong>old</strong> version → cog → Data → <em>Export JSON</em> → save the file.</li>
@@ -5019,51 +5020,51 @@
       </div>
     </details>
 
-    <details class=”sup-section”>
+    <details class="sup-section">
       <summary>Getting updates</summary>
-      <div class=”sup-body”>
+      <div class="sup-body">
         <p>OmniPad updates automatically — no action needed. When a new version is pushed to GitHub:</p>
         <ul>
-          <li><strong>Installed app users</strong> — a green <em>”New version available”</em> banner appears at the top. Click <em>Reload to update</em>.</li>
+          <li><strong>Installed app users</strong> — a green <em>“New version available”</em> banner appears at the top. Click <em>Reload to update</em>.</li>
           <li><strong>Browser-tab users</strong> — same green banner, or force a check: cog → Data → <em>Check for updates</em>.</li>
         </ul>
         <p>If the app feels stuck on an old version: <strong>Ctrl+Shift+R</strong> inside the app window to hard-reload past the cache.</p>
-        <p>Version: <strong id=”supportVersionDisplay”></strong></p>
+        <p>Version: <strong id="supportVersionDisplay"></strong></p>
       </div>
     </details>
 
-    <details class=”sup-section”>
+    <details class="sup-section">
       <summary>Keyboard shortcuts</summary>
-      <div class=”sup-body”>
-        <ul class=”kbd-list”>
-          <li><span class=”kbd-key”>Enter</span> in the add bar — create action</li>
-          <li><span class=”kbd-key”>Enter</span> on a row — edit the action text</li>
-          <li><span class=”kbd-key”>Delete</span> on a row — delete prompt</li>
-          <li><span class=”kbd-key”>Click</span> status pill — next status · <span class=”kbd-key”>Shift+Click</span> — previous</li>
-          <li><span class=”kbd-key”>Double-click</span> a row — open full action detail card</li>
-          <li><span class=”kbd-key”>Right-click</span> a row — context menu (priority, status, due date, delete)</li>
-          <li><span class=”kbd-key”>Ctrl+K</span> — global search · <span class=”kbd-key”>Ctrl+Shift+K</span> — quick capture (URL / action / note)</li>
-          <li><span class=”kbd-key”>Ctrl+1</span> / <span class=”kbd-key”>Ctrl+2</span> / <span class=”kbd-key”>Ctrl+3</span> — switch Actions / Notes / Links</li>
-          <li><span class=”kbd-key”>Ctrl+B</span> / <span class=”kbd-key”>Ctrl+I</span> / <span class=”kbd-key”>Ctrl+U</span> — bold / italic / underline in notes</li>
-          <li><span class=”kbd-key”>Tab</span> / <span class=”kbd-key”>Shift+Tab</span> in a note list — indent / outdent</li>
+      <div class="sup-body">
+        <ul class="kbd-list">
+          <li><span class="kbd-key">Enter</span> in the add bar — create action</li>
+          <li><span class="kbd-key">Enter</span> on a row — edit the action text</li>
+          <li><span class="kbd-key">Delete</span> on a row — delete prompt</li>
+          <li><span class="kbd-key">Click</span> status pill — next status · <span class="kbd-key">Shift+Click</span> — previous</li>
+          <li><span class="kbd-key">Double-click</span> a row — open full action detail card</li>
+          <li><span class="kbd-key">Right-click</span> a row — context menu (priority, status, due date, delete)</li>
+          <li><span class="kbd-key">Ctrl+K</span> — global search · <span class="kbd-key">Ctrl+Shift+K</span> — quick capture (URL / action / note)</li>
+          <li><span class="kbd-key">Ctrl+1</span> / <span class="kbd-key">Ctrl+2</span> / <span class="kbd-key">Ctrl+3</span> / <span class="kbd-key">Ctrl+4</span> / <span class="kbd-key">Ctrl+5</span> — switch Actions / Notes / Links / 1-2-1s / Crib</li>
+          <li><span class="kbd-key">Ctrl+B</span> / <span class="kbd-key">Ctrl+I</span> / <span class="kbd-key">Ctrl+U</span> — bold / italic / underline in notes</li>
+          <li><span class="kbd-key">Tab</span> / <span class="kbd-key">Shift+Tab</span> in a note list — indent / outdent</li>
         </ul>
       </div>
     </details>
 
-    <details class=”sup-section”>
+    <details class="sup-section">
       <summary>Backups &amp; data safety</summary>
-      <div class=”sup-body”>
+      <div class="sup-body">
         <p>The app takes a full snapshot once per day, kept for 14 days. Open <em>History</em> (clock icon) to browse them — restore any day, or download as JSON.</p>
         <p>Snapshots live in your browser's localStorage. For an off-device backup, export a JSON file occasionally via cog → Data → <em>Export JSON</em>.</p>
       </div>
     </details>
 
-    <details class=”sup-section”>
+    <details class="sup-section">
       <summary>About &amp; privacy</summary>
-      <div class=”sup-body”>
+      <div class="sup-body">
         <p>OmniPad is a local-first PWA hosted on GitHub Pages. Everything — actions, notes, projects, comments, backups — lives in your browser's localStorage on this device. Nothing is sent to a server.</p>
         <p>The only network calls are to GitHub (to serve the app and check for new versions). No telemetry, no analytics, no accounts.</p>
-        <p><a href=”https://github.com/tobystracc/Omnipad” target=”_blank” rel=”noopener”>View source on GitHub →</a></p>
+        <p><a href="https://github.com/tobystracc/Omnipad" target="_blank" rel="noopener">View source on GitHub →</a></p>
       </div>
     </details>
   </div>
@@ -5195,7 +5196,7 @@
         <span class="update-status" id="updateStatus"></span>
       </div>
       <div style="font-size:12px; color:var(--muted-2); margin-top:8px;">
-        Need help moving data between installs, restarting the server, or installing the PWA? Open <strong>Support</strong> from the toolbar (book icon).
+        Need help moving data between installs, getting updates, or installing the app? Open <strong>Support</strong> from the toolbar (book icon).
       </div>
     </section>
 
@@ -7857,18 +7858,7 @@
       const conf = document.createElement('span');
       conf.className = 'confirm-prompt';
       conf.textContent = 'Sure?';
-      conf.addEventListener('click', () => {
-        const snapshot = JSON.parse(JSON.stringify(a));
-        const idx = state.actions.findIndex(x => x.id === a.id);
-        state.actions = state.actions.filter(x => x.id !== a.id);
-        pendingDelete = null;
-        save(); render();
-        showUndo('Action deleted', () => {
-          if (idx >= 0 && idx <= state.actions.length) state.actions.splice(idx, 0, snapshot);
-          else state.actions.push(snapshot);
-          save(); render();
-        });
-      });
+      conf.addEventListener('click', () => deleteAction(a));
       tdDel.appendChild(conf);
       // auto-cancel after a moment
       setTimeout(() => {
@@ -8144,6 +8134,34 @@
     });
   }
 
+  // Set an action's co-name and its 1-2-1 link: an explicit pick wins, otherwise an exact
+  // (case-insensitive) match on an active person's name.
+  function setActionPerson(a, name, pickedId) {
+    const v = (name || '').trim();
+    a.coName = v;
+    if (pickedId != null) {
+      a.personId = pickedId;
+    } else if (v) {
+      const match = state.ones.find(o => !o.archived && (o.name || '').trim().toLowerCase() === v.toLowerCase());
+      a.personId = match ? match.id : null;
+    } else {
+      a.personId = null;
+    }
+  }
+
+  function deleteAction(a) {
+    const snapshot = JSON.parse(JSON.stringify(a));
+    const idx = state.actions.findIndex(x => x.id === a.id);
+    state.actions = state.actions.filter(x => x.id !== a.id);
+    pendingDelete = null;
+    save(); render();
+    showUndo('Action deleted', () => {
+      if (idx >= 0 && idx <= state.actions.length) state.actions.splice(idx, 0, snapshot);
+      else state.actions.push(snapshot);
+      save(); render();
+    });
+  }
+
   function beginCoNameEdit(a, span) {
     let done = false;
     let pickedId = (typeof a.personId === 'number') ? a.personId : null;
@@ -8160,17 +8178,7 @@
     ta.input.setSelectionRange(ta.input.value.length, ta.input.value.length);
     const commit = () => {
       if (done) return; done = true;
-      const v = ta.input.value.trim();
-      a.coName = v;
-      // Resolve link: explicit pick wins; otherwise exact case-insensitive name match
-      if (pickedId != null) {
-        a.personId = pickedId;
-      } else if (v) {
-        const match = state.ones.find(o => !o.archived && (o.name || '').trim().toLowerCase() === v.toLowerCase());
-        a.personId = match ? match.id : null;
-      } else {
-        a.personId = null;
-      }
+      setActionPerson(a, ta.input.value, pickedId);
       save(); render();
     };
     const cancel = () => { if (done) return; done = true; render(); };
@@ -8302,7 +8310,7 @@
       const newAction = addAction(v, a.projectId);
       if (newAction) {
         newAction.followUpFromId = a.id;
-        if (a.coName) newAction.coName = a.coName;
+        if (a.coName) { newAction.coName = a.coName; newAction.personId = a.personId; }
         save();
         showSoftToast(`Follow-up added: ${v.slice(0, 40)}${v.length > 40 ? '…' : ''}`, '↪');
       }
@@ -8605,10 +8613,13 @@
       completedAt: null,
       comments: [],
       coName: '',
-      personId: null
+      personId: null,
+      chaseAt: null,
+      fromEntryId: null
     };
     state.actions.push(a);
     save(); render();
+    return a;
   }
 
   // --- wiring ---
@@ -9186,7 +9197,7 @@
       // Notes
       state.notes.forEach(n => {
         const t = (n.title || '').toLowerCase();
-        const body = plainSnippet(n.body).toLowerCase();
+        const body = plainText(n.body).toLowerCase();
         if (t.includes(q) || body.includes(q)) {
           results.push({
             type: 'note',
@@ -9224,6 +9235,21 @@
             sortKey: new Date(lastEntryDate(o) || 0).getTime()
           });
         }
+        (o.entries || []).forEach(en => {
+          const text = plainText(en.notes);
+          const extra = [].concat(en.discussed || [], en.carried || []).join(' ');
+          const idx = text.toLowerCase().indexOf(q);
+          if (idx === -1 && !extra.toLowerCase().includes(q)) return;
+          const from = Math.max(0, idx - 30);
+          results.push({
+            type: 'one',
+            id: o.id,
+            entryId: en.id,
+            primary: `${o.name || '(unnamed)'} · ${fmtDate(en.date + 'T00:00:00')}`,
+            secondary: idx === -1 ? extra : (from ? '…' : '') + text.slice(from, from + 110),
+            sortKey: new Date(en.date || 0).getTime()
+          });
+        });
       });
       // Crib — active round only
       const ar = (state.cribRounds || []).find(r => r.id === state.cribActiveRoundId);
@@ -9339,6 +9365,16 @@
       currentOneId = r.id;
       state.settings.activeView = 'ones';
       save(); render();
+      if (r.entryId) {
+        setTimeout(() => {
+          const el = document.querySelector(`#oneEditor .one-entry[data-entry-id="${r.entryId}"]`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('row-flash');
+            setTimeout(() => el.classList.remove('row-flash'), 1600);
+          }
+        }, 50);
+      }
       return;
     }
     if (r.type === 'crib') {
@@ -9541,7 +9577,7 @@
     const files = Array.from(fileList);
     files.forEach(async (file) => {
       if (file.size > MAX_ATTACHMENT_BYTES) {
-        alert(`"${file.name}" is too large (${Math.round(file.size/1024)} KB). Limit is 2 MB per file.`);
+        alert(`"${file.name}" is too large (${Math.round(file.size/1024)} KB). Limit is ${Math.round(MAX_ATTACHMENT_BYTES / 1024 / 1024)} MB per file.`);
         return;
       }
       try {
@@ -9690,11 +9726,11 @@
     return fmtDate(iso);
   }
 
-  function plainSnippet(html) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html || '';
-    return (tmp.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 110);
+  function plainText(html) {
+    const doc = new DOMParser().parseFromString(html || '', 'text/html'); // inert: nothing loads or runs
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
   }
+  function plainSnippet(html) { return plainText(html).slice(0, 110); }
 
   function renderNotesView() {
     renderNotesSidebar();
@@ -9712,7 +9748,7 @@
     if (q) {
       sorted = sorted.filter(n => {
         const t = (n.title || '').toLowerCase();
-        const body = plainSnippet(n.body).toLowerCase();
+        const body = plainText(n.body).toLowerCase();
         return t.includes(q) || body.includes(q);
       });
     }
@@ -11081,11 +11117,11 @@
         { icon: '⧉', label: 'Copy name + URL', action: () => navigator.clipboard.writeText(linkNameAndUrl(link)).then(() => showSoftToast('Name + URL copied')) },
         null,
         { icon: '✎', label: 'Rename', action: () => {
-            const titleEl = row.querySelector('.li-title a');
+            const titleEl = row.querySelector('a.li-title');
             if (titleEl) beginInlineTitleEdit(titleEl, link);
           }
         },
-        { icon: link.pinned ? '◎' : '○', label: link.pinned ? 'Unpin' : 'Pin to top', action: () => { updateLink(link.id, { pinned: !link.pinned }); } },
+        { icon: link.pinned ? '◎' : '○', label: link.pinned ? 'Unpin' : 'Pin to top', action: () => { updateLink(link.id, { pinned: !link.pinned }); renderLinksView(); } },
         null,
         { icon: '🗑', label: 'Delete', danger: true, action: () => deleteLink(link.id) },
       ], e.clientX, e.clientY);
@@ -11710,7 +11746,7 @@
       root.appendChild(fld);
     }
     // Chargability
-    root.appendChild(mkField('Chargability %', s.chargability || '', v => updateRoundSummary('chargability', v), { placeholder: 'e.g. 85', type: 'number' }));
+    root.appendChild(mkField('Chargeability %', s.chargability || '', v => updateRoundSummary('chargability', v), { placeholder: 'e.g. 85', type: 'number' }));
     // Client Accounts
     {
       const block = document.createElement('div');
@@ -13260,18 +13296,20 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const o = oneById(oneId);
     if (!o) return;
     if (!Array.isArray(o.entries)) o.entries = [];
+    const agenda = Array.isArray(o.nextAgenda) ? o.nextAgenda : [];
     const entry = {
       id: state.counters.nextOneEntryId++,
       date: date || dateKey(new Date()),
       notes: sanitiseHtml(html || ''),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      // The meeting record keeps what was talked about; unticked points carry to next time
+      discussed: agenda.filter(it => it.done).map(it => (it.text || '').trim()).filter(Boolean),
+      carried: agenda.filter(it => !it.done).map(it => (it.text || '').trim()).filter(Boolean),
+      actionIds: []
     };
     o.entries.push(entry);
     o.updatedAt = entry.createdAt;
-    // Roll forward agenda: drop ticked items, keep the rest for next meeting (#8C)
-    if (Array.isArray(o.nextAgenda) && o.nextAgenda.length) {
-      o.nextAgenda = o.nextAgenda.filter(it => !it.done);
-    }
+    o.nextAgenda = agenda.filter(it => !it.done);
     save();
     return entry;
   }
@@ -13759,6 +13797,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       entries.forEach(e => {
         const card = document.createElement('div');
         card.className = 'one-entry';
+        card.dataset.entryId = e.id;
         const head = document.createElement('div');
         head.className = 'one-entry-head';
         const dateLbl = document.createElement('span');
@@ -13965,6 +14004,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   function closeCapture() {
     const palette = document.getElementById('capturePalette');
     if (palette) palette.hidden = true;
+    syncToolbarStates();
   }
   function updateCaptureUI(kind) {
     const modeEl = document.getElementById('captureMode');
@@ -14444,7 +14484,27 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       const msg  = document.getElementById('ghUpdateMsg');
       const link = document.getElementById('ghUpdateDownload');
       if (msg)  msg.textContent = `OmniPad ${latest} available`;
-      if (link) link.href = `${GITHUB_RAW_BASE}/action-tracker.html?v=${latest}`;
+      if (link) {
+        // raw.githubusercontent serves text/plain, so opening it shows source. Fetch it and save
+        // a real file instead; fall back to the repo page if that fails.
+        link.href = GITHUB_RAW_BASE.replace('https://raw.githubusercontent.com/', 'https://github.com/').replace(/\/[^/]+$/, '');
+        link.onclick = async (e) => {
+          e.preventDefault();
+          try {
+            const res = await fetch(`${GITHUB_RAW_BASE}/action-tracker.html?v=${latest}`, { cache: 'no-store' });
+            if (!res.ok) throw new Error(String(res.status));
+            const url = URL.createObjectURL(new Blob([await res.text()], { type: 'text/html' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'action-tracker.html';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
+          } catch (_) {
+            window.open(link.href, '_blank', 'noopener');
+          }
+        };
+      }
       const el = document.getElementById('ghUpdateBanner');
       if (el) el.classList.add('show');
     } catch (_) { /* silent — no network, no noise */ }
@@ -14581,12 +14641,12 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   let modalActionId = null;
 
   function getModalActionList() {
-    if (lastRenderedActionIds.length) {
-      return lastRenderedActionIds
-        .map(id => state.actions.find(a => a.id === id))
-        .filter(Boolean);
-    }
-    return getVisibleActions();
+    const list = lastRenderedActionIds.length
+      ? lastRenderedActionIds.map(id => state.actions.find(a => a.id === id)).filter(Boolean)
+      : getVisibleActions();
+    if (list.some(a => a.id === modalActionId)) return list;
+    const own = actionById(modalActionId);
+    return own ? [own] : list;
   }
 
   function openActionModal(id) {
@@ -14777,14 +14837,14 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const coLbl = document.createElement('span');
     coLbl.className = 'am-coname-label';
     coLbl.textContent = 'With';
-    const coInp = document.createElement('input');
-    coInp.type = 'text';
-    coInp.className = 'am-coname-input';
-    coInp.value = a.coName || '';
-    coInp.placeholder = 'Add a name…';
-    coInp.addEventListener('input', () => { a.coName = coInp.value; save(); render(); });
+    const coTa = mkPersonTypeahead({
+      initial: a.coName || '',
+      placeholder: 'Add a name…',
+      onText: (v) => { setActionPerson(a, v, null); save(); render(); },
+      onPick: (m) => { setActionPerson(a, m.name, m.id); save(); render(); }
+    });
     coRow.appendChild(coLbl);
-    coRow.appendChild(coInp);
+    coRow.appendChild(coTa.wrap);
     body.appendChild(coRow);
 
     // Subtasks / comments
@@ -14891,11 +14951,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     delBtn.type = 'button';
     delBtn.className = 'am-delete-btn';
     delBtn.textContent = 'Delete action';
-    delBtn.addEventListener('click', () => {
-      if (!confirm('Delete this action?')) return;
-      state.actions = state.actions.filter(x => x.id !== a.id);
-      save(); render(); closeActionModal();
-    });
+    delBtn.addEventListener('click', () => { closeActionModal(); deleteAction(a); });
     footer.appendChild(delBtn);
 
     card.appendChild(footer);
