@@ -1450,6 +1450,20 @@
   th.th-sortable.sort-active { color: var(--accent); }
   th.th-sortable.sort-active .sort-ind { opacity: 1; }
   td.col-coname { font-size: 12.5px; color: var(--fg); }
+  .co-cell { display: flex; align-items: center; gap: 4px; min-width: 0; }
+  .co-cell .co-name { flex: 0 1 auto; min-width: 0; }
+  .chase-chip {
+    flex-shrink: 0;
+    font-size: 10.5px; font-weight: 500;
+    padding: 1px 6px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+  }
+  .chase-chip.due { background: #fef3c7; color: #b45309; font-weight: 600; }
+  html[data-theme="dark"] .chase-chip.due { background: rgba(180,83,9,0.22); color: #fcd34d; }
+  .waiting-pop { width: 270px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .waiting-pop .wp-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-2); }
+  .waiting-pop .wp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .co-name {
     cursor: text;
     padding: 2px 5px;
@@ -1623,7 +1637,7 @@
   /* Project dropdown */
   .pp-menu {
     position: absolute;
-    z-index: 50;
+    z-index: 400;
     min-width: 180px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -3536,6 +3550,39 @@
     gap: 10px;
   }
   .one-composer-actions .btn { padding: 6px 14px; font-size: 13px; }
+  .one-staged { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+  .one-staged-item {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+  .one-action-input, .oee-add {
+    flex: 1; min-width: 200px;
+    padding: 4px 8px;
+    border: 1px dashed var(--border-strong); border-radius: 6px;
+    background: transparent; color: var(--fg);
+    font: inherit; font-size: 12.5px;
+  }
+  .one-action-input:focus, .oee-add:focus { outline: none; border-style: solid; border-color: var(--accent); }
+  .one-entry-extras { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .oee-label, .oa-live-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-2); margin-bottom: 2px; }
+  .oee-group ul { margin: 0; padding-left: 18px; font-size: 13px; }
+  .oee-group.discussed li::marker { content: '✓  '; color: #16a34a; }
+  .oee-group.carried li::marker { content: '→  '; color: var(--muted); }
+  .oee-add { width: 100%; margin-top: 4px; }
+  .oa-live { margin-top: 8px; }
+  .live-action { display: flex; align-items: center; gap: 6px; padding: 2px 0; min-width: 0; }
+  .live-action .status-pill { flex-shrink: 0; padding: 1px 7px; font-size: 10.5px; cursor: default; }
+  .live-action-text {
+    flex: 1; min-width: 0; text-align: left;
+    background: transparent; border: 0; padding: 0;
+    color: var(--fg); font: inherit; font-size: 13px; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .live-action-text:hover { text-decoration: underline; }
+  .am-from { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
+  .am-from:hover { text-decoration: underline; }
   .one-composer-hint { font-size: 11px; color: var(--muted-2); }
   .one-entry-actions { margin-left: auto; }
   .one-meta-field input.one-cadence-input { width: 46px; }
@@ -3633,6 +3680,8 @@
   .tp-stat.flight { background: rgba(59,130,246,0.12); color: #1d4ed8; }
   html[data-theme="dark"] .tp-stat.flight { background: rgba(59,130,246,0.18); color: #93c5fd; }
   .tp-stat.stale { background: rgba(234,88,12,0.14); color: #b45309; }
+  .tp-stat.chase { background: rgba(245,158,11,0.16); color: #92400e; }
+  html[data-theme="dark"] .tp-stat.chase { background: rgba(245,158,11,0.2); color: #fcd34d; }
   html[data-theme="dark"] .tp-stat.stale { background: rgba(234,88,12,0.22); color: #fcd34d; }
   .tp-summary {
     font-size: 12px;
@@ -4481,7 +4530,6 @@
   .oa-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
   .oa-title { font-size: 12px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--fg); }
   .oa-count { font-size: 11px; color: var(--muted); }
-  .oa-pull { margin-left: auto; padding: 3px 8px; font-size: 11px; }
   .oa-hint { font-size: 12px; color: var(--muted); padding: 2px 0 4px; }
   .oa-item { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
   .oa-item.done .oa-text { text-decoration: line-through; color: var(--muted); }
@@ -5503,6 +5551,7 @@
         <button class="cu-scope-btn active" data-scope="all" type="button">All open</button>
         <button class="cu-scope-btn" data-scope="stale" type="button">Stale</button>
         <button class="cu-scope-btn" data-scope="overdue" type="button">Overdue</button>
+        <button class="cu-scope-btn" data-scope="chase" type="button">To chase</button>
         <button class="cu-scope-btn" data-scope="project" id="cuScopeProject" type="button" hidden>This project</button>
       </div>
       <div class="cu-card" id="cuCard">
@@ -5676,6 +5725,7 @@
   let focusOnDueOnly = false;
   let focusOnInProgress = false;
   let focusOnStale = false;
+  let focusOnChase = false;
   let pendingDelete = null; // action id awaiting confirm
   let bulkRevealMode = false; // true after first click of master checkbox before any selection
   let selectedHistorySnap = null; // snapshot id selected in history panel
@@ -5699,7 +5749,8 @@
   const NOTE_COLOURS = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#a855f7','#ec4899'];
   const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
   let expandedActions = new Set(); // action ids with comments expanded
-  let openMenu = null; // active project dropdown element
+  let openMenu = null; // active picker / popover element
+  let openMenuOnClose = null; // runs once when that popover closes
   let quickAddOpenForProject = null; // projectId currently showing inline add
   let addProjectOpen = false; // inline add-project row active
 
@@ -6131,7 +6182,8 @@
       daysBetweenKeys(todayK, a.dueAt) <= 0).length;
     const flightCount = state.actions.filter(a => a.status === 'In Progress').length;
     const staleCount = state.actions.filter(a => a.status !== 'Complete' && daysSince(a.addedAt) > stale).length;
-    const totalAttention = dueCount + flightCount + staleCount;
+    const chaseCount = state.actions.filter(isChaseDue).length;
+    const totalAttention = dueCount + flightCount + staleCount + chaseCount;
     const completedToday = state.actions.filter(a => a.status === 'Complete' && a.completedAt &&
       dateKey(new Date(a.completedAt)) === todayK).length;
     const openCount = state.actions.filter(a => a.status !== 'Complete').length;
@@ -6159,33 +6211,20 @@
         s.addEventListener('click', onClick);
         return s;
       };
-      stats.appendChild(mkStat('due', 'due', dueCount, () => {
+      const narrowTo = (kind) => () => {
         focusMode = false;
         activeFilter = 'all';
         activePriorityFilter = 'all';
-        focusOnDueOnly = true;
-        focusOnInProgress = false;
-        focusOnStale = false;
+        focusOnDueOnly = kind === 'due';
+        focusOnInProgress = kind === 'flight';
+        focusOnStale = kind === 'stale';
+        focusOnChase = kind === 'chase';
         render();
-      }));
-      stats.appendChild(mkStat('flight', 'in flight', flightCount, () => {
-        focusMode = false;
-        activeFilter = 'all';
-        activePriorityFilter = 'all';
-        focusOnDueOnly = false;
-        focusOnInProgress = true;
-        focusOnStale = false;
-        render();
-      }));
-      stats.appendChild(mkStat('stale', 'stale', staleCount, () => {
-        focusMode = false;
-        activeFilter = 'all';
-        activePriorityFilter = 'all';
-        focusOnDueOnly = false;
-        focusOnInProgress = false;
-        focusOnStale = true;
-        render();
-      }));
+      };
+      stats.appendChild(mkStat('due', 'due', dueCount, narrowTo('due')));
+      stats.appendChild(mkStat('flight', 'in flight', flightCount, narrowTo('flight')));
+      stats.appendChild(mkStat('stale', 'stale', staleCount, narrowTo('stale')));
+      stats.appendChild(mkStat('chase', 'to chase', chaseCount, narrowTo('chase')));
     }
 
     const summary = document.getElementById('tpSummary');
@@ -6444,6 +6483,7 @@
     focusOnDueOnly = false;
     focusOnInProgress = false;
     focusOnStale = false;
+    focusOnChase = false;
   }
   function toggleFocusMode() {
     clearTodayNarrowing();
@@ -6473,6 +6513,7 @@
         if (cleanupScope === 'overdue') {
           return a.dueAt && daysBetweenKeys(todayK, a.dueAt) < 0;
         }
+        if (cleanupScope === 'chase') return isChaseDue(a);
         if (cleanupScope === 'project') {
           return cleanupScopeProject != null && a.projectId === cleanupScopeProject;
         }
@@ -6603,7 +6644,8 @@
           ${action.status || 'Open'}
         </span>
         <span class="cu-pill cu-pill-days">${daysOld === 0 ? 'Today' : daysOld + 'd old'}</span>
-        ${action.coName ? `<span class="cu-pill">With: ${escapeHtml(action.coName)}</span>` : ''}
+        ${action.coName ? `<span class="cu-pill">${action.status === 'Blocked' ? 'Waiting on' : 'With'}: ${escapeHtml(action.coName)}</span>` : ''}
+        ${chaseInfo(action) ? `<span class="cu-pill">⏳ Chase ${chaseInfo(action).label}</span>` : ''}
         ${comments.length ? `<span class="cu-pill">Subtasks ${doneSubs}/${comments.length}</span>` : ''}
       </div>
       <div class="cu-edit-row">
@@ -6686,6 +6728,7 @@
       all: 'No more open actions to review.',
       stale: 'No stale actions left.',
       overdue: 'Nothing overdue. Nice.',
+      chase: 'Nobody to chase right now.',
       project: 'No open actions in this project.'
     };
     if (card) card.innerHTML = `<div class="cu-done-msg"><strong>All done ✓</strong>${scopeMsg[cleanupScope] || scopeMsg.all}</div>`;
@@ -6904,7 +6947,8 @@
       list = list.filter(a =>
         a.priority === 'High' ||
         a.status === 'In Progress' ||
-        (a.dueAt && a.status !== 'Complete' && daysBetweenKeys(todayK, a.dueAt) <= 0)
+        (a.dueAt && a.status !== 'Complete' && daysBetweenKeys(todayK, a.dueAt) <= 0) ||
+        isChaseDue(a)
       );
     }
     // Today panel narrowing predicates (one at a time)
@@ -6916,6 +6960,8 @@
     } else if (focusOnStale) {
       const stale = state.settings.staleDays || 5;
       list = list.filter(a => a.status !== 'Complete' && daysSince(a.addedAt) > stale);
+    } else if (focusOnChase) {
+      list = list.filter(isChaseDue);
     }
     if (state.settings.hideCompletedAfterDay !== false) {
       const today = todayStamp();
@@ -7752,7 +7798,12 @@
         beginCoNameEdit(a, coTxt);
       }
     });
-    tdCo.appendChild(coTxt);
+    const coCell = document.createElement('div');
+    coCell.className = 'co-cell';
+    coCell.appendChild(coTxt);
+    const chase = mkChaseChip(a);
+    if (chase) coCell.appendChild(chase);
+    tdCo.appendChild(coCell);
     tr.appendChild(tdCo);
 
     // Status
@@ -7762,12 +7813,15 @@
     pill.className = 'status-pill';
     pill.dataset.status = a.status;
     pill.innerHTML = `<span class="sdot"></span>${a.status}`;
-    pill.title = 'Click to advance · Shift-click to reverse';
+    pill.title = a.status === 'Blocked' && a.coName
+      ? `Blocked · waiting on ${a.coName}${a.chaseAt ? ' · chase ' + fmtDueLabel(a.chaseAt, 8) : ''} — click to advance`
+      : 'Click to advance · Shift-click to reverse';
     pill.addEventListener('click', (e) => {
       const i = STATUSES.indexOf(a.status);
       const dir = e.shiftKey ? -1 : 1;
       setStatus(a, STATUSES[(i + dir + STATUSES.length) % STATUSES.length], { anchorEl: pill });
       save(); render();
+      if (a.status === 'Blocked') openWaitingAfterRender(a, false);
     });
     tdS.appendChild(pill);
     tr.appendChild(tdS);
@@ -7907,6 +7961,11 @@
           action: () => { setStatus(a, s, { anchorEl: tr }); save(); render(); }
         })),
         null,
+        { icon: '⏳', label: a.status === 'Blocked' ? 'Waiting on / chase…' : 'Waiting on…', action: () => {
+            setStatus(a, 'Blocked'); save(); render();
+            openWaitingAfterRender(a, false);
+          }
+        },
         { icon: '📅', label: a.dueAt ? 'Change due date' : 'Set due date', action: () => {
             const chip = tr.querySelector('.due-chip') || tr.querySelector('.col-due span');
             openDuePicker(chip || tr, a);
@@ -7963,6 +8022,9 @@
       document.removeEventListener('keydown', onMenuKey, true);
       window.removeEventListener('scroll', onPickerScroll, true);
       window.removeEventListener('resize', closePicker);
+      const cb = openMenuOnClose;
+      openMenuOnClose = null;
+      if (cb) cb();
     }
   }
   function onPickerScroll(e) {
@@ -8117,8 +8179,13 @@
     };
     renderItems();
     if (search) search.addEventListener('input', renderItems);
+    return showPopover(anchor, menu, search);
+  }
+  // Shows a popover under an anchor (flipping to stay on screen) with the shared close
+  // behaviour: outside click, Esc, page scroll, resize. onClose runs once on close.
+  function showPopover(anchor, menu, focusEl, onClose) {
+    closePicker();
     document.body.appendChild(menu);
-    // Below the anchor; flip left / above when it would leave the viewport
     const r = anchor.getBoundingClientRect();
     menu.style.left = (r.left + window.scrollX) + 'px';
     menu.style.top = (r.bottom + 4 + window.scrollY) + 'px';
@@ -8126,12 +8193,13 @@
     if (mr.right > window.innerWidth - 8) menu.style.left = Math.max(8, r.right + window.scrollX - mr.width) + 'px';
     if (mr.bottom > window.innerHeight - 8 && r.top - mr.height - 4 > 0) menu.style.top = (r.top - mr.height - 4 + window.scrollY) + 'px';
     openMenu = menu;
+    openMenuOnClose = onClose || null;
     setTimeout(() => {
       document.addEventListener('mousedown', onDocMouseDown, true);
       document.addEventListener('keydown', onMenuKey, true);
       window.addEventListener('scroll', onPickerScroll, true);
       window.addEventListener('resize', closePicker);
-      if (search) search.focus();
+      if (focusEl) focusEl.focus();
     }, 0);
     return menu;
   }
@@ -8160,6 +8228,71 @@
     } else {
       a.personId = null;
     }
+  }
+
+  // Waiting on: a Blocked action's co-name is who you're waiting on; chaseAt is when to chase.
+  function chaseInfo(a) {
+    if (a.status !== 'Blocked' || !a.chaseAt) return null;
+    const diff = daysBetweenKeys(dateKey(new Date()), a.chaseAt);
+    return { diff, label: diff < 0 ? `${-diff}d late` : diff === 0 ? 'today' : `${diff}d` };
+  }
+  function isChaseDue(a) {
+    const info = chaseInfo(a);
+    return !!info && info.diff <= 0;
+  }
+  function mkChaseChip(a) {
+    const info = chaseInfo(a);
+    if (!info) return null;
+    const chip = document.createElement('span');
+    chip.className = 'chase-chip' + (info.diff <= 0 ? ' due' : '');
+    chip.textContent = '⏳ ' + info.label;
+    chip.title = `Chase${a.coName ? ' ' + a.coName : ''} ${info.diff > 0 ? 'in ' + info.label : info.label} · click to change`;
+    chip.addEventListener('click', (e) => { e.stopPropagation(); openWaitingPopover(chip, a); });
+    return chip;
+  }
+  function openWaitingPopover(anchor, a) {
+    let changed = false;
+    const pop = document.createElement('div');
+    pop.className = 'pp-menu waiting-pop';
+    const who = document.createElement('div');
+    who.className = 'wp-title';
+    who.textContent = 'Waiting on';
+    const ta = mkPersonTypeahead({
+      initial: a.coName || '',
+      placeholder: 'Who are you waiting on?',
+      onText: (v) => { setActionPerson(a, v, null); changed = true; save(); },
+      onPick: (m) => { setActionPerson(a, m.name, m.id); changed = true; save(); }
+    });
+    const when = document.createElement('div');
+    when.className = 'wp-title';
+    when.textContent = 'Chase';
+    const chips = document.createElement('div');
+    chips.className = 'wp-chips';
+    [['Tomorrow', 1], ['In 3 days', 3], ['Next week', 7], ['No date', null]].forEach(([label, days]) => {
+      const key = days == null ? null : dateKey(new Date(Date.now() + days * 86400000));
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cu-quick-btn' + ((a.chaseAt || null) === key ? ' active' : '');
+      b.textContent = label;
+      b.addEventListener('click', () => { a.chaseAt = key; changed = true; save(); closePicker(); });
+      chips.appendChild(b);
+    });
+    pop.append(who, ta.wrap, when, chips);
+    // Re-render only when something changed, so a click straight back on the status pill
+    // isn't swallowed by its row being redrawn mid-click.
+    showPopover(anchor, pop, ta.input, () => {
+      if (!changed) return;
+      render();
+      if (modalActionId === a.id) renderActionModal();
+    });
+  }
+  function openWaitingAfterRender(a, inModal) {
+    setTimeout(() => {
+      const pill = inModal
+        ? document.querySelector('#actionModalCard .am-status-pill')
+        : document.querySelector(`#actionsBody tr[data-id="${a.id}"] .status-pill`);
+      if (pill && a.status === 'Blocked') openWaitingPopover(pill, a);
+    }, 0);
   }
 
   function deleteAction(a) {
@@ -13206,6 +13339,42 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
 
   // ============== 1-2-1s tracker ==============
   let currentOneId = null;
+  // Composer drafts live outside the DOM, so re-rendering the editor (ticking a talking
+  // point, adding a staged action) never loses what you've typed. In memory only.
+  const oneDrafts = new Map();
+  function oneDraft(id) {
+    if (!oneDrafts.has(id)) oneDrafts.set(id, { date: dateKey(new Date()), html: '', actions: [] });
+    return oneDrafts.get(id);
+  }
+  function findEntry(entryId) {
+    for (const o of state.ones) {
+      const e = (o.entries || []).find(x => x.id === entryId);
+      if (e) return { o, e };
+    }
+    return null;
+  }
+  function addActionFromMeeting(o, entry, text) {
+    const a = addAction(text, o.projectId || undefined);
+    if (!a) return null;
+    a.coName = o.name || '';
+    a.personId = o.id;
+    a.fromEntryId = entry.id;
+    entry.actionIds.push(a.id);
+    save();
+    return a;
+  }
+  function openEntry(personId, entryId) {
+    currentOneId = personId;
+    setView('ones');
+    setTimeout(() => {
+      const el = document.querySelector(`#oneEditor .one-entry[data-entry-id="${entryId}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('row-flash');
+        setTimeout(() => el.classList.remove('row-flash'), 1600);
+      }
+    }, 50);
+  }
   let onesSearchQuery = '';
   let onesStaleOnly = false;
   let onesShowArchived = false;
@@ -13441,6 +13610,26 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     });
   }
 
+  function mkLiveActionRow(a) {
+    const row = document.createElement('div');
+    row.className = 'live-action';
+    const pill = document.createElement('span');
+    pill.className = 'status-pill';
+    pill.dataset.status = a.status;
+    pill.innerHTML = '<span class="sdot"></span>';
+    pill.appendChild(document.createTextNode(a.status));
+    const text = document.createElement('button');
+    text.type = 'button';
+    text.className = 'live-action-text';
+    text.textContent = a.description;
+    text.title = 'Open action';
+    text.addEventListener('click', () => openActionModal(a.id));
+    row.append(pill, text);
+    const chase = mkChaseChip(a);
+    if (chase) row.appendChild(chase);
+    return row;
+  }
+
   function linkedActionsFor(o) {
     const lcName = (o.name || '').trim().toLowerCase();
     return state.actions.filter(a =>
@@ -13450,7 +13639,9 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   }
 
   function renderOneBacklinks(o, root) {
-    const linkedActions = linkedActionsFor(o);
+    const linkedActions = linkedActionsFor(o)
+      .filter(a => a.status === 'Complete')
+      .sort((x, y) => String(y.completedAt || '').localeCompare(String(x.completedAt || '')));
     const linkedRounds = (state.cribRounds || []).filter(r => r.summary && r.summary.peopleLeadPersonId === o.id);
     if (!linkedActions.length && !linkedRounds.length) return;
     const links = document.createElement('div');
@@ -13460,7 +13651,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     head.textContent = 'Linked';
     links.appendChild(head);
     if (linkedActions.length) {
-      const sub = document.createElement('div'); sub.className = 'ol-sub'; sub.textContent = `Actions (${linkedActions.length})`;
+      const sub = document.createElement('div'); sub.className = 'ol-sub'; sub.textContent = `Done together (${linkedActions.length})`;
       links.appendChild(sub);
       linkedActions.slice(0, 12).forEach(a => {
         const row = document.createElement('a'); row.href = '#'; row.className = 'ol-link';
@@ -13512,26 +13703,6 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     count.textContent = o.nextAgenda.length ? `· ${o.nextAgenda.length}` : '';
     head.appendChild(title); head.appendChild(count);
     const linked = linkedActionsFor(o).filter(a => a.status !== 'Complete');
-    if (linked.length) {
-      const pull = document.createElement('button');
-      pull.type = 'button'; pull.className = 'btn oa-pull';
-      pull.textContent = `↩ Pull stale actions (${linked.length})`;
-      pull.title = 'Append open actions linked to this person as talking points';
-      pull.addEventListener('click', () => {
-        const existing = new Set(o.nextAgenda.map(it => (it.text || '').trim()));
-        let added = 0;
-        linked.forEach(a => {
-          const text = `Discuss: ${a.description}`;
-          if (!existing.has(text)) {
-            o.nextAgenda.push({ id: state.counters.nextAgendaItemId++, text, done: false, addedAt: new Date().toISOString() });
-            added++;
-          }
-        });
-        if (added) { save(); renderOneEditor(); showSoftToast(`Added ${added} talking point${added>1?'s':''}`, '✓'); }
-        else showSoftToast('Already on the list', 'ℹ');
-      });
-      head.appendChild(pull);
-    }
     wrap.appendChild(head);
 
     if (!o.nextAgenda.length && !linked.length) {
@@ -13577,6 +13748,22 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     });
     adder.appendChild(inp);
     wrap.appendChild(adder);
+
+    // Live lists — always current, nothing copied
+    const name = o.name || 'them';
+    const liveList = (label, items) => {
+      if (!items.length) return;
+      const g = document.createElement('div');
+      g.className = 'oa-live';
+      const h = document.createElement('div');
+      h.className = 'oa-live-label';
+      h.textContent = `${label} (${items.length})`;
+      g.appendChild(h);
+      items.forEach(a => g.appendChild(mkLiveActionRow(a)));
+      wrap.appendChild(g);
+    };
+    liveList(`Waiting on ${name}`, linked.filter(a => a.status === 'Blocked'));
+    liveList(`Open actions with ${name}`, linked.filter(a => a.status !== 'Blocked'));
 
     root.appendChild(wrap);
   }
@@ -13766,47 +13953,82 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     // Add-entry composer
     const composer = document.createElement('div');
     composer.className = 'one-composer';
+    const draft = oneDraft(o.id);
     const dateInp = document.createElement('input');
     dateInp.type = 'date';
     dateInp.className = 'one-date';
-    dateInp.value = dateKey(new Date());
+    dateInp.value = draft.date;
+    dateInp.addEventListener('change', () => { draft.date = dateInp.value || dateKey(new Date()); });
     composer.appendChild(dateInp);
     const body = document.createElement('div');
     body.className = 'note-body one-entry-body';
     body.contentEditable = 'true';
     body.spellcheck = true;
     body.setAttribute('data-placeholder', 'Notes from the chat… (Ctrl/Cmd+Enter to save)');
+    body.innerHTML = draft.html;
+    body.addEventListener('input', () => { draft.html = body.innerHTML; });
     body.addEventListener('paste', (e) => {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData).getData('text');
       document.execCommand('insertText', false, text);
     });
+    const logMeeting = () => {
+      const html = body.innerHTML.trim();
+      const hasNotes = !!html && html !== '<br>';
+      const ticked = o.nextAgenda.some(it => it.done);
+      if (!hasNotes && !ticked && !draft.actions.length) return;
+      const entry = addEntry(o.id, dateInp.value, hasNotes ? html : '');
+      draft.actions.forEach(t => addActionFromMeeting(o, entry, t));
+      const n = draft.actions.length;
+      oneDrafts.delete(o.id);
+      save();
+      renderOnesView();
+      showSoftToast(`Meeting logged${n ? ` · ${n} action${n === 1 ? '' : 's'} added` : ''}`, '📝');
+    };
     body.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault();
-        const html = body.innerHTML.trim();
-        if (!html || html === '<br>') return;
-        addEntry(o.id, dateInp.value, html);
-        body.innerHTML = '';
-        renderOnesView();
-        showSoftToast('Meeting note saved', '📝');
-      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); logMeeting(); }
     });
     composer.appendChild(body);
+    // Actions agreed in the meeting: staged here, created (linked to this person) on log
+    const staged = document.createElement('div');
+    staged.className = 'one-staged';
+    draft.actions.forEach((t, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'one-staged-item';
+      chip.textContent = t;
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'crib-chip-remove';
+      rm.title = 'Remove';
+      rm.textContent = '×';
+      rm.addEventListener('click', () => { draft.actions.splice(i, 1); renderOneEditor(); });
+      chip.appendChild(rm);
+      staged.appendChild(chip);
+    });
+    const actInp = document.createElement('input');
+    actInp.type = 'text';
+    actInp.className = 'one-action-input';
+    actInp.placeholder = '+ Action from this meeting (Enter)';
+    actInp.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const v = actInp.value.trim();
+      if (v) draft.actions.push(v);
+      if (e.ctrlKey || e.metaKey) { logMeeting(); return; }
+      if (!v) return;
+      renderOneEditor();
+      setTimeout(() => { const next = document.querySelector('#oneEditor .one-action-input'); if (next) next.focus(); }, 0);
+    });
+    staged.appendChild(actInp);
+    composer.appendChild(staged);
     const composerActions = document.createElement('div');
     composerActions.className = 'one-composer-actions';
     const saveBtn = document.createElement('button');
     saveBtn.type = 'button';
     saveBtn.className = 'btn primary';
-    saveBtn.textContent = 'Log meeting note';
-    saveBtn.addEventListener('click', () => {
-      const html = body.innerHTML.trim();
-      if (!html || html === '<br>') return;
-      addEntry(o.id, dateInp.value, html);
-      body.innerHTML = '';
-      renderOnesView();
-      showSoftToast('Meeting note saved', '📝');
-    });
+    saveBtn.textContent = 'Log meeting';
+    saveBtn.title = 'Saves the notes, records ticked talking points as discussed and creates the staged actions';
+    saveBtn.addEventListener('click', logMeeting);
     composerActions.appendChild(saveBtn);
     const composerHint = document.createElement('span');
     composerHint.className = 'one-composer-hint';
@@ -13867,6 +14089,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
         bodyEl.innerHTML = e.notes || '';
         bodyEl.addEventListener('blur', () => updateEntry(o.id, e.id, { notes: bodyEl.innerHTML }));
         card.appendChild(bodyEl);
+        card.appendChild(renderEntryExtras(o, e));
         list.appendChild(card);
       });
       root.appendChild(list);
@@ -13874,6 +14097,45 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
 
     // Conversation topics
     root.appendChild(renderOneConvTopics(o));
+  }
+
+  function renderEntryExtras(o, e) {
+    const wrap = document.createElement('div');
+    wrap.className = 'one-entry-extras';
+    const group = (label, cls) => {
+      const g = document.createElement('div');
+      g.className = 'oee-group ' + cls;
+      const h = document.createElement('div');
+      h.className = 'oee-label';
+      h.textContent = label;
+      g.appendChild(h);
+      wrap.appendChild(g);
+      return g;
+    };
+    const textList = (label, cls, items) => {
+      if (!items.length) return;
+      const ul = document.createElement('ul');
+      items.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+      group(label, cls).appendChild(ul);
+    };
+    textList('Discussed', 'discussed', e.discussed || []);
+    textList('Carried over', 'carried', e.carried || []);
+    const acts = (e.actionIds || []).map(actionById).filter(Boolean);
+    const g = group(acts.length ? `Actions from this meeting (${acts.length})` : 'Actions from this meeting', 'actions');
+    acts.forEach(a => g.appendChild(mkLiveActionRow(a)));
+    const add = document.createElement('input');
+    add.type = 'text';
+    add.className = 'oee-add';
+    add.placeholder = '+ Add an action from this meeting';
+    add.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Enter') return;
+      const v = add.value.trim();
+      if (!v) return;
+      addActionFromMeeting(o, e, v);
+      renderOneEditor();
+    });
+    g.appendChild(add);
+    return wrap;
   }
 
   const CONV_TOPIC_GROUPS = [
@@ -14780,6 +15042,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       const dir = e.shiftKey ? -1 : 1;
       setStatus(a, STATUSES[(i + dir + STATUSES.length) % STATUSES.length], { anchorEl: statusPill });
       save(); render(); renderActionModal();
+      if (a.status === 'Blocked') openWaitingAfterRender(a, true);
     });
     statusGroup.appendChild(statusLbl);
     statusGroup.appendChild(statusPill);
@@ -14979,6 +15242,15 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     metaInfo.className = 'am-meta-info';
     const days = daysSince(a.addedAt);
     metaInfo.textContent = `Added ${fmtDate(a.addedAt)} · ${days === 0 ? 'today' : days + 'd ago'}${a.number ? ' · #' + a.number : ''}`;
+    const src = a.fromEntryId ? findEntry(a.fromEntryId) : null;
+    if (src) {
+      const from = document.createElement('button');
+      from.type = 'button';
+      from.className = 'am-from';
+      from.textContent = `From 1-2-1 with ${src.o.name || 'someone'} · ${fmtDate(src.e.date + 'T00:00:00')}`;
+      from.addEventListener('click', () => { closeActionModal(); openEntry(src.o.id, src.e.id); });
+      metaInfo.append(' · ', from);
+    }
     footer.appendChild(metaInfo);
 
     const delBtn = document.createElement('button');
