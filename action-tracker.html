@@ -222,7 +222,6 @@
     background: var(--surface);
     box-shadow: var(--shadow-md);
   }
-  .admin[hidden] { display: none; }
 
   .history {
     border: 1px solid var(--border);
@@ -232,7 +231,6 @@
     background: var(--surface);
     box-shadow: var(--shadow-md);
   }
-  .history[hidden] { display: none; }
 
   .support {
     border: 1px solid var(--border);
@@ -242,7 +240,6 @@
     background: var(--surface);
     box-shadow: var(--shadow-md);
   }
-  .support[hidden] { display: none; }
   .support-head {
     display: flex;
     align-items: center;
@@ -458,7 +455,9 @@
     gap: 8px;
     align-items: center;
   }
-  .admin input[type="text"] {
+  .admin input[type="number"] { width: 64px; }
+  .admin input[type="text"],
+  .admin input[type="number"] {
     border: 1px solid var(--border-strong);
     border-radius: 6px;
     padding: 6px 10px;
@@ -466,7 +465,8 @@
     background: var(--surface);
     color: var(--fg);
   }
-  .admin input[type="text"]:focus {
+  .admin input[type="text"]:focus,
+  .admin input[type="number"]:focus {
     outline: none;
     border-color: var(--accent);
   }
@@ -483,9 +483,15 @@
   .btn.danger { color: var(--danger); border-color: var(--danger-border); }
   .btn.danger:hover { background: var(--danger-soft); }
   .btn.primary {
-    background: var(--accent); border-color: var(--accent); color: var(--surface);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--surface);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
   }
-  .btn.primary:hover { filter: brightness(0.95); }
+  .btn.primary:hover { filter: brightness(1.15); }
   .btn.small { padding: 3px 10px; font-size: 12px; }
 
   .project-list {
@@ -776,52 +782,6 @@
   .bg-tint-swatches .tsw:hover { transform: translateY(-1px); }
   .bg-tint-swatches .tsw.active { box-shadow: 0 0 0 2px var(--accent), var(--shadow-sm); }
 
-  .backup-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .backup-item {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    gap: 10px;
-    align-items: center;
-    padding: 8px 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    font-size: 13px;
-  }
-  .backup-item .bk-date {
-    font-weight: 500;
-    color: var(--fg);
-  }
-  .backup-item .bk-meta {
-    color: var(--muted);
-    font-size: 12px;
-  }
-  .backup-item .bk-today {
-    display: inline-block;
-    margin-left: 6px;
-    padding: 1px 6px;
-    border-radius: 4px;
-    background: #f0fdf4;
-    color: #15803d;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  .backup-item button {
-    padding: 4px 10px;
-    font-size: 12px;
-  }
-  .backup-empty {
-    color: var(--muted-2);
-    font-size: 12px;
-    padding: 6px 2px;
-  }
-
   /* Filter chips */
   .filter-bar {
     display: flex;
@@ -841,7 +801,6 @@
     background: var(--border);
     margin: 4px 6px;
   }
-  .chip[hidden] { display: none !important; }
   .chip {
     display: inline-flex;
     align-items: center;
@@ -896,7 +855,6 @@
     position: fixed; inset: 0; z-index: 300;
     display: flex; align-items: center; justify-content: center;
   }
-  .cu-overlay[hidden] { display: none; }
   .cu-backdrop {
     position: absolute; inset: 0;
     background: rgba(0,0,0,.55);
@@ -941,7 +899,6 @@
     color: var(--muted); padding: 3px 10px 3px 8px;
   }
   .cu-undo:hover { color: var(--fg); border-color: var(--muted-2); }
-  .cu-undo[hidden] { display: none; }
   .cu-scope {
     display: flex; gap: 6px; flex-wrap: wrap;
     padding: 12px 20px 0;
@@ -957,7 +914,6 @@
   .cu-scope-btn.active {
     background: #7c3aed; border-color: #7c3aed; color: #fff;
   }
-  .cu-scope-btn[hidden] { display: none; }
   .cu-card {
     padding: 16px 24px 16px;
     min-height: 150px;
@@ -1111,11 +1067,11 @@
   .group-header .gh-count {
     color: var(--muted-2);
     font-weight: 500;
-    margin-left: 6px;
+    margin-left: 10px;
     flex-shrink: 0;
   }
   .group-header .gh-add {
-    margin-left: auto;
+    margin-left: 14px;
     background: transparent;
     border: 1px solid transparent;
     color: var(--muted);
@@ -1131,12 +1087,6 @@
     transition: all .12s ease;
   }
   .group-header .gh-add:hover { background: var(--surface); color: var(--fg); border-color: var(--border-strong); }
-  .group-header .gh-count {
-    margin-left: 10px;
-  }
-  .group-header .gh-add {
-    margin-left: 14px;
-  }
   .group-header .gh-drag-handle {
     color: var(--muted-2);
     cursor: grab;
@@ -1950,18 +1900,7 @@
     letter-spacing: -0.01em;
   }
   .empty p { margin: 0 0 18px; font-size: 13px; color: var(--muted); }
-  .btn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--surface);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 500;
-    box-shadow: var(--shadow-sm);
-  }
-  .btn.primary:hover { filter: brightness(1.15); }
 
-  /* Tooltip */
   /* View tabs */
   .view-tabs {
     display: inline-flex;
@@ -2900,7 +2839,6 @@
   #cribProjectsList .crib-field:last-child { margin-bottom: 0; }
   #cribProjectsList .crib-field-row { margin-bottom: 4px; gap: 6px; }
   #cribProjectsList .crib-field textarea { min-height: 40px; }
-  .crib-field-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
   /* AI: max 2 columns, more room for description */
   #cribAiList { grid-template-columns: repeat(2, 1fr); }
   #cribAiList .crib-field textarea { min-height: 68px; }
@@ -2971,10 +2909,12 @@
     color: var(--muted-2);
     font-size: 13px;
     font-style: italic;
-    padding: 12px 0 4px;
+    padding: 18px;
     display: flex;
     align-items: center;
     gap: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
   }
   .crib-card {
     border: 1px solid var(--border);
@@ -3351,14 +3291,6 @@
   .crib-sales-table tr.is-starred td { background: rgba(234,88,12,0.06); }
   .crib-sales-table tr.is-starred td:first-child { box-shadow: inset 3px 0 0 0 var(--high); }
 
-  .crib-empty-section {
-    color: var(--muted-2);
-    font-size: 13px;
-    text-align: center;
-    padding: 18px;
-    border: 1px dashed var(--border);
-    border-radius: 10px;
-  }
 
   .crib-auto-note {
     margin-top: 14px;
@@ -3431,7 +3363,7 @@
   /* Meta row */
   .one-meta {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     gap: 4px;
     padding: 4px 24px 10px;
@@ -3469,6 +3401,16 @@
     background: var(--surface);
   }
   .one-meta-suffix { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+  .one-mailto { color: var(--muted); text-decoration: none; font-size: 13px; }
+  .one-mailto:hover { color: var(--fg); }
+  .one-archived-banner {
+    margin: 0 24px 8px;
+    padding: 8px 12px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
   .one-meta-actions { display: none; }
   /* Editable saved entry notes */
   .one-entry-body-edit {
@@ -3791,7 +3733,6 @@
     font-size: 13px;
     font-weight: 500;
   }
-  .bulk-bar[hidden] { display: none; }
   .bulk-bar .bb-count {
     padding-right: 6px;
     border-right: 1px solid color-mix(in srgb, var(--surface) 18%, transparent);
@@ -3875,7 +3816,6 @@
     justify-content: center;
     padding-top: 12vh;
   }
-  .search-palette[hidden] { display: none; }
   .sp-backdrop {
     position: absolute;
     inset: 0;
@@ -4611,7 +4551,6 @@
     justify-content: center;
     padding: 24px 16px;
   }
-  .action-modal-overlay[hidden] { display: none; }
   .action-modal-backdrop {
     position: absolute;
     inset: 0;
@@ -4960,10 +4899,10 @@
       <span class="streak-chip" id="streakChip" hidden></span>
     </div>
     <div class="view-tabs" role="tablist">
-      <button class="view-tab active" data-view="actions" type="button">Actions<span class="tab-badge" id="actionsBadge" hidden></span></button>
-      <button class="view-tab" data-view="notes" type="button">Notes<span class="tab-dot" id="notesDot" hidden></span></button>
-      <button class="view-tab" data-view="links" type="button">Links<span class="tab-dot" id="linksDot" hidden></span></button>
-      <button class="view-tab" data-view="ones" type="button">1‑2‑1s<span class="tab-badge" id="onesBadge" hidden></span></button>
+      <button class="view-tab active" data-view="actions" type="button">Actions</button>
+      <button class="view-tab" data-view="notes" type="button">Notes</button>
+      <button class="view-tab" data-view="links" type="button">Links</button>
+      <button class="view-tab" data-view="ones" type="button">1‑2‑1s</button>
       <button class="view-tab" data-view="crib" type="button">Crib</button>
     </div>
     <div class="toolbar">
@@ -5143,6 +5082,10 @@
         <input type="checkbox" id="fireworksOnComplete">
         <label for="fireworksOnComplete">🎉 Confetti burst when an action is completed</label>
       </div>
+      <div class="toggle-row" style="margin-top:4px;">
+        <input type="checkbox" id="sparkleEggToggle">
+        <label for="sparkleEggToggle">🌟 Hidden sparkle easter egg</label>
+      </div>
     </section>
 
     <section>
@@ -5164,6 +5107,10 @@
         <input type="checkbox" id="boldHighPriority">
         <label for="boldHighPriority">Bold high-priority actions</label>
       </div>
+      <div class="toggle-row" style="margin-top:4px;">
+        <input type="checkbox" id="showTodayPanel">
+        <label for="showTodayPanel">Show Today bar</label>
+      </div>
       <div class="settings-subhead" style="margin-top:14px; margin-bottom:6px;">Sorting &amp; filtering</div>
       <div class="toggle-row">
         <input type="checkbox" id="reverseSort">
@@ -5176,6 +5123,11 @@
       <div class="toggle-row" style="margin-top:4px;">
         <input type="checkbox" id="hideCompletedAfterDay">
         <label for="hideCompletedAfterDay">Hide completed actions after the day they're done <span id="hiddenCompletedCount" style="color:var(--muted-2); font-size:11px; margin-left:4px;"></span></label>
+      </div>
+      <div class="toggle-row" style="margin-top:4px;">
+        <label for="staleDaysInput">Flag open actions as stale after</label>
+        <input type="number" id="staleDaysInput" min="1" max="60">
+        <span>days</span>
       </div>
       <div class="toggle-row" style="margin-top:4px;">
         <input type="checkbox" id="openOfficeInApp">
@@ -5531,6 +5483,7 @@
           <button class="chip ones-stale-chip" id="onesStaleFilter" type="button">
             <span class="dot" style="background:var(--high)"></span>Due for check-in
           </button>
+          <button class="chip" id="onesArchivedFilter" type="button" hidden>Archived <span id="onesArchivedCount"></span></button>
         </div>
         <div class="notes-list" id="onesList"></div>
       </aside>
@@ -5627,7 +5580,6 @@
   const ICONS = {
     chevDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
     chevUp:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>',
-    chevRight:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>',
     caretDown:'<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
     checkSm:  '<svg class="pp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>',
     equals:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/></svg>',
@@ -6171,26 +6123,8 @@
     }
   }
 
-  function getAttentionCount() {
-    const todayK = dateKey(new Date());
-    const stale = state.settings.staleDays || 5;
-    return state.actions.filter(a => {
-      if (a.status === 'Complete') return false;
-      if (a.priority === 'High') return true;
-      if (a.status === 'In Progress') return true;
-      if (a.dueAt && daysBetweenKeys(todayK, a.dueAt) <= 0) return true;
-      if (daysSince(a.addedAt) > stale) return true;
-      return false;
-    }).length;
-  }
-  function refreshTabBadges() {
-    // badges/dots removed — kept as no-op so call sites don't need updating
-  }
-  // Auto-refresh badges every minute so dots fade out naturally
-  setInterval(() => {
-    refreshTabBadges();
-    refreshStreakChip();
-  }, 60 * 1000);
+  // Keep the streak chip current across midnight
+  setInterval(() => refreshStreakChip(), 60 * 1000);
 
   function refreshStreakChip() {
     const chip = document.getElementById('streakChip');
@@ -6403,7 +6337,6 @@
     renderFocusChip();
     renderBulkBar();
     refreshStreakChip();
-    refreshTabBadges();
     renderTodayPanel();
     if (currentView === 'notes') renderNotesView();
     if (currentView === 'links') renderLinksView();
@@ -8237,63 +8170,6 @@
     });
   }
 
-  function beginIterateOrComplete(a, span, tickEl) {
-    const oldDesc = a.description;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'action-edit followup-input';
-    input.placeholder = 'What\'s next? — Enter to iterate · empty + Enter to mark complete · Esc to cancel';
-    span.replaceWith(input);
-    input.focus();
-    let done = false;
-    const finalise = (mode) => {
-      if (done) return; done = true;
-      const v = input.value.trim();
-      if (mode === 'cancel') { render(); return; }
-      if (v) {
-        // Iterate: move old description into a done sub-task; replace title
-        if (!Array.isArray(a.comments)) a.comments = [];
-        if (!state.counters.nextCommentId) state.counters.nextCommentId = 1;
-        a.comments.push({
-          id: state.counters.nextCommentId++,
-          text: oldDesc,
-          done: true,
-          addedAt: new Date().toISOString(),
-          completedAt: new Date().toISOString()
-        });
-        a.description = v;
-        // Status stays Open. Streak credit for completing the previous step.
-        const isFirst = recordCompletionForStreak();
-        showSoftToast(`Iterated: ${v.slice(0, 50)}${v.length > 50 ? '…' : ''}`, '↪');
-        if (isFirst) maybeFirstCompletionToast();
-        save(); render();
-      } else {
-        // Empty + commit: finalise as Complete
-        a.status = 'Complete';
-        a.completedAt = new Date().toISOString();
-        // Use a trailing render-then-fireworks to anchor on the tick button
-        save(); render();
-        if (tickEl) {
-          // Find the freshly-rendered tick for this row (the one in the DOM may have been replaced)
-          const newTick = document.querySelector(`tr[data-id="${a.id}"] .tick-btn`);
-          fireworks(newTick || tickEl);
-          showEncouragement(newTick || tickEl);
-        }
-        const isFirst = recordCompletionForStreak();
-        if (isFirst) maybeFirstCompletionToast();
-        save();
-      }
-    };
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); finalise('commit'); }
-      else if (e.key === 'Escape') { e.preventDefault(); finalise('cancel'); }
-    });
-    input.addEventListener('blur', () => {
-      // Treat blur as commit when there's text; cancel if empty (safer)
-      if (input.value.trim()) finalise('commit');
-      else finalise('cancel');
-    });
-  }
 
   function beginFollowUp(a, span) {
     const input = document.createElement('input');
@@ -8370,6 +8246,9 @@
     });
     document.getElementById('compactRows').checked = !!state.settings.compactRows;
     document.getElementById('sparklesToggle').checked = state.settings.sparkles !== false;
+    document.getElementById('sparkleEggToggle').checked = state.settings.sparkleEgg !== false;
+    document.getElementById('showTodayPanel').checked = state.settings.showTodayPanel !== false;
+    document.getElementById('staleDaysInput').value = state.settings.staleDays || 5;
     applyTheme(); // ensure seg buttons reflect
     // count of currently-hidden completed actions
     const today = todayStamp();
@@ -8506,55 +8385,6 @@
     }
   }
 
-  function renderBackupList() {
-    const root = document.getElementById('backupList');
-    if (!root) return;
-    const b = loadBackups();
-    root.innerHTML = '';
-    if (!b.snapshots.length) {
-      const empty = document.createElement('div');
-      empty.className = 'backup-empty';
-      empty.textContent = 'No backups yet — one will be taken on first use today.';
-      root.appendChild(empty);
-      return;
-    }
-    const today = dateKeyLocal(new Date());
-    const sorted = b.snapshots.slice().sort((a, b2) => b2.dateKey.localeCompare(a.dateKey));
-    sorted.forEach(snap => {
-      const row = document.createElement('div');
-      row.className = 'backup-item';
-      const left = document.createElement('div');
-      const dateLabel = document.createElement('div');
-      dateLabel.className = 'bk-date';
-      dateLabel.textContent = snap.dateKey;
-      if (snap.dateKey === today) {
-        const badge = document.createElement('span');
-        badge.className = 'bk-today';
-        badge.textContent = 'today';
-        dateLabel.appendChild(badge);
-      }
-      const meta = document.createElement('div');
-      meta.className = 'bk-meta';
-      const acts = (snap.data && snap.data.actions) ? snap.data.actions.length : 0;
-      const projs = (snap.data && snap.data.projects) ? snap.data.projects.length : 0;
-      meta.textContent = `${acts} action${acts===1?'':'s'} · ${projs} project${projs===1?'':'s'} · ${fmtDateTime(snap.takenAt)}`;
-      left.appendChild(dateLabel);
-      left.appendChild(meta);
-      const dl = document.createElement('button');
-      dl.className = 'btn';
-      dl.textContent = 'Download';
-      dl.addEventListener('click', () => downloadBackup(snap.id));
-      const rs = document.createElement('button');
-      rs.className = 'btn';
-      rs.textContent = 'Restore';
-      rs.addEventListener('click', () => restoreBackup(snap.id));
-      row.appendChild(left);
-      row.appendChild(document.createElement('span'));
-      row.appendChild(dl);
-      row.appendChild(rs);
-      root.appendChild(row);
-    });
-  }
 
   function deleteProject(id) {
     if (state.projects.length <= 1) return;
@@ -8858,6 +8688,20 @@
   document.getElementById('sparklesToggle').addEventListener('change', (e) => {
     state.settings.sparkles = e.target.checked;
     save();
+  });
+  document.getElementById('sparkleEggToggle').addEventListener('change', (e) => {
+    state.settings.sparkleEgg = e.target.checked;
+    save();
+  });
+  document.getElementById('showTodayPanel').addEventListener('change', (e) => {
+    state.settings.showTodayPanel = e.target.checked;
+    save(); renderTodayPanel();
+  });
+  document.getElementById('staleDaysInput').addEventListener('change', (e) => {
+    const n = parseInt(e.target.value, 10);
+    state.settings.staleDays = (n >= 1 && n <= 60) ? n : 5;
+    e.target.value = state.settings.staleDays;
+    save(); render();
   });
 
   // Export
@@ -9499,8 +9343,6 @@
     t.classList.add('show');
     undoTimer = setTimeout(() => hideUndoToast(), 5000);
   }
-  document.addEventListener('DOMContentLoaded', () => {});
-  // (Wiring done after IIFE start; see end of file.)
   const _undoBtn = document.getElementById('undoToastBtn');
   if (_undoBtn) _undoBtn.addEventListener('click', () => {
     const fn = undoActiveFn;
@@ -11257,15 +11099,10 @@
     ensureCribRounds();
     return state.cribRounds.find(r => r.id === state.cribActiveRoundId) || state.cribRounds[0];
   }
-  function cribData() {
-    return activeRound();
-  }
-  // Backwards-compat alias used by older code paths
-  function ensureCribShape() { ensureCribRounds(); }
   function addCribProject() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().projects.unshift({
+    activeRound().projects.unshift({
       id: state.counters.nextCribProjectId++,
       title: '', scope: '', value: '', complexity: '', keyAchievements: '• ', teamSize: '', lineManager: '',
       addedAt: now, updatedAt: now
@@ -11274,9 +11111,9 @@
     setTimeout(() => scrollAndFocus('cribProjectsSection', 'cribProjectsList'), 0);
   }
   function addCribPractice() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().practice.unshift({
+    activeRound().practice.unshift({
       id: state.counters.nextCribPracticeId++,
       title: '', keyAchievements: '• ',
       addedAt: now, updatedAt: now
@@ -11285,9 +11122,9 @@
     setTimeout(() => scrollAndFocus('cribPracticeSection', 'cribPracticeList'), 0);
   }
   function addCribSales() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().sales.push({
+    activeRound().sales.push({
       id: state.counters.nextCribSalesId++,
       oppId: '', opp: '', name: '', value: '', status: 'In Progress', role: '',
       addedAt: now, updatedAt: now
@@ -11300,9 +11137,9 @@
     }, 0);
   }
   function addCribKx() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().kx.unshift({
+    activeRound().kx.unshift({
       id: state.counters.nextCribKxId++,
       title: '', link: '',
       addedAt: now, updatedAt: now
@@ -11311,9 +11148,9 @@
     setTimeout(() => scrollAndFocus('cribKxSection', 'cribKxList'), 0);
   }
   function addCribAi() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().ai.unshift({
+    activeRound().ai.unshift({
       id: state.counters.nextCribAiId++,
       title: '', description: '', outputs: '', usage: '',
       addedAt: now, updatedAt: now
@@ -11322,9 +11159,9 @@
     setTimeout(() => scrollAndFocus('cribAiSection', 'cribAiList'), 0);
   }
   function addCribBd() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().bd.unshift({
+    activeRound().bd.unshift({
       id: state.counters.nextCribBdId++,
       oppId: '', name: '', wbs: '', value: '', description: '', rolePlayed: '',
       addedAt: now, updatedAt: now
@@ -11333,9 +11170,9 @@
     setTimeout(() => scrollAndFocus('cribBdSection', 'cribBdList'), 0);
   }
   function addCribPriority() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().priority.unshift({
+    activeRound().priority.unshift({
       id: state.counters.nextCribPriorityId++,
       description: '', type: '', contribution: '', metrics: '',
       addedAt: now, updatedAt: now
@@ -11344,9 +11181,9 @@
     setTimeout(() => scrollAndFocus('cribPrioritySection', 'cribPriorityList'), 0);
   }
   function addCribDev() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
-    cribData().dev.unshift({
+    activeRound().dev.unshift({
       id: state.counters.nextCribDevId++,
       bullets: '• ',
       addedAt: now, updatedAt: now
@@ -11355,8 +11192,8 @@
     setTimeout(() => scrollAndFocus('cribDevSection', 'cribDevList'), 0);
   }
   function addCribRelationship() {
-    ensureCribShape();
-    const d = cribData();
+    ensureCribRounds();
+    const d = activeRound();
     if (!Array.isArray(d.relationships)) d.relationships = [];
     if (!state.counters.nextCribRelationshipId) state.counters.nextCribRelationshipId = 1;
     const now = new Date().toISOString();
@@ -11388,7 +11225,7 @@
   }
   function deleteCribItem(kind, id) {
     ensureCribRounds();
-    const data = cribData();
+    const data = activeRound();
     const arr = data[kind];
     if (!arr) return;
     const item = arr.find(x => x.id === id);
@@ -11401,7 +11238,7 @@
     showUndo('Crib entry deleted', () => {
       ensureCribRounds();
       // Restore into the same round, even if user has switched away
-      const r = state.cribRounds.find(rr => rr.id === roundId) || cribData();
+      const r = state.cribRounds.find(rr => rr.id === roundId) || activeRound();
       if (idx >= 0 && idx <= r[kind].length) r[kind].splice(idx, 0, snap);
       else r[kind].push(snap);
       save(); renderCribView();
@@ -11409,7 +11246,7 @@
   }
   function updateCribItem(kind, id, field, value) {
     ensureCribRounds();
-    const data = cribData();
+    const data = activeRound();
     const item = data[kind].find(x => x.id === id);
     if (!item) return;
     item[field] = value;
@@ -11475,19 +11312,10 @@
     r.topSkills.splice(idx, 1);
     save(); renderCribTopSkills();
   }
-  function reorderTopSkill(fromIdx, toIdx, before) {
-    ensureCribRounds();
-    const arr = activeRound().topSkills;
-    if (!arr || fromIdx === toIdx) return;
-    const [item] = arr.splice(fromIdx, 1);
-    const insertAt = arr.findIndex((_, i) => i === (fromIdx < toIdx ? toIdx - 1 : toIdx));
-    arr.splice(before ? toIdx : toIdx + 1, 0, item);
-    save(); renderCribTopSkills();
-  }
 
   // Qualifications add
   function addCribQualification() {
-    ensureCribShape();
+    ensureCribRounds();
     const now = new Date().toISOString();
     const r = activeRound();
     if (!Array.isArray(r.qualifications)) r.qualifications = [];
@@ -11509,7 +11337,7 @@
     return b;
   }
   function addCribBucket() {
-    ensureCribShape();
+    ensureCribRounds();
     const b = newBucket();
     save(); renderCribView();
     setTimeout(() => {
@@ -12070,11 +11898,11 @@
     const root = document.getElementById('cribProjectsList');
     if (!root) return;
     root.innerHTML = '';
-    if (!cribData().projects.length) {
+    if (!activeRound().projects.length) {
       root.appendChild(mkEmptySection('No projects yet.', addCribProject));
       return;
     }
-    cribData().projects.forEach(p => {
+    activeRound().projects.forEach(p => {
       const card = mkCribCard(p, 'projects', (c) => {
         c.appendChild(mkField('Title', p.title, v => updateCribItem('projects', p.id, 'title', v), { placeholder: 'Project name', titleField: true }));
         c.appendChild(mkField('Scope', p.scope, v => updateCribItem('projects', p.id, 'scope', v), { textarea: true, rows: 2, placeholder: 'What was the work?' }));
@@ -12095,11 +11923,11 @@
     const root = document.getElementById('cribPracticeList');
     if (!root) return;
     root.innerHTML = '';
-    if (!cribData().practice.length) {
+    if (!activeRound().practice.length) {
       root.appendChild(mkEmptySection('No practice / community items yet.', addCribPractice));
       return;
     }
-    cribData().practice.forEach(p => {
+    activeRound().practice.forEach(p => {
       const card = mkCribCard(p, 'practice', (c) => {
         c.appendChild(mkField('Title', p.title, v => updateCribItem('practice', p.id, 'title', v), { placeholder: 'e.g. Engineering guild lead', titleField: true }));
         c.appendChild(mkField('Key achievements (Enter for new bullet)', p.keyAchievements, v => updateCribItem('practice', p.id, 'keyAchievements', v), { textarea: true, rows: 4, bullets: true, placeholder: '• Impact, contributions…' }));
@@ -12112,7 +11940,7 @@
     const root = document.getElementById('cribSalesList');
     if (!root) return;
     root.innerHTML = '';
-    if (!cribData().sales.length) {
+    if (!activeRound().sales.length) {
       root.appendChild(mkEmptySection('No sales rows yet.'));
       return;
     }
@@ -12122,7 +11950,7 @@
     thead.innerHTML = '<tr><th style="width:14%">Opp ID</th><th style="width:22%">Opportunity</th><th style="width:14%">Client</th><th style="width:11%">Value</th><th style="width:13%">Status</th><th style="width:20%">Role</th><th style="width:6%"></th></tr>';
     table.appendChild(thead);
     const tbody = document.createElement('tbody');
-    cribData().sales.forEach(s => {
+    activeRound().sales.forEach(s => {
       const tr = document.createElement('tr');
       if (s.starred) tr.classList.add('is-starred');
       const mkCell = (field, opts) => {
@@ -12180,7 +12008,7 @@
     // Totals row
     const totalsTr = document.createElement('tr');
     totalsTr.className = 'sales-totals';
-    const met = cribSalesMetrics(cribData().sales);
+    const met = cribSalesMetrics(activeRound().sales);
     const tdTotals = document.createElement('td');
     tdTotals.colSpan = 7;
     tdTotals.innerHTML =
@@ -12199,7 +12027,7 @@
     const root = document.getElementById('cribRelationshipsList');
     if (!root) return;
     root.innerHTML = '';
-    const rows = cribData().relationships || [];
+    const rows = activeRound().relationships || [];
     if (!rows.length) {
       root.appendChild(mkEmptySection('No key relationships yet.'));
       return;
@@ -12261,14 +12089,14 @@
     const note = document.getElementById('cribKxAutoNote');
     if (!root) return;
     root.innerHTML = '';
-    cribData().kx.forEach(k => {
+    activeRound().kx.forEach(k => {
       const card = mkCribCard(k, 'kx', (c) => {
         c.appendChild(mkField('Title', k.title, v => updateCribItem('kx', k.id, 'title', v), { placeholder: 'KX title', titleField: true }));
         c.appendChild(mkField('Link', k.link, v => updateCribItem('kx', k.id, 'link', v), { type: 'url', placeholder: 'https://…' }));
       });
       root.appendChild(card);
     });
-    if (cribData().kx.length === 0) {
+    if (activeRound().kx.length === 0) {
       const linksInCrib = state.links.filter(l => l.inCrib);
       if (linksInCrib.length === 0) {
         root.appendChild(mkEmptySection('No KX entries yet. Add one here, or check "★ Crib" on a link in the Links tab.', addCribKx));
@@ -12291,11 +12119,11 @@
     const root = document.getElementById('cribAiList');
     if (!root) return;
     root.innerHTML = '';
-    if (!cribData().ai.length) {
+    if (!activeRound().ai.length) {
       root.appendChild(mkEmptySection('No AI items yet.', addCribAi));
       return;
     }
-    cribData().ai.forEach(a => {
+    activeRound().ai.forEach(a => {
       const card = mkCribCard(a, 'ai', (c) => {
         c.appendChild(mkField('Title', a.title, v => updateCribItem('ai', a.id, 'title', v), { placeholder: 'e.g. Customer chatbot prototype', titleField: true }));
         c.appendChild(mkField('Description', a.description, v => updateCribItem('ai', a.id, 'description', v), { textarea: true, rows: 2, placeholder: 'What did you build?' }));
@@ -12496,11 +12324,11 @@
     const root = document.getElementById('cribBdList');
     if (!root) return;
     root.innerHTML = '';
-    if (!cribData().bd.length) {
+    if (!activeRound().bd.length) {
       root.appendChild(mkEmptySection('No BD entries yet.', addCribBd));
       return;
     }
-    cribData().bd.forEach(b => {
+    activeRound().bd.forEach(b => {
       const card = mkCribCard(b, 'bd', (c) => {
         const row1 = document.createElement('div');
         row1.className = 'crib-field-row cols-2';
@@ -12523,11 +12351,11 @@
     const root = document.getElementById('cribPriorityList');
     if (!root) return;
     root.innerHTML = '';
-    if (!cribData().priority.length) {
+    if (!activeRound().priority.length) {
       root.appendChild(mkEmptySection('No priorities yet.', addCribPriority));
       return;
     }
-    cribData().priority.forEach(p => {
+    activeRound().priority.forEach(p => {
       const card = mkCribCard(p, 'priority', (c) => {
         c.appendChild(mkField('Description', p.description, v => updateCribItem('priority', p.id, 'description', v), { textarea: true, rows: 2, placeholder: 'What is the priority?' }));
         c.appendChild(mkField('Type', p.type, v => updateCribItem('priority', p.id, 'type', v), { placeholder: 'e.g. Strategic · Operational · Personal' }));
@@ -12542,11 +12370,11 @@
     const root = document.getElementById('cribDevList');
     if (!root) return;
     root.innerHTML = '';
-    if (!cribData().dev.length) {
+    if (!activeRound().dev.length) {
       root.appendChild(mkEmptySection('No development points yet — add areas of growth, learning goals, focus themes…', addCribDev));
       return;
     }
-    cribData().dev.forEach(d => {
+    activeRound().dev.forEach(d => {
       const card = mkCribCard(d, 'dev', (c) => {
         c.appendChild(mkField('Development points (Enter for new bullet)', d.bullets, v => updateCribItem('dev', d.id, 'bullets', v), { textarea: true, rows: 5, bullets: true, placeholder: '• Free-form bullets — areas of focus, growth, themes…' }));
       });
@@ -13217,6 +13045,7 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   let currentOneId = null;
   let onesSearchQuery = '';
   let onesStaleOnly = false;
+  let onesShowArchived = false;
   let pendingOneDelete = null;
   let pendingEntryDelete = null;
   let editingEntryId = null;
@@ -13233,9 +13062,6 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   }
   function isOneStale(o) {
     return !o.archived && daysSinceLastEntry(o) > (o.cadenceDays || ONES_STALE_DAYS);
-  }
-  function staleOnesCount() {
-    return state.ones.filter(o => !o.archived && isOneStale(o)).length;
   }
   function addOne() {
     const now = new Date().toISOString();
@@ -13276,6 +13102,19 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
       else state.ones.push(snap);
       currentOneId = snap.id;
       save(); renderOnesView();
+    });
+  }
+  function setOneArchived(o, archived) {
+    updateOne(o.id, { archived });
+    if (archived && currentOneId === o.id && !onesShowArchived) {
+      const next = state.ones.find(x => !x.archived);
+      currentOneId = next ? next.id : null;
+    }
+    renderOnesView();
+    showUndo(`${o.name || 'Person'} ${archived ? 'archived' : 'restored'}`, () => {
+      updateOne(o.id, { archived: !archived });
+      currentOneId = o.id;
+      renderOnesView();
     });
   }
   function updateOne(id, fields) {
@@ -13343,7 +13182,6 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
   function renderOnesView() {
     renderOnesSidebar();
     renderOneEditor();
-    refreshTabBadges();
   }
 
   function renderOnesSidebar() {
@@ -13351,8 +13189,16 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     if (!root) return;
     const staleChip = document.getElementById('onesStaleFilter');
     if (staleChip) staleChip.classList.toggle('active', onesStaleOnly);
+    const archivedCount = state.ones.filter(o => o.archived).length;
+    if (!archivedCount) onesShowArchived = false;
+    const archChip = document.getElementById('onesArchivedFilter');
+    if (archChip) {
+      archChip.hidden = !archivedCount;
+      archChip.classList.toggle('active', onesShowArchived);
+      document.getElementById('onesArchivedCount').textContent = `(${archivedCount})`;
+    }
     root.innerHTML = '';
-    let list = state.ones.slice().filter(o => !o.archived);
+    let list = state.ones.slice().filter(o => onesShowArchived ? o.archived : !o.archived);
     const q = onesSearchQuery.trim().toLowerCase();
     if (q) {
       list = list.filter(o =>
@@ -13422,6 +13268,8 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
           { icon: o.pinned ? '◎' : '○', label: o.pinned ? 'Unpin' : 'Pin to top',
             action: () => { updateOne(o.id, { pinned: !o.pinned }); renderOnesView(); }
           },
+          null,
+          { icon: o.archived ? '↺' : '🗄', label: o.archived ? 'Restore' : 'Archive', action: () => setOneArchived(o, !o.archived) },
           null,
           { icon: '🗑', label: 'Delete', danger: true, action: () => deleteOne(o.id) },
         ], e.clientX, e.clientY);
@@ -13650,6 +13498,13 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     pinBtn.textContent = o.pinned ? '📌 Pinned' : '📌 Pin';
     pinBtn.addEventListener('click', () => { updateOne(o.id, { pinned: !o.pinned }); renderOnesView(); });
     headActions.appendChild(pinBtn);
+    const archBtn = document.createElement('button');
+    archBtn.type = 'button';
+    archBtn.className = 'btn small';
+    archBtn.textContent = o.archived ? 'Restore' : 'Archive';
+    archBtn.title = o.archived ? 'Bring back into the people list' : 'Hide from the people list, search and name suggestions';
+    archBtn.addEventListener('click', () => setOneArchived(o, !o.archived));
+    headActions.appendChild(archBtn);
     if (pendingOneDelete === o.id) {
       const conf = document.createElement('span');
       conf.className = 'confirm-prompt'; conf.textContent = 'Sure?';
@@ -13667,11 +13522,28 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     head.appendChild(headActions);
     root.appendChild(head);
 
-    // Meta row: role · cadence · project (single compact line)
+    if (o.archived) {
+      const banner = document.createElement('div');
+      banner.className = 'one-archived-banner';
+      banner.textContent = 'Archived — hidden from the people list, search and name suggestions.';
+      root.appendChild(banner);
+    }
+
+    // Meta row: role · email · cadence · project
     const meta = document.createElement('div');
     meta.className = 'one-meta';
     meta.appendChild(mkInlineMetaInput('Role', o.role || '', (v) => updateOne(o.id, { role: v })));
     const mkSep = () => { const s = document.createElement('span'); s.className = 'one-meta-sep'; s.textContent = '·'; return s; };
+    meta.appendChild(mkSep());
+    const mail = document.createElement('a');
+    mail.className = 'one-mailto';
+    mail.textContent = '✉';
+    mail.title = 'Send email';
+    const syncMail = (v) => { mail.href = 'mailto:' + v; mail.hidden = !v; };
+    syncMail(o.email || '');
+    const emailField = mkInlineMetaInput('Email', o.email || '', (v) => { updateOne(o.id, { email: v.trim() }); syncMail(v.trim()); }, 'email');
+    emailField.appendChild(mail);
+    meta.appendChild(emailField);
     meta.appendChild(mkSep());
     const cadWrap = document.createElement('span');
     cadWrap.className = 'one-meta-field';
@@ -13969,6 +13841,11 @@ table.tbl tr.starred td:first-child { box-shadow: inset 3px 0 0 0 #A100FF; font-
     const staleChip = document.getElementById('onesStaleFilter');
     if (staleChip) staleChip.addEventListener('click', () => {
       onesStaleOnly = !onesStaleOnly;
+      renderOnesSidebar();
+    });
+    const archChip = document.getElementById('onesArchivedFilter');
+    if (archChip) archChip.addEventListener('click', () => {
+      onesShowArchived = !onesShowArchived;
       renderOnesSidebar();
     });
   }
